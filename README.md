@@ -6,7 +6,7 @@ This library is a work in progress as custom components are still experimental a
 
 ## Using ADK LIB to play with add-ons
 
-Download the proper version the add-on requires in the [release](/releases) page. Once you have it downloaded, import it into Minecraft and you should be good to play your add-on. Make sure to apply the pack in the world you're playing on.
+Download the proper version the add-on requires in the [release](https://github.com/SmokeyStack/adk-lib/releases) page. Once you have it downloaded, import it into Minecraft and you should be good to play your add-on. Make sure to apply the pack in the world you're playing on.
 
 ## Using ADK LIB to develop add-ons
 
@@ -20,11 +20,11 @@ To use ADK LIB in your add-on, simply add the following to your behaviour pack's
 }
 ```
 
-Download the desired version from the [release][/releases] page. Once you have it downloaded, import it into Minecraft and you should be good to develop your add-on. Make sure to apply the pack in the world you're developing on.
+Download the desired version from the [release][https://github.com/SmokeyStack/adk-lib/releases] page. Once you have it downloaded, import it into Minecraft and you should be good to develop your add-on. Make sure to apply the pack in the world you're developing on.
 
 ## Distributing
 
-Under the [License](LICENSE), you are allowed to distribute this add-on with or without modifications. However, I would much appreciate if instead you direct your users to this [Github Page](https://github.com/SmokeyStack/adk-lib) and ask them to download from the [release](/releases) page.
+Under the [License](LICENSE), you are allowed to distribute this add-on with or without modifications. However, I would much appreciate if instead you direct your users to this [Github Page](https://github.com/SmokeyStack/adk-lib) and ask them to download from the [release](https://github.com/SmokeyStack/adk-lib/releases) page.
 
 ## Donate
 
