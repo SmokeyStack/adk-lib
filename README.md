@@ -20,7 +20,7 @@ To use ADK LIB in your add-on, simply add the following to your behaviour pack's
 }
 ```
 
-Download the desired version from the [release][https://github.com/SmokeyStack/adk-lib/releases] page. Once you have it downloaded, import it into Minecraft and you should be good to develop your add-on. Make sure to apply the pack in the world you're developing on.
+Download the desired version from the [release](https://github.com/SmokeyStack/adk-lib/releases) page. Once you have it downloaded, import it into Minecraft and you should be good to develop your add-on. Make sure to apply the pack in the world you're developing on.
 
 ## Distributing
 
