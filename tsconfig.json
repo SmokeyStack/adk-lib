@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "module": "ES2020",
+        "target": "ES2021",
+        "moduleResolution": "Node",
+        "allowSyntheticDefaultImports": true,
+        "baseUrl": "./scripts",
+        "rootDir": "./scripts",
+        "outDir": "./packs/BP/scripts"
+    }
+}
