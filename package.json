@@ -6,7 +6,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "compile": "tsc && regolith run preview"
+    "compile": "tsc && regolith run preview",
+    "build": "tsc && regolith run build"
   },
   "keywords": [],
   "author": "SmokeyStack",

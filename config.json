@@ -23,6 +23,13 @@
 					"target": "development"
 				},
 				"filters": []
+			},
+			"build": {
+				"export": {
+					"readOnly": false,
+					"target": "local"
+				},
+				"filters": []
 			}
 		}
 	}
