@@ -45,4 +45,8 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:on_random_tick_grow',
         new onRandomTick.grow()
     );
+    eventData.blockTypeRegistry.registerCustomComponent(
+        'adk-lib:on_random_tick_plant_growth',
+        new onRandomTick.plant_growth()
+    );
 });

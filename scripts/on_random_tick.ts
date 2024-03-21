@@ -1,6 +1,8 @@
 import {
     BlockComponentRandomTickEvent,
-    BlockCustomComponent
+    BlockCustomComponent,
+    BlockPermutation,
+    BlockStates
 } from '@minecraft/server';
 
 class onRandomTick implements BlockCustomComponent {
@@ -91,5 +93,20 @@ export class grow extends onRandomTick {
             default:
                 break;
         }
+    }
+}
+
+export class plant_growth extends onRandomTick {
+    onRandomTick(componentData: BlockComponentRandomTickEvent) {
+        let block = componentData.block;
+        let current_state = block.permutation.getState('adk-lib:age') as number;
+        let valid_values = BlockStates.get('adk-lib:age').validValues;
+        let max = valid_values[valid_values.length - 1] as number;
+        if (current_state < max)
+            block.setPermutation(
+                BlockPermutation.resolve(block.typeId, {
+                    'adk-lib:age': (current_state += 1)
+                })
+            );
     }
 }
