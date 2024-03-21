@@ -2,6 +2,7 @@ import { world } from '@minecraft/server';
 import * as onStepOn from 'on_step_on';
 import * as onStepOff from 'on_step_off';
 import * as onRandomTick from 'on_random_tick';
+import * as beforeOnPlayerPlace from 'before_on_player_place';
 
 world.beforeEvents.worldInitialize.subscribe((eventData) => {
     // On Step On
@@ -48,5 +49,15 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
     eventData.blockTypeRegistry.registerCustomComponent(
         'adk-lib:on_random_tick_plant_growth',
         new onRandomTick.plant_growth()
+    );
+
+    // Before On Player Place
+    eventData.blockTypeRegistry.registerCustomComponent(
+        'adk-lib:before_on_player_place_cancel',
+        new beforeOnPlayerPlace.cancel()
+    );
+    eventData.blockTypeRegistry.registerCustomComponent(
+        'adk-lib:before_on_player_place_change_into_bedrock',
+        new beforeOnPlayerPlace.changeIntoBedrock()
     );
 });
