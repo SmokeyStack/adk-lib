@@ -16,7 +16,7 @@ To use ADK LIB in your add-on, simply add the following to your behaviour pack's
 {
     "type": "data",
     "uuid": "5e2eda3e-6eaf-4068-9076-0a7f0587b8bb",
-    "version": [0, 1, 0]
+    "version": "0.1.0-1.20.80.23"
 }
 ```
 
