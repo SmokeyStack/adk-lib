@@ -14,7 +14,7 @@ class onPlayerInteract implements BlockCustomComponent {
 export class debug extends onPlayerInteract {
     onPlayerInteract(componentData: BlockComponentPlayerInteractEvent) {
         world.sendMessage(
-            `${componentData.player.name} interacted with block at ${componentData.block.x}, ${componentData.block.y}, ${componentData.block.z} on the ${componentData.face} face.`
+            `Player interacted with block at ${componentData.block.x}, ${componentData.block.y}, ${componentData.block.z} on the ${componentData.face} face.`
         );
     }
 }

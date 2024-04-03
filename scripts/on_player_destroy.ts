@@ -1,7 +1,8 @@
 import {
     BlockComponentPlayerDestroyEvent,
     BlockCustomComponent,
-    ItemStack
+    ItemStack,
+    world
 } from '@minecraft/server';
 
 class onPlayerDestroy implements BlockCustomComponent {
@@ -18,7 +19,7 @@ export class spawn_item extends onPlayerDestroy {
             componentData.block.location
         );
 
-        console.warn(
+        world.sendMessage(
             `Player destroyed ${componentData.destroyedBlockPermutation.type.id} at ${componentData.block.location.x}, ${componentData.block.location.y}, ${componentData.block.location.z}`
         );
     }
@@ -29,5 +30,10 @@ export class regenerate extends onPlayerDestroy {
         componentData.block.setType(
             componentData.destroyedBlockPermutation.type
         );
+
+        world.sendMessage(
+            `Player destroyed ${componentData.destroyedBlockPermutation.type.id} at ${componentData.block.location.x}, ${componentData.block.location.y}, ${componentData.block.location.z}`
+        );
+        world.sendMessage('Regenerating block...');
     }
 }

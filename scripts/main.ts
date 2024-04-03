@@ -8,6 +8,7 @@ import * as onPlaceOn from 'on_place_on';
 import * as onPlayerDestroy from 'on_player_destroy';
 import * as onPlayerInteract from 'on_player_interact';
 import * as onTick from 'on_tick';
+import * as onUse from 'on_use';
 
 world.beforeEvents.worldInitialize.subscribe((eventData) => {
     // On Step On
@@ -58,6 +59,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
 
     // Before On Player Place
     eventData.blockTypeRegistry.registerCustomComponent(
+        'adk-lib:before_on_player_place_debug',
+        new beforeOnPlayerPlace.debug()
+    );
+    eventData.blockTypeRegistry.registerCustomComponent(
         'adk-lib:before_on_player_place_cancel',
         new beforeOnPlayerPlace.cancel()
     );
@@ -67,6 +72,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
     );
 
     // On Entity Fall On
+    eventData.blockTypeRegistry.registerCustomComponent(
+        'adk-lib:on_entity_fall_on_debug',
+        new onEntityFallOn.debug()
+    );
     eventData.blockTypeRegistry.registerCustomComponent(
         'adk-lib:on_entity_fall_on_player_bounce',
         new onEntityFallOn.player_bounce()
@@ -102,5 +111,13 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
     eventData.blockTypeRegistry.registerCustomComponent(
         'adk-lib:on_tick_debug',
         new onTick.debug()
+    );
+
+    // Items
+
+    // On Use
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:on_use_debug',
+        new onUse.debug()
     );
 });
