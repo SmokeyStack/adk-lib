@@ -13,9 +13,8 @@ class onEntityFallOn implements BlockCustomComponent {
 
 export class debug extends onEntityFallOn {
     onEntityFallOn(componentData: BlockComponentEntityFallOnEvent): void {
-        world.sendMessage(
-            `${componentData.entity.typeId} fell on block at ${componentData.block.x}, ${componentData.block.y}, ${componentData.block.z} from a height of ${componentData.fallDistance}.`
-        );
+        world.sendMessage(`Entity: ${componentData.entity.nameTag}`);
+        world.sendMessage(`Fall Distance: ${componentData.fallDistance}`);
     }
 }
 

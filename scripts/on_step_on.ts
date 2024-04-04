@@ -1,6 +1,7 @@
 import {
     BlockComponentStepOnEvent,
-    BlockCustomComponent
+    BlockCustomComponent,
+    world
 } from '@minecraft/server';
 
 class onStepOn implements BlockCustomComponent {
@@ -10,11 +11,10 @@ class onStepOn implements BlockCustomComponent {
     onStepOn(_componentData: BlockComponentStepOnEvent) {}
 }
 
-export class sayHi extends onStepOn {
+export class debug extends onStepOn {
     onStepOn(componentData: BlockComponentStepOnEvent) {
-        componentData.dimension.runCommand(
-            `say Hi from ${componentData.block.typeId} at ${componentData.block.x}, ${componentData.block.y}, ${componentData.block.z}`
-        );
+        world.sendMessage(`Block: ${componentData.block.typeId}`);
+        world.sendMessage(`Entity: ${componentData.entity.typeId}`);
     }
 }
 

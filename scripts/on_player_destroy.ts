@@ -12,7 +12,16 @@ class onPlayerDestroy implements BlockCustomComponent {
     onPlayerDestroy(_componentData: BlockComponentPlayerDestroyEvent) {}
 }
 
-export class spawn_item extends onPlayerDestroy {
+export class debug extends onPlayerDestroy {
+    onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent) {
+        world.sendMessage(
+            `Destroyed Block Permutation: ${componentData.destroyedBlockPermutation.type.id}`
+        );
+        world.sendMessage(`Player: ${componentData.player.name}`);
+    }
+}
+
+export class spawnItem extends onPlayerDestroy {
     onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent) {
         componentData.dimension.spawnItem(
             new ItemStack('minecraft:diamond'),

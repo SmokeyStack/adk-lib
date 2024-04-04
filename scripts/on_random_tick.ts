@@ -2,7 +2,8 @@ import {
     BlockComponentRandomTickEvent,
     BlockCustomComponent,
     BlockPermutation,
-    BlockStates
+    BlockStates,
+    world
 } from '@minecraft/server';
 
 class onRandomTick implements BlockCustomComponent {
@@ -12,11 +13,9 @@ class onRandomTick implements BlockCustomComponent {
     onRandomTick(_componentData: BlockComponentRandomTickEvent) {}
 }
 
-export class sayHi extends onRandomTick {
+export class debug extends onRandomTick {
     onRandomTick(componentData: BlockComponentRandomTickEvent) {
-        componentData.dimension.runCommand(
-            `say Tick tock! from ${componentData.block.typeId} at ${componentData.block.x}, ${componentData.block.y}, ${componentData.block.z}`
-        );
+        world.sendMessage(`Block: ${componentData.block.typeId}`);
     }
 }
 
@@ -96,7 +95,7 @@ export class grow extends onRandomTick {
     }
 }
 
-export class plant_growth extends onRandomTick {
+export class plantGrowth extends onRandomTick {
     onRandomTick(componentData: BlockComponentRandomTickEvent) {
         let block = componentData.block;
         let current_state = block.permutation.getState('adk-lib:age') as number;

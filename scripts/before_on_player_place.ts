@@ -14,11 +14,12 @@ class beforeOnPlayerPlace implements BlockCustomComponent {
 
 export class debug extends beforeOnPlayerPlace {
     beforeOnPlayerPlace(componentData: BlockComponentPlayerPlaceBeforeEvent) {
-        componentData.cancel = true;
+        world.sendMessage(`Cancel: ${componentData.cancel}`);
+        world.sendMessage(`Face: ${componentData.face}`);
         world.sendMessage(
-            `Player attempted to place block at ${componentData.block.x}, ${componentData.block.y}, ${componentData.block.z}.`
+            `Permutation To Place: ${componentData.permutationToPlace.type.id}`
         );
-        world.sendMessage('Cancelling placement');
+        world.sendMessage(`Player: ${componentData.player.name}`);
     }
 }
 

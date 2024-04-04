@@ -1,7 +1,8 @@
 import {
     BlockComponentStepOffEvent,
     BlockCustomComponent,
-    system
+    system,
+    world
 } from '@minecraft/server';
 
 class onStepOff implements BlockCustomComponent {
@@ -11,11 +12,9 @@ class onStepOff implements BlockCustomComponent {
     onStepOff(_componentData: BlockComponentStepOffEvent) {}
 }
 
-export class sayHi extends onStepOff {
+export class debug extends onStepOff {
     onStepOff(componentData: BlockComponentStepOffEvent) {
-        componentData.dimension.runCommand(
-            `say D: don't leave me!!! from ${componentData.block.typeId} at ${componentData.block.x}, ${componentData.block.y}, ${componentData.block.z}`
-        );
+        world.sendMessage(`Block: ${componentData.block.typeId}`);
     }
 }
 

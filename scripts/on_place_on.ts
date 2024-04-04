@@ -14,10 +14,7 @@ class onPlaceOn implements BlockCustomComponent {
 export class debug extends onPlaceOn {
     onPlace(componentData: BlockComponentOnPlaceEvent) {
         world.sendMessage(
-            `Player placed block at ${componentData.block.x}, ${componentData.block.y}, ${componentData.block.z}.`
-        );
-        world.sendMessage(
-            `Previous block was ${componentData.previousBlock.type.id}.`
+            `Previous Block: ${componentData.previousBlock.type.id}`
         );
     }
 }

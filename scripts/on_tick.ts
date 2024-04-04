@@ -13,8 +13,6 @@ class onTick implements BlockCustomComponent {
 
 export class debug extends onTick {
     onTick(componentData: BlockComponentTickEvent) {
-        world.sendMessage(
-            `Block at ${componentData.block.x}, ${componentData.block.y}, ${componentData.block.z} ticked.`
-        );
+        world.sendMessage(`Block: ${componentData.block.typeId}`);
     }
 }

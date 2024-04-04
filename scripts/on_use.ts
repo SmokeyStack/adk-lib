@@ -13,8 +13,7 @@ class onUse implements ItemCustomComponent {
 
 export class debug extends onUse {
     onUse(componentData: ItemComponentUseEvent) {
-        world.sendMessage(
-            `Player attempted to use item ${componentData.itemStack.type.id}`
-        );
+        world.sendMessage(`Item: ${componentData.itemStack.typeId}`);
+        world.sendMessage(`Player: ${componentData.source.name}`);
     }
 }
