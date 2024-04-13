@@ -4,7 +4,7 @@ import {
     world
 } from '@minecraft/server';
 
-class beforeDurabilityDamage implements ItemCustomComponent {
+class onBeforeDurabilityDamage implements ItemCustomComponent {
     constructor() {
         this.onBeforeDurabilityDamage =
             this.onBeforeDurabilityDamage.bind(this);
@@ -14,7 +14,7 @@ class beforeDurabilityDamage implements ItemCustomComponent {
     ) {}
 }
 
-export class debug extends beforeDurabilityDamage {
+export class debug extends onBeforeDurabilityDamage {
     onBeforeDurabilityDamage(
         componentData: ItemComponentBeforeDurabilityDamageEvent
     ) {
