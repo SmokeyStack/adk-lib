@@ -61,6 +61,8 @@ class useOnFertilizable extends onUseOn {
                     componentData.usedOnBlockPermutation
                 );
             let player: Player = componentData.source as Player;
+            if (player.getGameMode() == 'creative') return;
+
             let item = player
                 .getComponent('inventory')
                 .container.getItem(player.selectedSlot);
@@ -68,10 +70,7 @@ class useOnFertilizable extends onUseOn {
             if (item.amount == 1)
                 player
                     .getComponent('inventory')
-                    .container.setItem(
-                        player.selectedSlot,
-                        new ItemStack('minecraft:air')
-                    );
+                    .container.setItem(player.selectedSlot, undefined);
             else
                 player
                     .getComponent('inventory')
@@ -102,7 +101,10 @@ interface Fertilizable {
 }
 
 class cropBlock implements Fertilizable {
-    constructor() {}
+    block: string;
+    constructor(block: string) {
+        this.block = block;
+    }
     isFertilizable(
         dimension: Dimension,
         block_position: Vector3,
@@ -140,7 +142,40 @@ class cropBlock implements Fertilizable {
         }
         dimension.setBlockPermutation(
             block_position,
-            BlockPermutation.resolve('minecraft:wheat', { growth: b })
+            BlockPermutation.resolve(this.block, { growth: b })
+        );
+        dimension.spawnParticle('minecraft:crop_growth_emitter', {
+            x: block_position.x + 0.5,
+            y: block_position.y + 0.5,
+            z: block_position.z + 0.5
+        });
+    }
+}
+
+class torchflowerCrop extends cropBlock {
+    grow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): void {
+        let a: number = BlockStates.get('growth').validValues[
+            BlockStates.get('growth').validValues.length - 1
+        ] as number;
+        let b: number = (block_permutation.getState('growth') as number) + 1;
+
+        world.sendMessage(`Growth: ${block_permutation.getState('growth')}`);
+
+        if (block_permutation.getState('growth') == 1) {
+            dimension.setBlockType(block_position, 'minecraft:torchflower');
+            return;
+        }
+
+        if (b > a) {
+            b = a;
+        }
+        dimension.setBlockPermutation(
+            block_position,
+            BlockPermutation.resolve(this.block, { growth: b })
         );
         dimension.spawnParticle('minecraft:crop_growth_emitter', {
             x: block_position.x + 0.5,
@@ -152,6 +187,14 @@ class cropBlock implements Fertilizable {
 
 const blockMap = new Map<string, Fertilizable>();
 
-const wheat = new cropBlock();
+const wheat = new cropBlock('minecraft:wheat');
+const beetroot = new cropBlock('minecraft:beetroot');
+const carrots = new cropBlock('minecraft:carrots');
+const potatoes = new cropBlock('minecraft:potatoes');
+const torchflower_crop = new torchflowerCrop('minecraft:torchflower_crop');
 
 blockMap.set('minecraft:wheat', wheat);
+blockMap.set('minecraft:beetroot', beetroot);
+blockMap.set('minecraft:carrots', carrots);
+blockMap.set('minecraft:potatoes', potatoes);
+blockMap.set('minecraft:torchflower_crop', torchflower_crop);
