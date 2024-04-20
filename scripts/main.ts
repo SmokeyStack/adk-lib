@@ -171,4 +171,9 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:use_on_debug',
         new itemOnUseOn.debug()
     );
+
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:use_on_fertilizable',
+        new itemOnUseOn.useOnFertilizable()
+    );
 });

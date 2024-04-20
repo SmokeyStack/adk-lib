@@ -34,7 +34,7 @@ export class debug extends onUseOn {
     }
 }
 
-class useOnFertilizable extends onUseOn {
+export class useOnFertilizable extends onUseOn {
     onUseOn(componentData: ItemComponentUseOnEvent) {
         if (
             blockMap
