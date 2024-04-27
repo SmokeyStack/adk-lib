@@ -438,6 +438,44 @@ class flowerBed implements Fertilizable {
     }
 }
 
+class mangroveLeaves implements Fertilizable {
+    isFertilizable(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return dimension.getBlock(block_position).below().isAir;
+    }
+
+    canGrow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    grow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): void {
+        dimension
+            .getBlock(block_position)
+            .below()
+            .setPermutation(
+                BlockPermutation.resolve('mangrove_propagule', {
+                    hanging: true
+                })
+            );
+        dimension.spawnParticle('minecraft:crop_growth_emitter', {
+            x: block_position.x + 0.5,
+            y: block_position.y + 0.5,
+            z: block_position.z + 0.5
+        });
+    }
+}
+
 const blockMap = new Map<string, Fertilizable>();
 
 const wheat = new cropBlock('minecraft:wheat');
@@ -449,6 +487,7 @@ const bamboo = new bambooBlock();
 const bamboo_sapling = new bambooShoot();
 const cocoa = new cocoaBlock();
 const pink_petals = new flowerBed();
+const mangrove_propagule = new mangroveLeaves();
 
 blockMap.set('minecraft:wheat', wheat);
 blockMap.set('minecraft:beetroot', beetroot);
@@ -459,6 +498,7 @@ blockMap.set('minecraft:bamboo', bamboo);
 blockMap.set('minecraft:bamboo_sapling', bamboo_sapling);
 blockMap.set('minecraft:cocoa', cocoa);
 blockMap.set('minecraft:pink_petals', pink_petals);
+blockMap.set('minecraft:mangrove_leaves', mangrove_propagule);
 
 function directionToVector3(direction: Direction): Vector3 {
     switch (direction) {
