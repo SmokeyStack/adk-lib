@@ -1208,6 +1208,40 @@ class sweetBerryBush implements Fertilizable {
     }
 }
 
+class tallFlowerBlock implements Fertilizable {
+    block: string;
+    constructor(block: string) {
+        this.block = block;
+    }
+    isFertilizable(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+    canGrow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    grow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): void {
+        dimension.spawnItem(new ItemStack(this.block), block_position);
+        dimension.spawnParticle('minecraft:crop_growth_emitter', {
+            x: block_position.x + 0.5,
+            y: block_position.y + 0.5,
+            z: block_position.z + 0.5
+        });
+    }
+}
+
 const blockMap = new Map<string, Fertilizable>();
 
 const wheat = new cropBlock('minecraft:wheat');
@@ -1232,6 +1266,10 @@ const big_dripleaf_block = new bigdripleafBlock();
 const melon_stem = new stemBlock();
 const pumpkin_stem = new stemBlock();
 const sweet_berry_bush = new sweetBerryBush();
+const lilac = new tallFlowerBlock('minecraft:lilac');
+const peony = new tallFlowerBlock('minecraft:peony');
+const rose_bush = new tallFlowerBlock('minecraft:rose_bush');
+const sunflower = new tallFlowerBlock('minecraft:sunflower');
 
 blockMap.set('minecraft:wheat', wheat);
 blockMap.set('minecraft:beetroot', beetroot);
@@ -1255,6 +1293,10 @@ blockMap.set('minecraft:big_dripleaf', big_dripleaf_block);
 blockMap.set('minecraft:pumpkin_stem', pumpkin_stem);
 blockMap.set('minecraft:melon_stem', melon_stem);
 blockMap.set('minecraft:sweet_berry_bush', sweet_berry_bush);
+blockMap.set('minecraft:lilac', lilac);
+blockMap.set('minecraft:peony', peony);
+blockMap.set('minecraft:rose_bush', rose_bush);
+blockMap.set('minecraft:sunflower', sunflower);
 
 function directionToVector3(direction: Direction): Vector3 {
     switch (direction) {
