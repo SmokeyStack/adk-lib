@@ -28,3 +28,14 @@ export class debug extends onBeforeDurabilityDamage {
         world.sendMessage(`Item: ${componentData.itemStack.typeId}`);
     }
 }
+
+export class elytraIsUseable extends onBeforeDurabilityDamage {
+    onBeforeDurabilityDamage(
+        componentData: ItemComponentBeforeDurabilityDamageEvent
+    ) {
+        const { itemStack } = componentData;
+        const { maxDurability, damage } = itemStack.getComponent('durability');
+        const potentialDurabilityDamage = maxDurability + 1 - (damage + 1);
+        componentData.durabilityDamage = potentialDurabilityDamage > 0 ? 1 : 0;
+    }
+}

@@ -1,7 +1,9 @@
 import {
+    Block,
     BlockPermutation,
     BlockStates,
     Dimension,
+    Direction,
     ItemComponentUseOnEvent,
     ItemCustomComponent,
     ItemStack,
@@ -185,6 +187,168 @@ class torchflowerCrop extends cropBlock {
     }
 }
 
+class bambooBlock implements Fertilizable {
+    isFertilizable(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        let j: number;
+        let i: number = this.countBambooInRange(dimension, block_position, {
+            x: 0,
+            y: 1,
+            z: 0
+        });
+        return (
+            i +
+                (j = this.countBambooInRange(dimension, block_position, {
+                    x: 0,
+                    y: -1,
+                    z: 0
+                })) +
+                1 <
+                16 &&
+            dimension
+                .getBlock(block_position)
+                .above(i)
+                .permutation.getState('age_bit') != 1
+        );
+    }
+
+    canGrow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    grow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): void {
+        let i: number = this.countBambooInRange(dimension, block_position, {
+            x: 0,
+            y: 1,
+            z: 0
+        });
+        let j: number = this.countBambooInRange(dimension, block_position, {
+            x: 0,
+            y: -1,
+            z: 0
+        });
+        let k: number = i + j + 1;
+        let l: number = 1 + Math.random() * 2;
+        for (let m: number = 0; m < l; ++m) {
+            let blockPos: Block = dimension.getBlock(block_position).above(i);
+            let blockState: BlockPermutation = blockPos.permutation;
+            if (
+                k >= 16 ||
+                blockState.getState('age_bit') == 1 ||
+                !blockPos.above().isAir
+            ) {
+                return;
+            }
+            this.updateLeaves(blockState, dimension, blockPos, k);
+            ++i;
+            ++k;
+        }
+    }
+
+    updateLeaves(
+        state: BlockPermutation,
+        world: Dimension,
+        blockPos: Block,
+        height: number
+    ) {
+        let blockState: BlockPermutation = blockPos.below().permutation;
+        let blockState2: BlockPermutation = blockPos.below(2).permutation;
+        let bambooLeaves: string = 'no_leaves';
+        if (height >= 1) {
+            if (
+                blockState.type.id != 'minecraft:bamboo' ||
+                blockState.getState('bamboo_leaf_size') == 'no_leaves'
+            ) {
+                bambooLeaves = 'small_leaves';
+            } else if (
+                blockState.type.id == 'minecraft:bamboo' &&
+                blockState.getState('bamboo_leaf_size') != 'no_leaves'
+            ) {
+                bambooLeaves = 'large_leaves';
+                if (blockState2.type.id == 'minecraft:bamboo') {
+                    world.setBlockPermutation(
+                        blockPos.below(),
+                        blockState.withState('bamboo_leaf_size', 'small_leaves')
+                    );
+                    world.setBlockPermutation(
+                        blockPos.below(2),
+                        blockState2.withState('bamboo_leaf_size', 'no_leaves')
+                    );
+                }
+            }
+        }
+        let i: string =
+            state.getState('bamboo_stalk_thickness') == 'thick' ||
+            blockState2.type.id == 'minecraft:bamboo'
+                ? 'thick'
+                : 'thin';
+        let j: number =
+            (height >= 11 && Math.random() < 0.25) || height == 15 ? 1 : 0;
+        world.setBlockPermutation(
+            blockPos.above(),
+            BlockPermutation.resolve('minecraft:bamboo', {
+                bamboo_stalk_thickness: i,
+                bamboo_leaf_size: bambooLeaves,
+                age_bit: j
+            })
+        );
+    }
+
+    countBambooInRange(world: Dimension, pos: Vector3, direction: Vector3) {
+        let i: number;
+
+        for (
+            i = 0;
+            i < 16 &&
+            world.getBlock({
+                x: pos.x + direction.x * (i + 1),
+                y: pos.y + direction.y * (i + 1),
+                z: pos.z + direction.z * (i + 1)
+            }).typeId == 'minecraft:bamboo';
+            ++i
+        ) {}
+
+        return i;
+    }
+}
+
+class bambooShoot implements Fertilizable {
+    isFertilizable(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return dimension.getBlock(block_position).above().isAir;
+    }
+
+    canGrow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    grow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): void {
+        dimension.getBlock(block_position).above().setType('minecraft:bamboo');
+    }
+}
+
 const blockMap = new Map<string, Fertilizable>();
 
 const wheat = new cropBlock('minecraft:wheat');
@@ -192,9 +356,143 @@ const beetroot = new cropBlock('minecraft:beetroot');
 const carrots = new cropBlock('minecraft:carrots');
 const potatoes = new cropBlock('minecraft:potatoes');
 const torchflower_crop = new torchflowerCrop('minecraft:torchflower_crop');
+const bamboo = new bambooBlock();
+const bambooShoots = new bambooShoot();
 
 blockMap.set('minecraft:wheat', wheat);
 blockMap.set('minecraft:beetroot', beetroot);
 blockMap.set('minecraft:carrots', carrots);
 blockMap.set('minecraft:potatoes', potatoes);
 blockMap.set('minecraft:torchflower_crop', torchflower_crop);
+blockMap.set('minecraft:bamboo', bamboo);
+blockMap.set('minecraft:bamboo_sapling', bambooShoots);
+
+function directionToVector3(direction: Direction): Vector3 {
+    switch (direction) {
+        case Direction.Down:
+            return { x: 0, y: -1, z: 0 };
+        case Direction.Up:
+            return { x: 0, y: 1, z: 0 };
+        case Direction.North:
+            return { x: 0, y: 0, z: -1 };
+        case Direction.South:
+            return { x: 0, y: 0, z: 1 };
+        case Direction.West:
+            return { x: -1, y: 0, z: 0 };
+        case Direction.East:
+            return { x: 1, y: 0, z: 0 };
+    }
+}
+
+function setLiquidBlock(type: string, dimension: Dimension, location: Vector3) {
+    dimension.setBlockType(location, type);
+}
+
+export class useOnBucket extends onUseOn {
+    onUseOn(componentData: ItemComponentUseOnEvent) {
+        let block_location: Vector3 = componentData.block.offset(
+            directionToVector3(componentData.blockFace)
+        );
+
+        componentData.source.dimension.setBlockType(
+            block_location,
+            'minecraft:water'
+        );
+
+        if (
+            componentData.source.dimension.getBlock(block_location).above()
+                .typeId == 'minecraft:air'
+        ) {
+            setLiquidBlock('minecraft:water', componentData.source.dimension, {
+                x: block_location.x,
+                y: block_location.y + 1,
+                z: block_location.z
+            });
+            setLiquidBlock('minecraft:air', componentData.source.dimension, {
+                x: block_location.x,
+                y: block_location.y + 1,
+                z: block_location.z
+            });
+        }
+
+        if (
+            componentData.source.dimension.getBlock(block_location).below()
+                .typeId == 'minecraft:air'
+        ) {
+            setLiquidBlock('minecraft:water', componentData.source.dimension, {
+                x: block_location.x,
+                y: block_location.y - 1,
+                z: block_location.z
+            });
+            setLiquidBlock('minecraft:air', componentData.source.dimension, {
+                x: block_location.x,
+                y: block_location.y - 1,
+                z: block_location.z
+            });
+        }
+
+        if (
+            componentData.source.dimension.getBlock(block_location).north()
+                .typeId == 'minecraft:air'
+        ) {
+            setLiquidBlock('minecraft:water', componentData.source.dimension, {
+                x: block_location.x,
+                y: block_location.y,
+                z: block_location.z - 1
+            });
+            setLiquidBlock('minecraft:air', componentData.source.dimension, {
+                x: block_location.x,
+                y: block_location.y,
+                z: block_location.z - 1
+            });
+        }
+
+        if (
+            componentData.source.dimension.getBlock(block_location).south()
+                .typeId == 'minecraft:air'
+        ) {
+            setLiquidBlock('minecraft:water', componentData.source.dimension, {
+                x: block_location.x,
+                y: block_location.y,
+                z: block_location.z + 1
+            });
+            setLiquidBlock('minecraft:air', componentData.source.dimension, {
+                x: block_location.x,
+                y: block_location.y,
+                z: block_location.z + 1
+            });
+        }
+
+        if (
+            componentData.source.dimension.getBlock(block_location).west()
+                .typeId == 'minecraft:air'
+        ) {
+            setLiquidBlock('minecraft:water', componentData.source.dimension, {
+                x: block_location.x - 1,
+                y: block_location.y,
+                z: block_location.z
+            });
+            setLiquidBlock('minecraft:air', componentData.source.dimension, {
+                x: block_location.x - 1,
+                y: block_location.y,
+                z: block_location.z
+            });
+        }
+
+        if (
+            componentData.source.dimension.getBlock(block_location).east()
+                .typeId == 'minecraft:air'
+        ) {
+            setLiquidBlock('minecraft:water', componentData.source.dimension, {
+                x: block_location.x + 1,
+                y: block_location.y,
+                z: block_location.z
+            });
+            setLiquidBlock('minecraft:air', componentData.source.dimension, {
+                x: block_location.x + 1,
+                y: block_location.y,
+                z: block_location.z
+            });
+        }
+    }
+}
