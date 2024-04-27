@@ -594,6 +594,62 @@ class rootedDirt implements Fertilizable {
     }
 }
 
+class pitcherCrop implements Fertilizable {
+    isFertilizable(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return !block_permutation.getState('upper_block_bit') as boolean;
+    }
+
+    canGrow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    grow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): void {
+        let i: number = Math.min(
+            (block_permutation.getState('growth') as number) + 1,
+            4
+        );
+        if (this.isFullyGrown(block_permutation)) {
+            return;
+        }
+        let blockState: BlockPermutation = block_permutation.withState(
+            'growth',
+            i
+        );
+        dimension.setBlockPermutation(block_position, blockState);
+        if (this.isDoubleTallAtAge(i)) {
+            dimension
+                .getBlock(block_position)
+                .above()
+                .setPermutation(blockState.withState('upper_block_bit', true));
+        }
+        dimension.spawnParticle('minecraft:crop_growth_emitter', {
+            x: block_position.x + 0.5,
+            y: block_position.y + 0.5,
+            z: block_position.z + 0.5
+        });
+    }
+
+    isFullyGrown(state: BlockPermutation) {
+        return state.getState('age') == 4;
+    }
+
+    isDoubleTallAtAge(age: number) {
+        return age >= 3;
+    }
+}
+
 const blockMap = new Map<string, Fertilizable>();
 
 const wheat = new cropBlock('minecraft:wheat');
@@ -607,7 +663,7 @@ const cocoa = new cocoaBlock();
 const pink_petals = new flowerBed();
 const mangrove_propagule = new mangroveLeaves();
 const netherrack = new netherrackBlock();
-const rooted_dirt = new rootedDirt();
+const pitcher = new pitcherCrop();
 
 blockMap.set('minecraft:wheat', wheat);
 blockMap.set('minecraft:beetroot', beetroot);
@@ -620,7 +676,7 @@ blockMap.set('minecraft:cocoa', cocoa);
 blockMap.set('minecraft:pink_petals', pink_petals);
 blockMap.set('minecraft:mangrove_leaves', mangrove_propagule);
 blockMap.set('minecraft:netherrack', netherrack);
-blockMap.set('minecraft:dirt_with_roots', rooted_dirt);
+blockMap.set('minecraft:pitcher_crop', pitcher);
 
 function directionToVector3(direction: Direction): Vector3 {
     switch (direction) {
