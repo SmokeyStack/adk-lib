@@ -1129,6 +1129,46 @@ class bigdripleafBlock implements Fertilizable {
     }
 }
 
+class stemBlock implements Fertilizable {
+    isFertilizable(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return block_permutation.getState('growth') != 7;
+    }
+
+    canGrow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    grow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): void {
+        let i: number = Math.min(
+            7,
+            (block_permutation.getState('growth') as number) +
+                Math.floor(Math.random() * 4 + 2)
+        );
+        let block_state: BlockPermutation = block_permutation.withState(
+            'growth',
+            i
+        );
+        dimension.setBlockPermutation(block_position, block_state);
+        dimension.spawnParticle('minecraft:crop_growth_emitter', {
+            x: block_position.x + 0.5,
+            y: block_position.y + 0.5,
+            z: block_position.z + 0.5
+        });
+    }
+}
+
 const blockMap = new Map<string, Fertilizable>();
 
 const wheat = new cropBlock('minecraft:wheat');
@@ -1142,6 +1182,7 @@ const cocoa = new cocoaBlock();
 const pink_petals = new flowerBed();
 const mangrove_propagule = new mangroveLeaves();
 const netherrack = new netherrackBlock();
+const rooted_dirt = new rootedDirt();
 const pitcher = new pitcherCrop();
 const seagrass = new seagrassBlock();
 const sea_pickle = new seaPickleBlock();
@@ -1149,6 +1190,8 @@ const short_grass = new grassBlock();
 const fern = new grassBlock();
 const small_dripleaf_block = new smallDripleafBlock();
 const big_dripleaf_block = new bigdripleafBlock();
+const melon_stem = new stemBlock();
+const pumpkin_stem = new stemBlock();
 
 blockMap.set('minecraft:wheat', wheat);
 blockMap.set('minecraft:beetroot', beetroot);
@@ -1160,6 +1203,7 @@ blockMap.set('minecraft:bamboo_sapling', bamboo_sapling);
 blockMap.set('minecraft:cocoa', cocoa);
 blockMap.set('minecraft:pink_petals', pink_petals);
 blockMap.set('minecraft:mangrove_leaves', mangrove_propagule);
+blockMap.set('minecraft:dirt_with_roots', rooted_dirt);
 blockMap.set('minecraft:netherrack', netherrack);
 blockMap.set('minecraft:pitcher_crop', pitcher);
 blockMap.set('minecraft:seagrass', seagrass);
@@ -1168,6 +1212,8 @@ blockMap.set('minecraft:short_grass', short_grass);
 blockMap.set('minecraft:fern', fern);
 blockMap.set('minecraft:small_dripleaf_block', small_dripleaf_block);
 blockMap.set('minecraft:big_dripleaf', big_dripleaf_block);
+blockMap.set('minecraft:pumpkin_stem', pumpkin_stem);
+blockMap.set('minecraft:melon_stem', melon_stem);
 
 function directionToVector3(direction: Direction): Vector3 {
     switch (direction) {
