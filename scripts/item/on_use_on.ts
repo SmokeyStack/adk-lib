@@ -1169,6 +1169,45 @@ class stemBlock implements Fertilizable {
     }
 }
 
+class sweetBerryBush implements Fertilizable {
+    isFertilizable(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return (block_permutation.getState('growth') as number) < 3;
+    }
+
+    canGrow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    grow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): void {
+        let i: number = Math.min(
+            3,
+            (block_permutation.getState('growth') as number) + 1
+        );
+        let block_state: BlockPermutation = block_permutation.withState(
+            'growth',
+            i
+        );
+        dimension.setBlockPermutation(block_position, block_state);
+        dimension.spawnParticle('minecraft:crop_growth_emitter', {
+            x: block_position.x + 0.5,
+            y: block_position.y + 0.5,
+            z: block_position.z + 0.5
+        });
+    }
+}
+
 const blockMap = new Map<string, Fertilizable>();
 
 const wheat = new cropBlock('minecraft:wheat');
@@ -1192,6 +1231,7 @@ const small_dripleaf_block = new smallDripleafBlock();
 const big_dripleaf_block = new bigdripleafBlock();
 const melon_stem = new stemBlock();
 const pumpkin_stem = new stemBlock();
+const sweet_berry_bush = new sweetBerryBush();
 
 blockMap.set('minecraft:wheat', wheat);
 blockMap.set('minecraft:beetroot', beetroot);
@@ -1214,6 +1254,7 @@ blockMap.set('minecraft:small_dripleaf_block', small_dripleaf_block);
 blockMap.set('minecraft:big_dripleaf', big_dripleaf_block);
 blockMap.set('minecraft:pumpkin_stem', pumpkin_stem);
 blockMap.set('minecraft:melon_stem', melon_stem);
+blockMap.set('minecraft:sweet_berry_bush', sweet_berry_bush);
 
 function directionToVector3(direction: Direction): Vector3 {
     switch (direction) {
