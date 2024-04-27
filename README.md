@@ -10,17 +10,28 @@ Download the proper version the add-on requires in the [release](https://github.
 
 ## Using ADK LIB to develop add-ons
 
-To use ADK LIB in your add-on, simply add the following to your behaviour pack's manifest.json in the modules section.
+To use ADK LIB in your add-on, simply add the following to your behaviour pack's manifest.json in the dependencies section.
 
 ```json
 {
-    "type": "data",
     "uuid": "5e2eda3e-6eaf-4068-9076-0a7f0587b8bb",
-    "version": "0.1.0-1.21.0.20"
+    "version": "0.1.0-1.21.0.23"
 }
 ```
 
 Download the desired version from the [release](https://github.com/SmokeyStack/adk-lib/releases) page. Once you have it downloaded, import it into Minecraft and you should be good to develop your add-on. Make sure to apply the pack in the world you're developing on.
+
+### Using the Components
+
+To use the custom components, please see the [main.ts](/scripts/main.ts) for a list of all registered custom components. Documentation is currently being worked on for what each component does.
+
+Once you have chosen the custom component, simply add it to the `minecraft:custom_components` component in your item or block file.
+
+```json
+{
+    "minecraft:custom_components": ["adk-lib:on_random_tick_debug"]
+}
+```
 
 ## Distributing
 
