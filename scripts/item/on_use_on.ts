@@ -786,6 +786,48 @@ class seaPickleBlock implements Fertilizable {
     }
 }
 
+class grassBlock implements Fertilizable {
+    isFertilizable(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    canGrow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    grow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): void {
+        if (!dimension.getBlock(block_position).above().isAir) return;
+
+        if (
+            dimension.getBlock(block_position).typeId == 'minecraft:short_grass'
+        ) {
+            dimension.setBlockType(block_position, 'minecraft:tall_grass');
+        }
+
+        if (dimension.getBlock(block_position).typeId == 'minecraft:fern') {
+            dimension.setBlockType(block_position, 'minecraft:large_fern');
+        }
+
+        dimension.spawnParticle('minecraft:crop_growth_emitter', {
+            x: block_position.x + 0.5,
+            y: block_position.y + 0.5,
+            z: block_position.z + 0.5
+        });
+    }
+}
+
 const blockMap = new Map<string, Fertilizable>();
 
 const wheat = new cropBlock('minecraft:wheat');
@@ -802,6 +844,8 @@ const netherrack = new netherrackBlock();
 const pitcher = new pitcherCrop();
 const seagrass = new seagrassBlock();
 const sea_pickle = new seaPickleBlock();
+const short_grass = new grassBlock();
+const fern = new grassBlock();
 
 blockMap.set('minecraft:wheat', wheat);
 blockMap.set('minecraft:beetroot', beetroot);
@@ -817,6 +861,8 @@ blockMap.set('minecraft:netherrack', netherrack);
 blockMap.set('minecraft:pitcher_crop', pitcher);
 blockMap.set('minecraft:seagrass', seagrass);
 blockMap.set('minecraft:sea_pickle', sea_pickle);
+blockMap.set('minecraft:short_grass', short_grass);
+blockMap.set('minecraft:fern', fern);
 
 function directionToVector3(direction: Direction): Vector3 {
     switch (direction) {
