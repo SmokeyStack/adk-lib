@@ -54,7 +54,6 @@ export class useOnFertilizable extends onUseOn {
                     componentData.usedOnBlockPermutation
                 )
         ) {
-            world.sendMessage('Can grow');
             blockMap
                 .get(componentData.block.typeId)
                 ?.grow(
@@ -186,7 +185,6 @@ class torchflowerCrop extends cropBlock {
         });
     }
 }
-
 class bambooBlock implements Fertilizable {
     isFertilizable(
         dimension: Dimension,
@@ -254,6 +252,11 @@ class bambooBlock implements Fertilizable {
             ++i;
             ++k;
         }
+        dimension.spawnParticle('minecraft:crop_growth_emitter', {
+            x: block_position.x + 0.5,
+            y: block_position.y + 0.5,
+            z: block_position.z + 0.5
+        });
     }
 
     updateLeaves(
@@ -346,6 +349,48 @@ class bambooShoot implements Fertilizable {
         block_permutation: BlockPermutation
     ): void {
         dimension.getBlock(block_position).above().setType('minecraft:bamboo');
+        dimension.spawnParticle('minecraft:crop_growth_emitter', {
+            x: block_position.x + 0.5,
+            y: block_position.y + 0.5,
+            z: block_position.z + 0.5
+        });
+    }
+}
+
+class cocoaBlock implements Fertilizable {
+    isFertilizable(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        let i: number = block_permutation.getState('age') as number;
+        return i < 2;
+    }
+
+    canGrow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    grow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): void {
+        dimension.setBlockPermutation(
+            block_position,
+            BlockPermutation.resolve('minecraft:cocoa', {
+                age: (block_permutation.getState('age') as number) + 1
+            })
+        );
+        dimension.spawnParticle('minecraft:crop_growth_emitter', {
+            x: block_position.x + 0.5,
+            y: block_position.y + 0.5,
+            z: block_position.z + 0.5
+        });
     }
 }
 
@@ -357,7 +402,8 @@ const carrots = new cropBlock('minecraft:carrots');
 const potatoes = new cropBlock('minecraft:potatoes');
 const torchflower_crop = new torchflowerCrop('minecraft:torchflower_crop');
 const bamboo = new bambooBlock();
-const bambooShoots = new bambooShoot();
+const bamboo_sapling = new bambooShoot();
+const cocoa = new cocoaBlock();
 
 blockMap.set('minecraft:wheat', wheat);
 blockMap.set('minecraft:beetroot', beetroot);
@@ -365,7 +411,8 @@ blockMap.set('minecraft:carrots', carrots);
 blockMap.set('minecraft:potatoes', potatoes);
 blockMap.set('minecraft:torchflower_crop', torchflower_crop);
 blockMap.set('minecraft:bamboo', bamboo);
-blockMap.set('minecraft:bamboo_sapling', bambooShoots);
+blockMap.set('minecraft:bamboo_sapling', bamboo_sapling);
+blockMap.set('minecraft:cocoa', cocoa);
 
 function directionToVector3(direction: Direction): Vector3 {
     switch (direction) {
