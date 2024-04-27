@@ -700,6 +700,92 @@ class seagrassBlock implements Fertilizable {
     }
 }
 
+class seaPickleBlock implements Fertilizable {
+    isFertilizable(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    canGrow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    grow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): void {
+        let re = new RegExp('^minecraft:(?!dead_).*_coral_block$');
+
+        if (
+            !block_permutation.getState('dead_bit') &&
+            re.exec(dimension.getBlock(block_position).below().typeId)
+        ) {
+            let j: number = 1;
+            let k: number = 2;
+            let l: number = 0;
+            let m: number = block_position.x - 2;
+            let n: number = 0;
+            for (let o: number = 0; o < 5; ++o) {
+                for (let p: number = 0; p < j; ++p) {
+                    let q: number = 2 + block_position.y - 1;
+                    for (let r: number = q - 2; r < q; ++r) {
+                        let block_pos: Vector3 = {
+                            x: m + o,
+                            y: r,
+                            z: block_position.z - n + p
+                        };
+
+                        if (
+                            areVectorsEqual(block_pos, block_position) ||
+                            Math.floor(Math.random() * 6) != 0 ||
+                            dimension.getBlock(block_pos).typeId !=
+                                'minecraft:water' ||
+                            !re.exec(
+                                dimension.getBlock(block_pos).below().typeId
+                            )
+                        )
+                            continue;
+
+                        dimension.setBlockPermutation(
+                            block_pos,
+                            block_permutation.withState(
+                                'cluster_count',
+                                Math.random() * 3
+                            )
+                        );
+                    }
+                }
+                if (l < 2) {
+                    j += 2;
+                    ++n;
+                } else {
+                    j -= 2;
+                    --n;
+                }
+                ++l;
+            }
+            dimension.setBlockPermutation(
+                block_position,
+                block_permutation.withState('cluster_count', 3)
+            );
+
+            dimension.spawnParticle('minecraft:crop_growth_emitter', {
+                x: block_position.x + 0.5,
+                y: block_position.y + 0.5,
+                z: block_position.z + 0.5
+            });
+        }
+    }
+}
+
 const blockMap = new Map<string, Fertilizable>();
 
 const wheat = new cropBlock('minecraft:wheat');
@@ -715,6 +801,7 @@ const mangrove_propagule = new mangroveLeaves();
 const netherrack = new netherrackBlock();
 const pitcher = new pitcherCrop();
 const seagrass = new seagrassBlock();
+const sea_pickle = new seaPickleBlock();
 
 blockMap.set('minecraft:wheat', wheat);
 blockMap.set('minecraft:beetroot', beetroot);
@@ -729,6 +816,7 @@ blockMap.set('minecraft:mangrove_leaves', mangrove_propagule);
 blockMap.set('minecraft:netherrack', netherrack);
 blockMap.set('minecraft:pitcher_crop', pitcher);
 blockMap.set('minecraft:seagrass', seagrass);
+blockMap.set('minecraft:sea_pickle', sea_pickle);
 
 function directionToVector3(direction: Direction): Vector3 {
     switch (direction) {
@@ -745,6 +833,10 @@ function directionToVector3(direction: Direction): Vector3 {
         case Direction.East:
             return { x: 1, y: 0, z: 0 };
     }
+}
+
+function areVectorsEqual(v1: Vector3, v2: Vector3): boolean {
+    return v1.x === v2.x && v1.y === v2.y && v1.z === v2.z;
 }
 
 function setLiquidBlock(type: string, dimension: Dimension, location: Vector3) {
