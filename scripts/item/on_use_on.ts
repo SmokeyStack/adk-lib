@@ -476,6 +476,93 @@ class mangroveLeaves implements Fertilizable {
     }
 }
 
+class netherrackBlock implements Fertilizable {
+    isFertilizable(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        if (!dimension.getBlock(block_position).isAir) return false;
+
+        for (let a: number = -1; a <= 1; a++) {
+            for (let b: number = -1; b <= 1; b++) {
+                for (let c: number = -1; c <= 1; c++) {
+                    let id: string = dimension.getBlock({
+                        x: block_position.x + a,
+                        y: block_position.y + c,
+                        z: block_position.z + b
+                    }).typeId;
+                    if (
+                        id == 'minecraft:crimson_nylium' ||
+                        id == 'minecraft:crimson_nylium'
+                    )
+                        return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    canGrow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    grow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): void {
+        let bl: boolean = false;
+        let bl2: boolean = false;
+
+        for (let a: number = -1; a <= 1; a++) {
+            for (let b: number = -1; b <= 1; b++) {
+                for (let c: number = -1; c <= 1; c++) {
+                    let id: string = dimension.getBlock({
+                        x: block_position.x + a,
+                        y: block_position.y + c,
+                        z: block_position.z + b
+                    }).typeId;
+                    if (id == 'minecraft:warped_nylium') {
+                        bl2 = true;
+                    }
+                    if (id == 'minecraft:crimson_nylium') {
+                        bl = true;
+                    }
+
+                    if (!bl2 || !bl) continue;
+                    break;
+                }
+            }
+        }
+
+        if (bl2 && bl) {
+            world.sendMessage('Both');
+            let rand = Math.random();
+            dimension.setBlockType(
+                block_position,
+                Math.random() < 0.5
+                    ? 'minecraft:warped_nylium'
+                    : 'minecraft:crimson_nylium'
+            );
+        } else if (bl2) {
+            dimension.setBlockType(block_position, 'minecraft:warped_nylium');
+        } else if (bl) {
+            dimension.setBlockType(block_position, 'minecraft:crimson_nylium');
+        }
+        dimension.spawnParticle('minecraft:crop_growth_emitter', {
+            x: block_position.x + 0.5,
+            y: block_position.y + 1.5,
+            z: block_position.z + 0.5
+        });
+    }
+}
+
 const blockMap = new Map<string, Fertilizable>();
 
 const wheat = new cropBlock('minecraft:wheat');
@@ -488,6 +575,7 @@ const bamboo_sapling = new bambooShoot();
 const cocoa = new cocoaBlock();
 const pink_petals = new flowerBed();
 const mangrove_propagule = new mangroveLeaves();
+const netherrack = new netherrackBlock();
 
 blockMap.set('minecraft:wheat', wheat);
 blockMap.set('minecraft:beetroot', beetroot);
@@ -499,6 +587,7 @@ blockMap.set('minecraft:bamboo_sapling', bamboo_sapling);
 blockMap.set('minecraft:cocoa', cocoa);
 blockMap.set('minecraft:pink_petals', pink_petals);
 blockMap.set('minecraft:mangrove_leaves', mangrove_propagule);
+blockMap.set('minecraft:netherrack', netherrack);
 
 function directionToVector3(direction: Direction): Vector3 {
     switch (direction) {
