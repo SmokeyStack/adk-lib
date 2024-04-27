@@ -563,6 +563,37 @@ class netherrackBlock implements Fertilizable {
     }
 }
 
+class rootedDirt implements Fertilizable {
+    isFertilizable(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return dimension.getBlock(block_position).below().isAir;
+    }
+
+    canGrow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    grow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): void {
+        dimension.setBlockType(block_position, 'minecraft:hanging_roots');
+        dimension.spawnParticle('minecraft:crop_growth_emitter', {
+            x: block_position.x + 0.5,
+            y: block_position.y + 0.5,
+            z: block_position.z + 0.5
+        });
+    }
+}
+
 const blockMap = new Map<string, Fertilizable>();
 
 const wheat = new cropBlock('minecraft:wheat');
@@ -576,6 +607,7 @@ const cocoa = new cocoaBlock();
 const pink_petals = new flowerBed();
 const mangrove_propagule = new mangroveLeaves();
 const netherrack = new netherrackBlock();
+const rooted_dirt = new rootedDirt();
 
 blockMap.set('minecraft:wheat', wheat);
 blockMap.set('minecraft:beetroot', beetroot);
@@ -588,6 +620,7 @@ blockMap.set('minecraft:cocoa', cocoa);
 blockMap.set('minecraft:pink_petals', pink_petals);
 blockMap.set('minecraft:mangrove_leaves', mangrove_propagule);
 blockMap.set('minecraft:netherrack', netherrack);
+blockMap.set('minecraft:dirt_with_roots', rooted_dirt);
 
 function directionToVector3(direction: Direction): Vector3 {
     switch (direction) {
