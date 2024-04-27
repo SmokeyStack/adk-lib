@@ -394,6 +394,50 @@ class cocoaBlock implements Fertilizable {
     }
 }
 
+class flowerBed implements Fertilizable {
+    isFertilizable(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    canGrow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    grow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): void {
+        let i: number = block_permutation.getState('growth') as number;
+        if (i < 4) {
+            dimension.setBlockPermutation(
+                block_position,
+                BlockPermutation.resolve('minecraft:pink_petals', {
+                    growth: i + 1
+                })
+            );
+        } else {
+            dimension.spawnItem(
+                new ItemStack('minecraft:pink_petals', 1),
+                block_position
+            );
+        }
+        dimension.spawnParticle('minecraft:crop_growth_emitter', {
+            x: block_position.x + 0.5,
+            y: block_position.y + 0.5,
+            z: block_position.z + 0.5
+        });
+    }
+}
+
 const blockMap = new Map<string, Fertilizable>();
 
 const wheat = new cropBlock('minecraft:wheat');
@@ -404,6 +448,7 @@ const torchflower_crop = new torchflowerCrop('minecraft:torchflower_crop');
 const bamboo = new bambooBlock();
 const bamboo_sapling = new bambooShoot();
 const cocoa = new cocoaBlock();
+const pink_petals = new flowerBed();
 
 blockMap.set('minecraft:wheat', wheat);
 blockMap.set('minecraft:beetroot', beetroot);
@@ -413,6 +458,7 @@ blockMap.set('minecraft:torchflower_crop', torchflower_crop);
 blockMap.set('minecraft:bamboo', bamboo);
 blockMap.set('minecraft:bamboo_sapling', bamboo_sapling);
 blockMap.set('minecraft:cocoa', cocoa);
+blockMap.set('minecraft:pink_petals', pink_petals);
 
 function directionToVector3(direction: Direction): Vector3 {
     switch (direction) {
