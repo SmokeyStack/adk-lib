@@ -828,6 +828,307 @@ class grassBlock implements Fertilizable {
     }
 }
 
+class smallDripleafBlock implements Fertilizable {
+    isFertilizable(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    canGrow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    grow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): void {
+        if (block_permutation.getState('upper_block_bit') == false) {
+            this.BigDripleafBlockGrow(
+                dimension,
+                block_position,
+                block_permutation.getState(
+                    'minecraft:cardinal_direction'
+                ) as string
+            );
+        } else {
+            block_position.y--;
+            this.BigDripleafBlockGrow(
+                dimension,
+                block_position,
+                block_permutation.getState(
+                    'minecraft:cardinal_direction'
+                ) as string
+            );
+        }
+
+        dimension.spawnParticle('minecraft:crop_growth_emitter', {
+            x: block_position.x + 0.5,
+            y: block_position.y + 0.5,
+            z: block_position.z + 0.5
+        });
+    }
+
+    BigDripleafBlockGrow(
+        world: Dimension,
+        block_position: Vector3,
+        direction: string
+    ): void {
+        let j: number;
+        let i: number = Math.floor(Math.random() * 4) + 2;
+        let block_position_copy: Vector3 = { ...block_position };
+        for (
+            j = 0;
+            j < i &&
+            this.BigDripleafBlockCanGrowInto(
+                world,
+                block_position_copy,
+                world.getBlock(block_position_copy)
+            );
+            ++j
+        ) {
+            block_position_copy.y++;
+        }
+        let k: number = block_position.y + j - 1;
+        block_position_copy.y = block_position.y;
+        while (block_position_copy.y < k) {
+            this.BigDripleafStemBlockPlaceStemAt(
+                world,
+                block_position_copy,
+                direction
+            );
+            block_position_copy.y++;
+        }
+        this.BigDripleafBlockPlaceDripleafAt(
+            world,
+            block_position_copy,
+            direction
+        );
+    }
+
+    BigDripleafBlockCanGrowInto(
+        world: Dimension,
+        block_position: Vector3,
+        block: Block
+    ): boolean {
+        return (
+            !(world.heightRange.max < block_position.y) &&
+            this.BigDripleafBlockCanGrowInto2(block)
+        );
+    }
+
+    BigDripleafBlockCanGrowInto2(block: Block) {
+        return (
+            block.isAir ||
+            block.typeId == 'minecraft:water' ||
+            block.typeId == 'minecraft:small_dripleaf_block'
+        );
+    }
+
+    BigDripleafStemBlockPlaceStemAt(
+        world: Dimension,
+        block_position: Vector3,
+        direction: string
+    ): void {
+        world.setBlockPermutation(
+            block_position,
+            BlockPermutation.resolve('minecraft:big_dripleaf', {
+                'minecraft:cardinal_direction': direction,
+                big_dripleaf_head: false
+            })
+        );
+    }
+
+    BigDripleafBlockPlaceDripleafAt(
+        world: Dimension,
+        block_position: Vector3,
+        direction: string
+    ): void {
+        world.setBlockPermutation(
+            block_position,
+            BlockPermutation.resolve('minecraft:big_dripleaf', {
+                'minecraft:cardinal_direction': direction,
+                big_dripleaf_head: true
+            })
+        );
+    }
+}
+
+class bigdripleafBlock implements Fertilizable {
+    isFertilizable(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        if (block_permutation.getState('big_dripleaf_head')) {
+            return this.BigDripleafBlockCanGrowInto2(
+                dimension.getBlock(block_position).above()
+            );
+        } else {
+            let optional: Vector3 = this.findColumnEnd(
+                dimension,
+                block_position,
+                block_permutation,
+                1,
+                'minecraft:big_dripleaf'
+            );
+
+            if (optional == null) return false;
+
+            let block_position_copy: Vector3 = { ...optional };
+            block_position_copy.y++;
+            return this.BigDripleafBlockCanGrowInto(
+                dimension,
+                block_position_copy,
+                dimension.getBlock(block_position_copy)
+            );
+        }
+    }
+
+    canGrow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    grow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): void {
+        if (block_permutation.getState('big_dripleaf_head')) {
+            let block_position_copy: Vector3 = { ...block_position };
+            block_position_copy.y++;
+            if (
+                this.BigDripleafBlockCanGrowInto(
+                    dimension,
+                    block_position_copy,
+                    dimension.getBlock(block_position_copy)
+                )
+            ) {
+                let direction: string = block_permutation.getState(
+                    'minecraft:cardinal_direction'
+                ) as string;
+                this.BigDripleafStemBlockPlaceStemAt(
+                    dimension,
+                    block_position,
+                    direction
+                );
+                this.BigDripleafBlockPlaceDripleafAt(
+                    dimension,
+                    block_position_copy,
+                    direction
+                );
+            }
+        } else {
+            let optional: Vector3 = this.findColumnEnd(
+                dimension,
+                block_position,
+                block_permutation,
+                1,
+                'minecraft:big_dripleaf'
+            );
+
+            if (optional == null) return;
+
+            let block_position_copy: Vector3 = { ...optional };
+            let block_position_copy2: Vector3 = { ...block_position_copy };
+            block_position_copy2.y++;
+            let direction: string = block_permutation.getState(
+                'minecraft:cardinal_direction'
+            ) as string;
+            this.BigDripleafStemBlockPlaceStemAt(
+                dimension,
+                block_position_copy,
+                direction
+            );
+            this.BigDripleafBlockPlaceDripleafAt(
+                dimension,
+                block_position_copy2,
+                direction
+            );
+        }
+        dimension.spawnParticle('minecraft:crop_growth_emitter', {
+            x: block_position.x + 0.5,
+            y: block_position.y + 0.5,
+            z: block_position.z + 0.5
+        });
+    }
+
+    BigDripleafBlockCanGrowInto(
+        world: Dimension,
+        block_position: Vector3,
+        block: Block
+    ): boolean {
+        return (
+            !(world.heightRange.max < block_position.y) &&
+            this.BigDripleafBlockCanGrowInto2(block)
+        );
+    }
+
+    BigDripleafBlockCanGrowInto2(block: Block) {
+        return (
+            block.isAir ||
+            block.typeId == 'minecraft:water' ||
+            block.typeId == 'minecraft:small_dripleaf_block'
+        );
+    }
+
+    BigDripleafStemBlockPlaceStemAt(
+        world: Dimension,
+        block_position: Vector3,
+        direction: string
+    ): void {
+        world.setBlockPermutation(
+            block_position,
+            BlockPermutation.resolve('minecraft:big_dripleaf', {
+                'minecraft:cardinal_direction': direction,
+                big_dripleaf_head: false
+            })
+        );
+    }
+
+    BigDripleafBlockPlaceDripleafAt(
+        world: Dimension,
+        block_position: Vector3,
+        direction: string
+    ): void {
+        world.setBlockPermutation(
+            block_position,
+            BlockPermutation.resolve('minecraft:big_dripleaf', {
+                'minecraft:cardinal_direction': direction,
+                big_dripleaf_head: true
+            })
+        );
+    }
+
+    findColumnEnd(
+        world: Dimension,
+        block_position: Vector3,
+        block: BlockPermutation,
+        direction: number,
+        endBlock: string
+    ): Vector3 {
+        let block_position_copy: Vector3 = { ...block_position };
+        do {
+            block_position_copy.y += direction;
+        } while (world.getBlock(block_position_copy).permutation == block);
+        if (world.getBlock(block_position_copy).typeId == endBlock) {
+            return block_position_copy;
+        }
+        return null;
+    }
+}
+
 const blockMap = new Map<string, Fertilizable>();
 
 const wheat = new cropBlock('minecraft:wheat');
@@ -846,6 +1147,8 @@ const seagrass = new seagrassBlock();
 const sea_pickle = new seaPickleBlock();
 const short_grass = new grassBlock();
 const fern = new grassBlock();
+const small_dripleaf_block = new smallDripleafBlock();
+const big_dripleaf_block = new bigdripleafBlock();
 
 blockMap.set('minecraft:wheat', wheat);
 blockMap.set('minecraft:beetroot', beetroot);
@@ -863,6 +1166,8 @@ blockMap.set('minecraft:seagrass', seagrass);
 blockMap.set('minecraft:sea_pickle', sea_pickle);
 blockMap.set('minecraft:short_grass', short_grass);
 blockMap.set('minecraft:fern', fern);
+blockMap.set('minecraft:small_dripleaf_block', small_dripleaf_block);
+blockMap.set('minecraft:big_dripleaf', big_dripleaf_block);
 
 function directionToVector3(direction: Direction): Vector3 {
     switch (direction) {
