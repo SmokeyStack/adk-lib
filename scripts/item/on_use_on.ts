@@ -650,6 +650,56 @@ class pitcherCrop implements Fertilizable {
     }
 }
 
+class seagrassBlock implements Fertilizable {
+    isFertilizable(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    canGrow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): boolean {
+        return true;
+    }
+
+    grow(
+        dimension: Dimension,
+        block_position: Vector3,
+        block_permutation: BlockPermutation
+    ): void {
+        let block_state: BlockPermutation = block_permutation.withState(
+            'sea_grass_type',
+            'double_bot'
+        );
+        let block_state2: BlockPermutation = block_permutation.withState(
+            'sea_grass_type',
+            'double_top'
+        );
+
+        if (
+            dimension.getBlock(block_position).above().typeId ==
+            'minecraft:water'
+        ) {
+            dimension.setBlockPermutation(block_position, block_state);
+            dimension.setBlockPermutation(
+                dimension.getBlock(block_position).above(),
+                block_state2
+            );
+
+            dimension.spawnParticle('minecraft:crop_growth_emitter', {
+                x: block_position.x + 0.5,
+                y: block_position.y + 0.5,
+                z: block_position.z + 0.5
+            });
+        }
+    }
+}
+
 const blockMap = new Map<string, Fertilizable>();
 
 const wheat = new cropBlock('minecraft:wheat');
@@ -664,6 +714,7 @@ const pink_petals = new flowerBed();
 const mangrove_propagule = new mangroveLeaves();
 const netherrack = new netherrackBlock();
 const pitcher = new pitcherCrop();
+const seagrass = new seagrassBlock();
 
 blockMap.set('minecraft:wheat', wheat);
 blockMap.set('minecraft:beetroot', beetroot);
@@ -677,6 +728,7 @@ blockMap.set('minecraft:pink_petals', pink_petals);
 blockMap.set('minecraft:mangrove_leaves', mangrove_propagule);
 blockMap.set('minecraft:netherrack', netherrack);
 blockMap.set('minecraft:pitcher_crop', pitcher);
+blockMap.set('minecraft:seagrass', seagrass);
 
 function directionToVector3(direction: Direction): Vector3 {
     switch (direction) {
