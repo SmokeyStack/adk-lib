@@ -1,11 +1,8 @@
 import {
-    Dimension,
-    Direction,
     ItemComponentUseOnEvent,
     ItemCustomComponent,
     ItemStack,
     Player,
-    Vector3,
     world
 } from '@minecraft/server';
 
@@ -76,118 +73,8 @@ export class useOnFertilizable extends onUseOn {
         }
     }
 }
-
-function setLiquidBlock(type: string, dimension: Dimension, location: Vector3) {
-    dimension.setBlockType(location, type);
-}
-
 export class bucket extends onUseOn {
     onUseOn(componentData: ItemComponentUseOnEvent) {
         onUseOnBucket(componentData);
-        /*
-        let block_location: Vector3 = componentData.block.offset(
-            directionToVector3(componentData.blockFace)
-        );
-
-        componentData.source.dimension.setBlockType(
-            block_location,
-            'minecraft:water'
-        );
-
-        if (
-            componentData.source.dimension.getBlock(block_location).above()
-                .typeId == 'minecraft:air'
-        ) {
-            setLiquidBlock('minecraft:water', componentData.source.dimension, {
-                x: block_location.x,
-                y: block_location.y + 1,
-                z: block_location.z
-            });
-            setLiquidBlock('minecraft:air', componentData.source.dimension, {
-                x: block_location.x,
-                y: block_location.y + 1,
-                z: block_location.z
-            });
-        }
-
-        if (
-            componentData.source.dimension.getBlock(block_location).below()
-                .typeId == 'minecraft:air'
-        ) {
-            setLiquidBlock('minecraft:water', componentData.source.dimension, {
-                x: block_location.x,
-                y: block_location.y - 1,
-                z: block_location.z
-            });
-            setLiquidBlock('minecraft:air', componentData.source.dimension, {
-                x: block_location.x,
-                y: block_location.y - 1,
-                z: block_location.z
-            });
-        }
-
-        if (
-            componentData.source.dimension.getBlock(block_location).north()
-                .typeId == 'minecraft:air'
-        ) {
-            setLiquidBlock('minecraft:water', componentData.source.dimension, {
-                x: block_location.x,
-                y: block_location.y,
-                z: block_location.z - 1
-            });
-            setLiquidBlock('minecraft:air', componentData.source.dimension, {
-                x: block_location.x,
-                y: block_location.y,
-                z: block_location.z - 1
-            });
-        }
-
-        if (
-            componentData.source.dimension.getBlock(block_location).south()
-                .typeId == 'minecraft:air'
-        ) {
-            setLiquidBlock('minecraft:water', componentData.source.dimension, {
-                x: block_location.x,
-                y: block_location.y,
-                z: block_location.z + 1
-            });
-            setLiquidBlock('minecraft:air', componentData.source.dimension, {
-                x: block_location.x,
-                y: block_location.y,
-                z: block_location.z + 1
-            });
-        }
-
-        if (
-            componentData.source.dimension.getBlock(block_location).west()
-                .typeId == 'minecraft:air'
-        ) {
-            setLiquidBlock('minecraft:water', componentData.source.dimension, {
-                x: block_location.x - 1,
-                y: block_location.y,
-                z: block_location.z
-            });
-            setLiquidBlock('minecraft:air', componentData.source.dimension, {
-                x: block_location.x - 1,
-                y: block_location.y,
-                z: block_location.z
-            });
-        }
-
-        if (
-            componentData.source.dimension.getBlock(block_location).east()
-                .typeId == 'minecraft:air'
-        ) {
-            setLiquidBlock('minecraft:water', componentData.source.dimension, {
-                x: block_location.x + 1,
-                y: block_location.y,
-                z: block_location.z
-            });
-            setLiquidBlock('minecraft:air', componentData.source.dimension, {
-                x: block_location.x + 1,
-                y: block_location.y,
-                z: block_location.z
-            });
-        }*/
     }
 }
