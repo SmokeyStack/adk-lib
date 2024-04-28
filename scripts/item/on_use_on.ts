@@ -10,6 +10,7 @@ import {
 } from '@minecraft/server';
 
 import { BLOCK_MAP } from './fertilzeable';
+import { onUseOnBucket } from './item_bucket';
 
 class onUseOn implements ItemCustomComponent {
     constructor() {
@@ -76,29 +77,14 @@ export class useOnFertilizable extends onUseOn {
     }
 }
 
-function directionToVector3(direction: Direction): Vector3 {
-    switch (direction) {
-        case Direction.Down:
-            return { x: 0, y: -1, z: 0 };
-        case Direction.Up:
-            return { x: 0, y: 1, z: 0 };
-        case Direction.North:
-            return { x: 0, y: 0, z: -1 };
-        case Direction.South:
-            return { x: 0, y: 0, z: 1 };
-        case Direction.West:
-            return { x: -1, y: 0, z: 0 };
-        case Direction.East:
-            return { x: 1, y: 0, z: 0 };
-    }
-}
-
 function setLiquidBlock(type: string, dimension: Dimension, location: Vector3) {
     dimension.setBlockType(location, type);
 }
 
-export class useOnBucket extends onUseOn {
+export class bucket extends onUseOn {
     onUseOn(componentData: ItemComponentUseOnEvent) {
+        onUseOnBucket(componentData);
+        /*
         let block_location: Vector3 = componentData.block.offset(
             directionToVector3(componentData.blockFace)
         );
@@ -202,6 +188,6 @@ export class useOnBucket extends onUseOn {
                 y: block_location.y,
                 z: block_location.z
             });
-        }
+        }*/
     }
 }

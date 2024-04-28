@@ -176,4 +176,9 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:use_on_fertilizable',
         new itemOnUseOn.useOnFertilizable()
     );
+
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:on_use_on_bucket',
+        new itemOnUseOn.bucket()
+    );
 });
