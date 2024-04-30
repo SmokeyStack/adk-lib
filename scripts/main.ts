@@ -137,18 +137,11 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         new itemOnConsume.teleport()
     );
 
-    // On Use
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_use_debug',
-        new itemUse.debug()
-    );
-
     // On Hit Entity
     eventData.itemComponentRegistry.registerCustomComponent(
         'adk-lib:on_hit_entity_debug',
         new itemOnHitEntity.debug()
     );
-
     eventData.itemComponentRegistry.registerCustomComponent(
         'adk-lib:on_hit_entity_summon_lightning',
         new itemOnHitEntity.summonLightning()
@@ -167,10 +160,15 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:on_mine_block_debug',
         new itemOnMineBlock.debug()
     );
-
     eventData.itemComponentRegistry.registerCustomComponent(
         'adk-lib:on_mine_block_digger',
         new itemOnMineBlock.digger()
+    );
+
+    // On Use
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:on_use_debug',
+        new itemUse.debug()
     );
 
     // On Use On
@@ -178,14 +176,16 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:use_on_debug',
         new itemOnUseOn.debug()
     );
-
     eventData.itemComponentRegistry.registerCustomComponent(
         'adk-lib:use_on_fertilizable',
         new itemOnUseOn.useOnFertilizable()
     );
-
     eventData.itemComponentRegistry.registerCustomComponent(
         'adk-lib:on_use_on_bucket',
         new itemOnUseOn.bucket()
+    );
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:on_use_on_dye',
+        new itemOnUseOn.dye()
     );
 });

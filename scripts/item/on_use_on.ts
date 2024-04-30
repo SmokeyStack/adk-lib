@@ -1,13 +1,19 @@
 import {
+    BlockPermutation,
+    BlockSignComponent,
+    DyeColor,
     ItemComponentUseOnEvent,
     ItemCustomComponent,
     ItemStack,
     Player,
+    SignSide,
+    Vector3,
     world
 } from '@minecraft/server';
 
 import { BLOCK_MAP } from './fertilzeable';
 import { onUseOnBucket } from './item_bucket';
+import { areVectorsEqual } from '../utils/vector';
 
 class onUseOn implements ItemCustomComponent {
     constructor() {
@@ -77,4 +83,113 @@ export class bucket extends onUseOn {
     onUseOn(componentData: ItemComponentUseOnEvent) {
         onUseOnBucket(componentData);
     }
+}
+
+export class dye extends onUseOn {
+    onUseOn(componentData: ItemComponentUseOnEvent): void {
+        const REGEX: RegExp = new RegExp(
+            'minecraft:(?:[a-z]\\w+_)?(?:standing|wall|hanging)_sign'
+        );
+
+        if (!REGEX.test(componentData.block.typeId)) return;
+
+        let signComponent: BlockSignComponent =
+            componentData.block.getComponent('sign');
+        let blockPermutation: BlockPermutation =
+            componentData.usedOnBlockPermutation;
+        let playerLocation: Vector3 = componentData.source.location;
+        let blockLocation: Vector3 = componentData.block.location;
+
+        if (componentData.block.typeId.endsWith('wall_sign')) {
+            let flooredX: number, flooredZ: number;
+
+            if (playerLocation.x > 0) flooredX = Math.floor(playerLocation.x);
+            else flooredX = signedFloor(playerLocation.x);
+            if (playerLocation.z > 0) flooredZ = Math.floor(playerLocation.z);
+            else flooredZ = signedFloor(playerLocation.z);
+            switch (blockPermutation.getState('facing_direction')) {
+                case 2:
+                    {
+                        if (playerLocation.z < blockLocation.z)
+                            flooredZ = blockLocation.z;
+                        dyeSign(
+                            signComponent,
+                            {
+                                x: blockLocation.x,
+                                y: blockLocation.y,
+                                z: flooredZ
+                            },
+                            blockLocation,
+                            DyeColor.Blue
+                        );
+                    }
+                    break;
+                case 3:
+                    {
+                        if (playerLocation.z > blockLocation.z)
+                            flooredZ = blockLocation.z;
+                        dyeSign(
+                            signComponent,
+                            {
+                                x: blockLocation.x,
+                                y: blockLocation.y,
+                                z: flooredZ
+                            },
+                            blockLocation,
+                            DyeColor.Blue
+                        );
+                    }
+                    break;
+                case 4:
+                    {
+                        if (playerLocation.x < blockLocation.x)
+                            flooredX = blockLocation.x;
+                        dyeSign(
+                            signComponent,
+                            {
+                                x: flooredX,
+                                y: blockLocation.y,
+                                z: blockLocation.z
+                            },
+                            blockLocation,
+                            DyeColor.Blue
+                        );
+                    }
+                    break;
+                case 5:
+                    {
+                        if (playerLocation.x > blockLocation.x)
+                            flooredX = blockLocation.x;
+                        dyeSign(
+                            signComponent,
+                            {
+                                x: flooredX,
+                                y: blockLocation.y,
+                                z: blockLocation.z
+                            },
+                            blockLocation,
+                            DyeColor.Blue
+                        );
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}
+
+function dyeSign(
+    signComponent: BlockSignComponent,
+    playerLocation: Vector3,
+    blockLocation: Vector3,
+    color: DyeColor
+): void {
+    if (areVectorsEqual(playerLocation, blockLocation))
+        signComponent.setTextDyeColor(color, SignSide.Front);
+    else signComponent.setTextDyeColor(color, SignSide.Back);
+}
+
+function signedFloor(value: number): number {
+    return Math.sign(value) * Math.ceil(Math.abs(value));
 }
