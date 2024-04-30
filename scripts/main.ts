@@ -8,8 +8,9 @@ import * as blockOnPlace from 'blocks/on_place';
 import * as blockOnPlayerDestroy from 'blocks/on_player_destroy';
 import * as blockOnPlayerInteract from 'blocks/on_player_interact';
 import * as blockOnTick from 'blocks/on_tick';
-import * as itemUse from 'item/on_use';
 import * as itemOnBeforeDurabilityDamage from 'item/on_before_durability_damage';
+import * as itemOnConsume from 'item/on_consume';
+import * as itemUse from 'item/on_use';
 import * as itemOnMineBlock from 'item/on_mine_block';
 import * as itemOnHitEntity from 'item/on_hit_entity';
 import * as itemOnUseOn from 'item/on_use_on';
@@ -124,16 +125,22 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
 
     // Items
 
-    // On Use
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_use_debug',
-        new itemUse.debug()
-    );
-
     // On Before Durability Damage
     eventData.itemComponentRegistry.registerCustomComponent(
         'adk-lib:before_durability_damage_debug',
         new itemOnBeforeDurabilityDamage.debug()
+    );
+
+    // On Consume
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:on_consume_teleport',
+        new itemOnConsume.teleport()
+    );
+
+    // On Use
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:on_use_debug',
+        new itemUse.debug()
     );
 
     // On Hit Entity
