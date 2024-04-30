@@ -1,13 +1,16 @@
 import {
     Block,
+    BlockPermutation,
     Container,
     Dimension,
+    Direction,
     ItemComponentUseOnEvent,
     ItemStack,
     Player,
     Vector3
 } from '@minecraft/server';
 import { directionToVector3 } from '../utils/math';
+import { decrementStack } from 'utils/decrement_stack';
 
 export function onUseOnBucket(componentData: ItemComponentUseOnEvent) {
     let tags: string[] = componentData.itemStack.getTags();
@@ -36,33 +39,16 @@ export function onUseOnBucket(componentData: ItemComponentUseOnEvent) {
     }
 
     if (fluid == 'adk-lib:fluid_empty') {
-        for (let [source, turnInto] of sourceIntoItem) {
-            let block: Block = componentData.block;
-
-            if (componentData.usedOnBlockPermutation.type.id != source) {
-                const OFFSET: Vector3 = directionToVector3(
-                    componentData.blockFace
-                );
-                block = componentData.block.offset(OFFSET);
-            }
-
-            if (block.type.id != source) continue;
-
-            player.dimension.setBlockType(block.location, 'minecraft:air');
-            let itemStack: ItemStack = new ItemStack(turnInto);
-
-            if (
-                inventory.emptySlotsCount == 0 &&
-                componentData.itemStack.amount != 1
-            ) {
-                player.dimension.spawnItem(itemStack, player.location);
-                return;
-            }
-
-            inventory.setItem(player.selectedSlotIndex, itemStack);
-
-            break;
-        }
+        pickupLiquid(
+            sourceIntoItem,
+            componentData.block,
+            componentData.usedOnBlockPermutation,
+            componentData.blockFace,
+            player,
+            inventory,
+            componentData.itemStack,
+            true
+        );
 
         return;
     }
@@ -118,6 +104,12 @@ function updateLiquidBlock(dimension: Dimension, location: Vector3) {
     dimension.setBlockType(location, 'minecraft:air');
 }
 
+/**
+ * @brief Updates the block if it is air.
+ * @param dimension Dimension to execute in
+ * @param block Block to check
+ * @param blockLocation Block location
+ */
 function updateIfAir(
     dimension: Dimension,
     block: Block,
@@ -125,4 +117,50 @@ function updateIfAir(
 ): void {
     if (block.typeId == 'minecraft:air')
         updateLiquidBlock(dimension, blockLocation);
+}
+
+/**
+ * @brief Picks up the liquid and replaces it with the item.
+ * @param sourceIntoItem A map of the source liquid to the item it turns into
+ * @param block The block to check
+ * @param blockPermutation The block permutation
+ * @param blockFace The block face
+ * @param player The player
+ * @param inventory The player's inventory
+ * @param item The item stack
+ * @param turnToAir Whether to turn the block into air
+ * @returns
+ */
+export function pickupLiquid(
+    sourceIntoItem: Map<string, string>,
+    block: Block,
+    blockPermutation: BlockPermutation,
+    blockFace: Direction,
+    player: Player,
+    inventory: Container,
+    item: ItemStack,
+    turnToAir: boolean
+): void {
+    for (let [source, turnInto] of sourceIntoItem) {
+        if (blockPermutation.type.id != source) {
+            const OFFSET: Vector3 = directionToVector3(blockFace);
+            block = block.offset(OFFSET);
+        }
+
+        if (block.type.id != source) continue;
+        if (turnToAir)
+            player.dimension.setBlockType(block.location, 'minecraft:air');
+
+        let itemStack: ItemStack = new ItemStack(turnInto);
+
+        if (inventory.emptySlotsCount == 0 || item.amount != 1) {
+            player.dimension.spawnItem(itemStack, player.location);
+            decrementStack(player);
+            return;
+        }
+
+        inventory.setItem(player.selectedSlotIndex, itemStack);
+
+        break;
+    }
 }

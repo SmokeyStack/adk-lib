@@ -1,6 +1,7 @@
 import {
     Block,
     BlockPermutation,
+    Container,
     ItemComponentUseOnEvent,
     ItemCustomComponent,
     Player,
@@ -9,7 +10,7 @@ import {
 } from '@minecraft/server';
 
 import { BLOCK_MAP } from './fertilzeable';
-import { onUseOnBucket } from './item_bucket';
+import { onUseOnBucket, pickupLiquid } from './item_bucket';
 import { onUseOnDye } from './item_dye';
 import { decrementStack } from '../utils/decrement_stack';
 import { directionToVector3 } from 'utils/math';
@@ -97,5 +98,34 @@ export class fire extends onUseOn {
         }
 
         decrementStack(componentData.source as Player);
+    }
+}
+
+export class glassBottle extends onUseOn {
+    onUseOn(componentData: ItemComponentUseOnEvent): void {
+        let tags: string[] = componentData.itemStack.getTags();
+        const REGEX_TURN_INTO: RegExp = new RegExp(
+            'adk-lib:fluid_([a-z]\\w+:[a-z]\\w+)_turn_into_([a-z]\\w+:[a-z]\\w+)'
+        );
+        let player: Player = componentData.source as Player;
+        let inventory: Container = player.getComponent('inventory').container;
+        let sourceIntoItem: Map<string, string> = new Map();
+
+        for (let tag of tags) {
+            const match = REGEX_TURN_INTO.exec(tag);
+
+            if (match) sourceIntoItem.set(match[1], match[2]);
+        }
+
+        pickupLiquid(
+            sourceIntoItem,
+            componentData.block,
+            componentData.usedOnBlockPermutation,
+            componentData.blockFace,
+            player,
+            inventory,
+            componentData.itemStack,
+            false
+        );
     }
 }

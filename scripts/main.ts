@@ -200,4 +200,8 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:on_use_on_fire',
         new itemOnUseOn.fire()
     );
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:on_use_on_glass_bottle',
+        new itemOnUseOn.glassBottle()
+    );
 });
