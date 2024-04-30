@@ -178,6 +178,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:on_use_debug',
         new itemUse.debug()
     );
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:on_use_goat_horn',
+        new itemUse.goatHorn()
+    );
 
     // On Use On
     eventData.itemComponentRegistry.registerCustomComponent(

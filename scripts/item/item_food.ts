@@ -2,7 +2,7 @@ import { ItemComponentConsumeEvent } from '@minecraft/server';
 
 export function giveFoodEffect(componentData: ItemComponentConsumeEvent) {
     let tags: string[] = componentData.itemStack.getTags();
-    const effectMap: Array<EffectOptions> = [];
+    const effectMap: EffectOptions[] = [];
     let effect: string;
     let duration: number = 0;
     let amplifier: number = 0;
