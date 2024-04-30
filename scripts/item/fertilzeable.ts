@@ -6,7 +6,7 @@ import {
     Block,
     ItemStack
 } from '@minecraft/server';
-import { areVectorsEqual } from '../utils/vector';
+import { areVectorsEqual } from '../utils/math';
 
 interface Fertilizable {
     isFertilizable(

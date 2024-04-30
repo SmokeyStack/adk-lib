@@ -130,11 +130,19 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:before_durability_damage_debug',
         new itemOnBeforeDurabilityDamage.debug()
     );
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:before_durability_damage_elytra_is_useable',
+        new itemOnBeforeDurabilityDamage.elytraIsUseable()
+    );
 
     // On Consume
     eventData.itemComponentRegistry.registerCustomComponent(
         'adk-lib:on_consume_teleport',
         new itemOnConsume.teleport()
+    );
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:on_consume_food_effect',
+        new itemOnConsume.foodEffect()
     );
 
     // On Hit Entity

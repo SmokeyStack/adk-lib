@@ -5,10 +5,9 @@ import {
     Vector3,
     DyeColor,
     SignSide,
-    ItemStack,
     Player
 } from '@minecraft/server';
-import { areVectorsEqual } from '../utils/vector';
+import { areVectorsEqual } from '../utils/math';
 import { decrementStack } from '../utils/decrement_stack';
 
 export function onUseOnDye(componentData: ItemComponentUseOnEvent) {

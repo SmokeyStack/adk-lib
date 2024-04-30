@@ -29,6 +29,11 @@ export class debug extends onBeforeDurabilityDamage {
     }
 }
 
+/**
+ * This was supposed to be a custom component that implements the elytra functionality of not being able to be damaged if the item has 1 durability left.
+ * Unfortunately, I forgot that onBeforeDurabilityDamage only activates if the item gets damaged by hitting an entity, not by using it.
+ * I'll leave this here for reference.
+ */
 export class elytraIsUseable extends onBeforeDurabilityDamage {
     onBeforeDurabilityDamage(
         componentData: ItemComponentBeforeDurabilityDamageEvent
