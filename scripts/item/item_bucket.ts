@@ -51,7 +51,10 @@ export function onUseOnBucket(componentData: ItemComponentUseOnEvent) {
             player.dimension.setBlockType(block.location, 'minecraft:air');
             let itemStack: ItemStack = new ItemStack(turnInto);
 
-            if (inventory.emptySlotsCount == 0) {
+            if (
+                inventory.emptySlotsCount == 0 &&
+                componentData.itemStack.amount != 1
+            ) {
                 player.dimension.spawnItem(itemStack, player.location);
                 return;
             }
