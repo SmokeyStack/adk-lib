@@ -74,7 +74,7 @@ export class dye extends onUseOn {
     }
 }
 
-export class fireCharge extends onUseOn {
+export class fire extends onUseOn {
     onUseOn(componentData: ItemComponentUseOnEvent): void {
         let block: Block = componentData.block;
         let blockPermutation: BlockPermutation =
