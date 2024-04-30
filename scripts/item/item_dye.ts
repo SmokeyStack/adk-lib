@@ -113,11 +113,13 @@ function dyeSign(
     color: DyeColor,
     player: Player
 ): void {
-    if (areVectorsEqual(playerLocation, blockLocation))
-        signComponent.setTextDyeColor(color, SignSide.Front);
-    else signComponent.setTextDyeColor(color, SignSide.Back);
-
-    decrementStack(player);
+    const side = areVectorsEqual(playerLocation, blockLocation)
+        ? SignSide.Front
+        : SignSide.Back;
+    if (signComponent.getTextDyeColor(side) !== color) {
+        signComponent.setTextDyeColor(color, side);
+        decrementStack(player);
+    }
 }
 
 /**
