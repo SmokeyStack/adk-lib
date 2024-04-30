@@ -32,9 +32,15 @@ export function giveFoodEffect(componentData: ItemComponentConsumeEvent) {
     }
 
     effectMap.forEach((effectOptions: EffectOptions) => {
+        if (componentData.source.getEffects().length > 0)
+            componentData.source.getEffects().forEach((effect) => {
+                if (effect.typeId === effectOptions.effect)
+                    componentData.source.removeEffect(effect.typeId);
+            });
+
         componentData.source.addEffect(
             effectOptions.effect,
-            effectOptions.duration,
+            effectOptions.duration + 1,
             {
                 amplifier: effectOptions.amplifier,
                 showParticles: effectOptions.showParticles
