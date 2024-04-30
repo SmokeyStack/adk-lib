@@ -76,67 +76,36 @@ export function onUseOnBucket(componentData: ItemComponentUseOnEvent) {
     );
     let itemStack: ItemStack = new ItemStack(REGEX_FLUID.exec(fluid)[2]);
     inventory.setItem(player.selectedSlotIndex, itemStack);
-    let checkBlockAbove: Block = componentData.source.dimension
-        .getBlock(blockLocation)
-        .above();
-    let checkBlockBelow: Block = componentData.source.dimension
-        .getBlock(blockLocation)
-        .below();
-    let checkBlockNorth: Block = componentData.source.dimension
-        .getBlock(blockLocation)
-        .north();
-    let checkBlockEast: Block = componentData.source.dimension
-        .getBlock(blockLocation)
-        .east();
-    let checkBlockSouth: Block = componentData.source.dimension
-        .getBlock(blockLocation)
-        .south();
-    let checkBlockWest: Block = componentData.source.dimension
-        .getBlock(blockLocation)
-        .west();
-
-    if (checkBlockAbove.typeId == 'minecraft:air') {
-        updateLiquidBlock(componentData.source.dimension, {
-            x: blockLocation.x,
-            y: blockLocation.y + 1,
-            z: blockLocation.z
-        });
-    }
-    if (checkBlockBelow.typeId == 'minecraft:air') {
-        updateLiquidBlock(componentData.source.dimension, {
-            x: blockLocation.x,
-            y: blockLocation.y - 1,
-            z: blockLocation.z
-        });
-    }
-    if (checkBlockNorth.typeId == 'minecraft:air') {
-        updateLiquidBlock(componentData.source.dimension, {
-            x: blockLocation.x,
-            y: blockLocation.y,
-            z: blockLocation.z - 1
-        });
-    }
-    if (checkBlockSouth.typeId == 'minecraft:air') {
-        updateLiquidBlock(componentData.source.dimension, {
-            x: blockLocation.x,
-            y: blockLocation.y,
-            z: blockLocation.z + 1
-        });
-    }
-    if (checkBlockWest.typeId == 'minecraft:air') {
-        updateLiquidBlock(componentData.source.dimension, {
-            x: blockLocation.x - 1,
-            y: blockLocation.y,
-            z: blockLocation.z
-        });
-    }
-    if (checkBlockEast.typeId == 'minecraft:air') {
-        updateLiquidBlock(componentData.source.dimension, {
-            x: blockLocation.x + 1,
-            y: blockLocation.y,
-            z: blockLocation.z
-        });
-    }
+    updateIfAir(
+        componentData.source.dimension,
+        componentData.source.dimension.getBlock(blockLocation).above(),
+        { x: blockLocation.x, y: blockLocation.y + 1, z: blockLocation.z }
+    );
+    updateIfAir(
+        componentData.source.dimension,
+        componentData.source.dimension.getBlock(blockLocation).below(),
+        { x: blockLocation.x, y: blockLocation.y - 1, z: blockLocation.z }
+    );
+    updateIfAir(
+        componentData.source.dimension,
+        componentData.source.dimension.getBlock(blockLocation).north(),
+        { x: blockLocation.x, y: blockLocation.y, z: blockLocation.z - 1 }
+    );
+    updateIfAir(
+        componentData.source.dimension,
+        componentData.source.dimension.getBlock(blockLocation).east(),
+        { x: blockLocation.x + 1, y: blockLocation.y, z: blockLocation.z }
+    );
+    updateIfAir(
+        componentData.source.dimension,
+        componentData.source.dimension.getBlock(blockLocation).south(),
+        { x: blockLocation.x, y: blockLocation.y, z: blockLocation.z + 1 }
+    );
+    updateIfAir(
+        componentData.source.dimension,
+        componentData.source.dimension.getBlock(blockLocation).west(),
+        { x: blockLocation.x - 1, y: blockLocation.y, z: blockLocation.z }
+    );
 }
 
 /**
@@ -147,4 +116,13 @@ export function onUseOnBucket(componentData: ItemComponentUseOnEvent) {
 function updateLiquidBlock(dimension: Dimension, location: Vector3) {
     dimension.setBlockType(location, 'minecraft:bedrock');
     dimension.setBlockType(location, 'minecraft:air');
+}
+
+function updateIfAir(
+    dimension: Dimension,
+    block: Block,
+    blockLocation: Vector3
+): void {
+    if (block.typeId == 'minecraft:air')
+        updateLiquidBlock(dimension, blockLocation);
 }
