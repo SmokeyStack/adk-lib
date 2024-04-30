@@ -14,6 +14,7 @@ import { onUseOnBucket, pickupLiquid } from './item_bucket';
 import { onUseOnDye } from './item_dye';
 import { decrementStack } from '../utils/decrement_stack';
 import { directionToVector3 } from 'utils/math';
+import { onUseOnWax } from './item_wax';
 
 class onUseOn implements ItemCustomComponent {
     constructor() {
@@ -127,5 +128,11 @@ export class glassBottle extends onUseOn {
             componentData.itemStack,
             false
         );
+    }
+}
+
+export class wax extends onUseOn {
+    onUseOn(componentData: ItemComponentUseOnEvent): void {
+        onUseOnWax(componentData);
     }
 }
