@@ -23,7 +23,7 @@ Download the desired version from the [release](https://github.com/SmokeyStack/a
 
 ### Using the Components
 
-To use the custom components, please see the [main.ts](/scripts/main.ts) for a list of all registered custom components. Documentation is currently being worked on for what each component does.
+To use the custom components, please see the [documentation](/docs) for a list of all registered custom components.
 
 Once you have chosen the custom component, simply add it to the `minecraft:custom_components` component in your item or block file.
 

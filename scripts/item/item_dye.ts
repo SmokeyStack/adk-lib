@@ -4,7 +4,9 @@ import {
     BlockPermutation,
     Vector3,
     DyeColor,
-    SignSide
+    SignSide,
+    ItemStack,
+    Player
 } from '@minecraft/server';
 import { areVectorsEqual } from '../utils/vector';
 
@@ -26,6 +28,7 @@ export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
     let blockLocation: Vector3 = componentData.block.location;
     let flooredX: number, flooredZ: number;
     let color: string;
+    let player: Player = componentData.source as Player;
 
     for (let tag of tags) {
         if (REGEX_DYE.exec(tag)) {
@@ -34,7 +37,6 @@ export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
             break;
         }
     }
-
     if (playerLocation.x > 0) flooredX = Math.floor(playerLocation.x);
     else flooredX = signedFloor(playerLocation.x);
     if (playerLocation.z > 0) flooredZ = Math.floor(playerLocation.z);
@@ -47,7 +49,8 @@ export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
             blockLocation,
             DyeColor[color],
             flooredX,
-            flooredZ
+            flooredZ,
+            player
         );
 
         return;
@@ -60,7 +63,8 @@ export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
             blockLocation,
             DyeColor[color],
             flooredX,
-            flooredZ
+            flooredZ,
+            player
         );
 
         return;
@@ -74,7 +78,8 @@ export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
                 blockLocation,
                 DyeColor[color],
                 flooredX,
-                flooredZ
+                flooredZ,
+                player
             );
 
             return;
@@ -87,7 +92,8 @@ export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
             blockLocation,
             DyeColor[color],
             flooredX,
-            flooredZ
+            flooredZ,
+            player
         );
     }
 }
@@ -103,11 +109,14 @@ function dyeSign(
     signComponent: BlockSignComponent,
     playerLocation: Vector3,
     blockLocation: Vector3,
-    color: DyeColor
+    color: DyeColor,
+    player: Player
 ): void {
     if (areVectorsEqual(playerLocation, blockLocation))
         signComponent.setTextDyeColor(color, SignSide.Front);
     else signComponent.setTextDyeColor(color, SignSide.Back);
+
+    decrementStack(player);
 }
 
 /**
@@ -119,6 +128,7 @@ function dyeSign(
  * @param color DyeColor
  * @param flooredX Floored X
  * @param flooredZ Floored Z
+ * @param player Player
  */
 function dyeSignFacingDirection(
     blockPermutation: BlockPermutation,
@@ -127,7 +137,8 @@ function dyeSignFacingDirection(
     blockLocation: Vector3,
     color: DyeColor,
     flooredX: number,
-    flooredZ: number
+    flooredZ: number,
+    player: Player
 ): void {
     switch (blockPermutation.getState('facing_direction')) {
         case 2:
@@ -142,7 +153,8 @@ function dyeSignFacingDirection(
                         z: flooredZ
                     },
                     blockLocation,
-                    color
+                    color,
+                    player
                 );
             }
             break;
@@ -158,7 +170,8 @@ function dyeSignFacingDirection(
                         z: flooredZ
                     },
                     blockLocation,
-                    color
+                    color,
+                    player
                 );
             }
             break;
@@ -174,7 +187,8 @@ function dyeSignFacingDirection(
                         z: blockLocation.z
                     },
                     blockLocation,
-                    color
+                    color,
+                    player
                 );
             }
             break;
@@ -190,7 +204,8 @@ function dyeSignFacingDirection(
                         z: blockLocation.z
                     },
                     blockLocation,
-                    color
+                    color,
+                    player
                 );
             }
             break;
@@ -208,6 +223,7 @@ function dyeSignFacingDirection(
  * @param color DyeColor
  * @param flooredX Floored X
  * @param flooredZ Floored Z
+ * @param player Player
  */
 function dyeSignGroundDirection(
     blockPermutation: BlockPermutation,
@@ -216,7 +232,8 @@ function dyeSignGroundDirection(
     blockLocation: Vector3,
     color: DyeColor,
     flooredX: number,
-    flooredZ: number
+    flooredZ: number,
+    player: Player
 ): void {
     switch (blockPermutation.getState('ground_sign_direction')) {
         case 0:
@@ -235,7 +252,8 @@ function dyeSignGroundDirection(
                         z: flooredZ
                     },
                     blockLocation,
-                    color
+                    color,
+                    player
                 );
             }
             break;
@@ -255,7 +273,8 @@ function dyeSignGroundDirection(
                         z: flooredZ
                     },
                     blockLocation,
-                    color
+                    color,
+                    player
                 );
             }
             break;
@@ -273,7 +292,8 @@ function dyeSignGroundDirection(
                         z: blockLocation.z
                     },
                     blockLocation,
-                    color
+                    color,
+                    player
                 );
             }
             break;
@@ -291,7 +311,8 @@ function dyeSignGroundDirection(
                         z: blockLocation.z
                     },
                     blockLocation,
-                    color
+                    color,
+                    player
                 );
             }
             break;
@@ -307,4 +328,24 @@ function dyeSignGroundDirection(
  */
 function signedFloor(value: number): number {
     return Math.sign(value) * Math.ceil(Math.abs(value));
+}
+
+function decrementStack(player: Player): void {
+    if (player.getGameMode() == 'creative') return;
+
+    let item = player
+        .getComponent('inventory')
+        .container.getItem(player.selectedSlotIndex);
+
+    if (item.amount == 1)
+        player
+            .getComponent('inventory')
+            .container.setItem(player.selectedSlotIndex, undefined);
+    else
+        player
+            .getComponent('inventory')
+            .container.setItem(
+                player.selectedSlotIndex,
+                new ItemStack(item.typeId, item.amount - 1)
+            );
 }
