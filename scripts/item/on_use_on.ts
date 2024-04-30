@@ -9,6 +9,7 @@ import {
 import { BLOCK_MAP } from './fertilzeable';
 import { onUseOnBucket } from './item_bucket';
 import { onUseOnDye } from './item_dye';
+import { decrementStack } from '../utils/decrement_stack';
 
 class onUseOn implements ItemCustomComponent {
     constructor() {
@@ -54,23 +55,7 @@ export class useOnFertilizable extends onUseOn {
                 componentData.usedOnBlockPermutation
             );
             let player: Player = componentData.source as Player;
-            if (player.getGameMode() == 'creative') return;
-
-            let item = player
-                .getComponent('inventory')
-                .container.getItem(player.selectedSlotIndex);
-
-            if (item.amount == 1)
-                player
-                    .getComponent('inventory')
-                    .container.setItem(player.selectedSlotIndex, undefined);
-            else
-                player
-                    .getComponent('inventory')
-                    .container.setItem(
-                        player.selectedSlotIndex,
-                        new ItemStack(item.typeId, item.amount - 1)
-                    );
+            decrementStack(player);
         }
     }
 }

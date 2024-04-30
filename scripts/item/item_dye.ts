@@ -9,6 +9,7 @@ import {
     Player
 } from '@minecraft/server';
 import { areVectorsEqual } from '../utils/vector';
+import { decrementStack } from '../utils/decrement_stack';
 
 export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
     const REGEX: RegExp = new RegExp(
@@ -328,24 +329,4 @@ function dyeSignGroundDirection(
  */
 function signedFloor(value: number): number {
     return Math.sign(value) * Math.ceil(Math.abs(value));
-}
-
-function decrementStack(player: Player): void {
-    if (player.getGameMode() == 'creative') return;
-
-    let item = player
-        .getComponent('inventory')
-        .container.getItem(player.selectedSlotIndex);
-
-    if (item.amount == 1)
-        player
-            .getComponent('inventory')
-            .container.setItem(player.selectedSlotIndex, undefined);
-    else
-        player
-            .getComponent('inventory')
-            .container.setItem(
-                player.selectedSlotIndex,
-                new ItemStack(item.typeId, item.amount - 1)
-            );
 }
