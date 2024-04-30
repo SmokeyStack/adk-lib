@@ -99,14 +99,13 @@ export class dye extends onUseOn {
             componentData.usedOnBlockPermutation;
         let playerLocation: Vector3 = componentData.source.location;
         let blockLocation: Vector3 = componentData.block.location;
+        let flooredX: number, flooredZ: number;
 
+        if (playerLocation.x > 0) flooredX = Math.floor(playerLocation.x);
+        else flooredX = signedFloor(playerLocation.x);
+        if (playerLocation.z > 0) flooredZ = Math.floor(playerLocation.z);
+        else flooredZ = signedFloor(playerLocation.z);
         if (componentData.block.typeId.endsWith('wall_sign')) {
-            let flooredX: number, flooredZ: number;
-
-            if (playerLocation.x > 0) flooredX = Math.floor(playerLocation.x);
-            else flooredX = signedFloor(playerLocation.x);
-            if (playerLocation.z > 0) flooredZ = Math.floor(playerLocation.z);
-            else flooredZ = signedFloor(playerLocation.z);
             switch (blockPermutation.getState('facing_direction')) {
                 case 2:
                     {
@@ -175,6 +174,95 @@ export class dye extends onUseOn {
                 default:
                     break;
             }
+
+            return;
+        }
+        if (componentData.block.typeId.endsWith('standing_sign')) {
+            world.sendMessage(
+                blockPermutation.getState('ground_sign_direction').toString()
+            );
+            switch (blockPermutation.getState('ground_sign_direction')) {
+                case 0:
+                case 1:
+                case 2:
+                case 14:
+                case 15:
+                    {
+                        if (playerLocation.z > blockLocation.z)
+                            flooredZ = blockLocation.z;
+                        dyeSign(
+                            signComponent,
+                            {
+                                x: blockLocation.x,
+                                y: blockLocation.y,
+                                z: flooredZ
+                            },
+                            blockLocation,
+                            DyeColor.Blue
+                        );
+                    }
+                    break;
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                    {
+                        if (playerLocation.z < blockLocation.z)
+                            flooredZ = blockLocation.z;
+                        dyeSign(
+                            signComponent,
+                            {
+                                x: blockLocation.x,
+                                y: blockLocation.y,
+                                z: flooredZ
+                            },
+                            blockLocation,
+                            DyeColor.Blue
+                        );
+                    }
+                    break;
+                case 3:
+                case 4:
+                case 5:
+                    {
+                        if (playerLocation.x < blockLocation.x)
+                            flooredX = blockLocation.x;
+                        dyeSign(
+                            signComponent,
+                            {
+                                x: flooredX,
+                                y: blockLocation.y,
+                                z: blockLocation.z
+                            },
+                            blockLocation,
+                            DyeColor.Blue
+                        );
+                    }
+                    break;
+                case 11:
+                case 12:
+                case 13:
+                    {
+                        if (playerLocation.x > blockLocation.x)
+                            flooredX = blockLocation.x;
+                        dyeSign(
+                            signComponent,
+                            {
+                                x: flooredX,
+                                y: blockLocation.y,
+                                z: blockLocation.z
+                            },
+                            blockLocation,
+                            DyeColor.Blue
+                        );
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            return;
         }
     }
 }
