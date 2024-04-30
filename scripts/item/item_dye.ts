@@ -15,6 +15,9 @@ export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
 
     if (!REGEX.test(componentData.block.typeId)) return;
 
+    let tags: string[] = componentData.itemStack.getTags();
+    const REGEX_DYE: RegExp = new RegExp('adk-lib:dye_([a-zA-Z]\\w+)');
+
     let signComponent: BlockSignComponent =
         componentData.block.getComponent('sign');
     let blockPermutation: BlockPermutation =
@@ -22,6 +25,15 @@ export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
     let playerLocation: Vector3 = componentData.source.location;
     let blockLocation: Vector3 = componentData.block.location;
     let flooredX: number, flooredZ: number;
+    let color: string;
+
+    for (let tag of tags) {
+        if (REGEX_DYE.exec(tag)) {
+            color = REGEX_DYE.exec(tag)[1];
+
+            break;
+        }
+    }
 
     if (playerLocation.x > 0) flooredX = Math.floor(playerLocation.x);
     else flooredX = signedFloor(playerLocation.x);
@@ -33,7 +45,7 @@ export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
             signComponent,
             playerLocation,
             blockLocation,
-            DyeColor.Blue,
+            DyeColor[color],
             flooredX,
             flooredZ
         );
@@ -46,7 +58,7 @@ export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
             signComponent,
             playerLocation,
             blockLocation,
-            DyeColor.Blue,
+            DyeColor[color],
             flooredX,
             flooredZ
         );
@@ -60,7 +72,7 @@ export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
                 signComponent,
                 playerLocation,
                 blockLocation,
-                DyeColor.Blue,
+                DyeColor[color],
                 flooredX,
                 flooredZ
             );
@@ -73,7 +85,7 @@ export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
             signComponent,
             playerLocation,
             blockLocation,
-            DyeColor.Blue,
+            DyeColor[color],
             flooredX,
             flooredZ
         );
