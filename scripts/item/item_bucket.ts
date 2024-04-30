@@ -1,5 +1,6 @@
 import {
     Block,
+    Container,
     Dimension,
     Direction,
     ItemComponentUseOnEvent,
@@ -11,30 +12,30 @@ import {
 export function onUseOnBucket(componentData: ItemComponentUseOnEvent) {
     let tags: string[] = componentData.itemStack.getTags();
     const REGEX_FLUID: RegExp = new RegExp(
-        'adk-lib:fluid_([a-z]\\w+:[a-z]\\w+)'
+        'adk-lib:fluid_([a-z]\\w+:[a-z]\\w+)_([a-z]\\w+:[a-z]\\w+)'
     );
     const REGEX_TURN_INTO: RegExp = new RegExp(
         'adk-lib:fluid_([a-z]\\w+:[a-z]\\w+)_turn_into_([a-z]\\w+:[a-z]\\w+)'
     );
     let player: Player = componentData.source as Player;
+    let inventory: Container = player.getComponent('inventory').container;
     let fluid: string;
     let sourceIntoItem: Map<string, string> = new Map();
 
     for (let tag of tags) {
-        if (REGEX_FLUID.test(tag)) {
+        if (REGEX_FLUID.test(tag) || tag == 'adk-lib:fluid_empty') {
             fluid = tag;
+
             break;
         }
     }
-
     for (let tag of tags) {
         const match = REGEX_TURN_INTO.exec(tag);
-        if (match) {
-            sourceIntoItem.set(match[1], match[2]);
-        }
+
+        if (match) sourceIntoItem.set(match[1], match[2]);
     }
 
-    if (fluid == 'adk-lib:fluid_minecraft:empty') {
+    if (fluid == 'adk-lib:fluid_empty') {
         for (let [source, turnInto] of sourceIntoItem) {
             let block: Block = componentData.block;
 
@@ -49,9 +50,13 @@ export function onUseOnBucket(componentData: ItemComponentUseOnEvent) {
 
             player.dimension.setBlockType(block.location, 'minecraft:air');
             let itemStack: ItemStack = new ItemStack(turnInto);
-            player
-                .getComponent('inventory')
-                .container.setItem(player.selectedSlotIndex, itemStack);
+
+            if (inventory.emptySlotsCount == 0) {
+                player.dimension.spawnItem(itemStack, player.location);
+                return;
+            }
+
+            inventory.setItem(player.selectedSlotIndex, itemStack);
 
             break;
         }
@@ -66,6 +71,8 @@ export function onUseOnBucket(componentData: ItemComponentUseOnEvent) {
         blockLocation,
         REGEX_FLUID.exec(fluid)[1]
     );
+    let itemStack: ItemStack = new ItemStack(REGEX_FLUID.exec(fluid)[2]);
+    inventory.setItem(player.selectedSlotIndex, itemStack);
     let checkBlockAbove: Block = componentData.source.dimension
         .getBlock(blockLocation)
         .above();
