@@ -1,8 +1,10 @@
 import {
+    Block,
+    BlockPermutation,
     ItemComponentUseOnEvent,
     ItemCustomComponent,
-    ItemStack,
     Player,
+    Vector3,
     world
 } from '@minecraft/server';
 
@@ -10,6 +12,7 @@ import { BLOCK_MAP } from './fertilzeable';
 import { onUseOnBucket } from './item_bucket';
 import { onUseOnDye } from './item_dye';
 import { decrementStack } from '../utils/decrement_stack';
+import { directionToVector3 } from 'utils/math';
 
 class onUseOn implements ItemCustomComponent {
     constructor() {
@@ -68,5 +71,31 @@ export class bucket extends onUseOn {
 export class dye extends onUseOn {
     onUseOn(componentData: ItemComponentUseOnEvent): void {
         onUseOnDye(componentData);
+    }
+}
+
+export class fireCharge extends onUseOn {
+    onUseOn(componentData: ItemComponentUseOnEvent): void {
+        let block: Block = componentData.block;
+        let blockPermutation: BlockPermutation =
+            componentData.usedOnBlockPermutation;
+
+        if (block.typeId.endsWith('campfire')) {
+            block.setPermutation(
+                blockPermutation.withState('extinguished', false)
+            );
+        } else if (block.typeId.endsWith('candle')) {
+            block.setPermutation(blockPermutation.withState('lit', true));
+        } else {
+            let location: Vector3 = directionToVector3(componentData.blockFace);
+            let blockOffset: Block = block.offset(location);
+            let blockBelow: Block = blockOffset.below();
+
+            if (!blockBelow.isSolid || !blockOffset.isAir) return;
+
+            blockOffset.setType('minecraft:fire');
+        }
+
+        decrementStack(componentData.source as Player);
     }
 }

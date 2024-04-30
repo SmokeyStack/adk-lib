@@ -196,4 +196,8 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:on_use_on_dye',
         new itemOnUseOn.dye()
     );
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:on_use_on_fire_charge',
+        new itemOnUseOn.fireCharge()
+    );
 });
