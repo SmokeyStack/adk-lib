@@ -39,7 +39,10 @@ export function onUseOnWax(componentData: ItemComponentUseOnEvent) {
         if (newBlock == 'minecraft:waxed_copper_block')
             newBlock = 'minecraft:waxed_copper';
 
-        if (block.typeId.includes('door')) {
+        if (
+            block.typeId.includes('door') &&
+            !block.typeId.includes('trapdoor')
+        ) {
             if (!block.permutation.getState('upper_block_bit'))
                 player.runCommand(
                     `setblock ${block.location.x} ${block.location.y} ${
