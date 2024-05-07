@@ -3,6 +3,7 @@ import {
     ItemCustomComponent,
     world
 } from '@minecraft/server';
+import { logEventData } from 'utils/debug';
 
 class onUse implements ItemCustomComponent {
     constructor() {
@@ -13,8 +14,21 @@ class onUse implements ItemCustomComponent {
 
 export class debug extends onUse {
     onUse(componentData: ItemComponentUseEvent) {
-        world.sendMessage(`Item: ${componentData.itemStack.typeId}`);
-        world.sendMessage(`Player: ${componentData.source.name}`);
+        let data: Object = logEventData(
+            componentData,
+            componentData.constructor.name
+        );
+        let result: string = JSON.stringify(
+            Object.keys(data)
+                .sort()
+                .reduce((result, key) => {
+                    result[key] = data[key];
+                    return result;
+                }, {}),
+            null,
+            4
+        );
+        console.log(result);
     }
 }
 

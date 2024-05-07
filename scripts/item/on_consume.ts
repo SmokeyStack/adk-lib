@@ -9,12 +9,33 @@ import {
 import { clamp } from '../utils/math';
 import { dimensionMap, teleportEntity } from './teleport';
 import { giveFoodEffect } from './item_food';
+import { logEventData } from 'utils/debug';
 
 class onConsume implements ItemCustomComponent {
     constructor() {
         this.onConsume = this.onConsume.bind(this);
     }
     onConsume(_componentData: ItemComponentConsumeEvent) {}
+}
+
+export class debug extends onConsume {
+    onConsume(componentData: ItemComponentConsumeEvent): void {
+        let data: Object = logEventData(
+            componentData,
+            componentData.constructor.name
+        );
+        let result: string = JSON.stringify(
+            Object.keys(data)
+                .sort()
+                .reduce((result, key) => {
+                    result[key] = data[key];
+                    return result;
+                }, {}),
+            null,
+            4
+        );
+        console.log(result);
+    }
 }
 
 export class teleport extends onConsume {

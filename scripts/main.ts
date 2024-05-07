@@ -1,4 +1,4 @@
-import { world } from '@minecraft/server';
+import { EquipmentSlot, Player, system, world } from '@minecraft/server';
 import * as blockOnStepOn from 'blocks/on_step_on';
 import * as blockOnStepOff from 'blocks/on_step_off';
 import * as blockOnRandomTick from 'blocks/on_random_tick';
@@ -9,6 +9,7 @@ import * as blockOnPlayerDestroy from 'blocks/on_player_destroy';
 import * as blockOnPlayerInteract from 'blocks/on_player_interact';
 import * as blockOnTick from 'blocks/on_tick';
 import * as itemOnBeforeDurabilityDamage from 'item/on_before_durability_damage';
+import * as itemOnCompleteUse from 'item/on_complete_use';
 import * as itemOnConsume from 'item/on_consume';
 import * as itemUse from 'item/on_use';
 import * as itemOnMineBlock from 'item/on_mine_block';
@@ -135,6 +136,12 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         new itemOnBeforeDurabilityDamage.elytraIsUseable()
     );
 
+    // On Complete Use
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:on_complete_use_debug',
+        new itemOnCompleteUse.debug()
+    );
+
     // On Consume
     eventData.itemComponentRegistry.registerCustomComponent(
         'adk-lib:on_consume_teleport',
@@ -171,6 +178,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
     eventData.itemComponentRegistry.registerCustomComponent(
         'adk-lib:on_mine_block_digger',
         new itemOnMineBlock.digger()
+    );
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:on_mine_block_pickaxe',
+        new itemOnMineBlock.pickaxe()
     );
 
     // On Use

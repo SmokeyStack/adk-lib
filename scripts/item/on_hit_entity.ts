@@ -5,6 +5,7 @@ import {
     ItemStack,
     world
 } from '@minecraft/server';
+import { logEventData } from 'utils/debug';
 
 class onHitEntity implements ItemCustomComponent {
     constructor() {
@@ -15,12 +16,21 @@ class onHitEntity implements ItemCustomComponent {
 
 export class debug extends onHitEntity {
     onHitEntity(componentData: ItemComponentHitEntityEvent) {
-        world.sendMessage(
-            `Attacking Entity: ${componentData.attackingEntity.typeId}`
+        let data: Object = logEventData(
+            componentData,
+            componentData.constructor.name
         );
-        world.sendMessage(`Had Effect: ${componentData.hadEffect}`);
-        world.sendMessage(`Hit Entity: ${componentData.hitEntity.typeId}`);
-        world.sendMessage(`Item: ${componentData.itemStack.typeId}`);
+        let result: string = JSON.stringify(
+            Object.keys(data)
+                .sort()
+                .reduce((result, key) => {
+                    result[key] = data[key];
+                    return result;
+                }, {}),
+            null,
+            4
+        );
+        console.log(result);
     }
 }
 

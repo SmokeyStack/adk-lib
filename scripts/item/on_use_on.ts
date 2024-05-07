@@ -15,6 +15,7 @@ import { onUseOnDye } from './item_dye';
 import { decrementStack } from '../utils/decrement_stack';
 import { directionToVector3 } from 'utils/math';
 import { onUseOnWax } from './item_wax';
+import { logEventData } from 'utils/debug';
 
 class onUseOn implements ItemCustomComponent {
     constructor() {
@@ -25,18 +26,21 @@ class onUseOn implements ItemCustomComponent {
 
 export class debug extends onUseOn {
     onUseOn(componentData: ItemComponentUseOnEvent) {
-        world.sendMessage(`Source: ${componentData.source.typeId}`);
-        world.sendMessage(
-            `Used On Block Permutation: ${componentData.usedOnBlockPermutation.type.id}`
+        let data: Object = logEventData(
+            componentData,
+            componentData.constructor.name
         );
-        world.sendMessage(
-            `Block: ${componentData.block.typeId} at (${componentData.block.location.x}, ${componentData.block.location.y}, ${componentData.block.location.z})`
+        let result: string = JSON.stringify(
+            Object.keys(data)
+                .sort()
+                .reduce((result, key) => {
+                    result[key] = data[key];
+                    return result;
+                }, {}),
+            null,
+            4
         );
-        world.sendMessage(`Block Face: ${componentData.blockFace}`);
-        world.sendMessage(
-            `Face Location: (${componentData.faceLocation.x}, ${componentData.faceLocation.y}, ${componentData.faceLocation.z})`
-        );
-        world.sendMessage(`Item: ${componentData.itemStack.typeId}`);
+        console.log(result);
     }
 }
 

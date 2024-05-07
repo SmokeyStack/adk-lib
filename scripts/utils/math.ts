@@ -51,3 +51,7 @@ export function getRandomVelocity(): Vector3 {
         z: nextDouble(-0.5, 0.5)
     };
 }
+
+export function lerp(delta: number, start: number, end: number) {
+    return start + delta * (end - start);
+}

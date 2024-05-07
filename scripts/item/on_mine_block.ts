@@ -2,9 +2,10 @@ import {
     EquipmentSlot,
     ItemComponentMineBlockEvent,
     ItemCustomComponent,
-    ItemStack,
-    world
+    ItemStack
 } from '@minecraft/server';
+import { logEventData } from 'utils/debug';
+import { canHarvest } from './item_pickaxe';
 
 class onMineBlock implements ItemCustomComponent {
     constructor() {
@@ -15,12 +16,21 @@ class onMineBlock implements ItemCustomComponent {
 
 export class debug extends onMineBlock {
     onMineBlock(componentData: ItemComponentMineBlockEvent) {
-        world.sendMessage(`Block: ${componentData.block.typeId}`);
-        world.sendMessage(`Item: ${componentData.itemStack.typeId}`);
-        world.sendMessage(
-            `Mined Block Permutation: ${componentData.minedBlockPermutation.type.id}`
+        let data: Object = logEventData(
+            componentData,
+            componentData.constructor.name
         );
-        world.sendMessage(`Entity: ${componentData.source.typeId}`);
+        let result: string = JSON.stringify(
+            Object.keys(data)
+                .sort()
+                .reduce((result, key) => {
+                    result[key] = data[key];
+                    return result;
+                }, {}),
+            null,
+            4
+        );
+        console.log(result);
     }
 }
 
@@ -46,5 +56,12 @@ export class digger extends onMineBlock {
         player
             .getComponent('minecraft:equippable')
             .setEquipment(EquipmentSlot.Mainhand, item);
+    }
+}
+
+export class pickaxe extends onMineBlock {
+    onMineBlock(componentData: ItemComponentMineBlockEvent): void {
+        logEventData(componentData, componentData.constructor.name);
+        canHarvest(componentData);
     }
 }
