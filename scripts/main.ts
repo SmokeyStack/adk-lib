@@ -1,4 +1,4 @@
-import { EquipmentSlot, Player, system, world } from '@minecraft/server';
+import { world } from '@minecraft/server';
 import * as blockOnStepOn from 'blocks/on_step_on';
 import * as blockOnStepOff from 'blocks/on_step_off';
 import * as blockOnRandomTick from 'blocks/on_random_tick';
@@ -116,6 +116,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
     eventData.blockTypeRegistry.registerCustomComponent(
         'adk-lib:on_player_interact_debug',
         new blockOnPlayerInteract.debug()
+    );
+    eventData.blockTypeRegistry.registerCustomComponent(
+        'adk-lib:on_player_interact_turn_into',
+        new blockOnPlayerInteract.turnInto()
     );
 
     // On Tick

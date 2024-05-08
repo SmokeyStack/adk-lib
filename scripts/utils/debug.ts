@@ -214,6 +214,7 @@ function logPlayerFunctions(data: any, key: string, skip: string[] = []): any {
         case 'getGameMode':
             return data[key]();
         case 'getSpawnPoint':
+            if (data[key]() === undefined) return;
             return logEventData(data[key](), '', skip);
         case 'getTotalXp':
             return data[key]();
