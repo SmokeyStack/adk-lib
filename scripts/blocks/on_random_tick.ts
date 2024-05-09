@@ -1,4 +1,5 @@
 import {
+    Block,
     BlockComponentRandomTickEvent,
     BlockCustomComponent,
     BlockPermutation,
@@ -107,5 +108,40 @@ export class plantGrowth extends onRandomTick {
                     'adk-lib:age': (current_state += 1)
                 })
             );
+    }
+}
+
+export class sugarCane extends onRandomTick {
+    onRandomTick(componentData: BlockComponentRandomTickEvent): void {
+        const block: Block = componentData.block;
+
+        if (!block.above().isAir) return;
+
+        let count: number = 1;
+
+        while (block.below(count).typeId === block.typeId) ++count;
+
+        const namespace: string = block.typeId.split(':')[0];
+        const blockStateAge: string = namespace + ':age';
+
+        if (count < 3) {
+            let age: number = block.permutation.getState(
+                blockStateAge
+            ) as number;
+            if (age == 15) {
+                block.above().setType(block.typeId);
+                block.setPermutation(
+                    BlockPermutation.resolve(block.typeId, {
+                        [blockStateAge]: 0
+                    })
+                );
+            } else {
+                block.setPermutation(
+                    BlockPermutation.resolve(block.typeId, {
+                        [blockStateAge]: age + 1
+                    })
+                );
+            }
+        }
     }
 }

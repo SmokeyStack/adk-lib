@@ -15,6 +15,7 @@ import * as itemUse from 'item/on_use';
 import * as itemOnMineBlock from 'item/on_mine_block';
 import * as itemOnHitEntity from 'item/on_hit_entity';
 import * as itemOnUseOn from 'item/on_use_on';
+import { logEventData } from 'utils/debug';
 
 world.beforeEvents.worldInitialize.subscribe((eventData) => {
     // On Step On
@@ -62,6 +63,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:on_random_tick_plant_growth',
         new blockOnRandomTick.plantGrowth()
     );
+    eventData.blockTypeRegistry.registerCustomComponent(
+        'adk-lib:on_random_tick_sugar_cane',
+        new blockOnRandomTick.sugarCane()
+    );
 
     // Before On Player Place
     eventData.blockTypeRegistry.registerCustomComponent(
@@ -75,6 +80,18 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
     eventData.blockTypeRegistry.registerCustomComponent(
         'adk-lib:before_on_player_place_change_into_bedrock',
         new blockBeforeOnPlayerPlace.changeIntoBedrock()
+    );
+    eventData.blockTypeRegistry.registerCustomComponent(
+        'adk-lib:before_on_player_place_double_slab',
+        new blockBeforeOnPlayerPlace.doubleSlab()
+    );
+    eventData.blockTypeRegistry.registerCustomComponent(
+        'adk-lib:before_on_player_place_sugar_cane',
+        new blockBeforeOnPlayerPlace.sugarCane()
+    );
+    eventData.blockTypeRegistry.registerCustomComponent(
+        'adk-lib:before_on_player_place_stairs',
+        new blockBeforeOnPlayerPlace.stairs()
     );
 
     // On Entity Fall On
@@ -102,7 +119,6 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:on_player_destroy_debug',
         new blockOnPlayerDestroy.debug()
     );
-
     eventData.blockTypeRegistry.registerCustomComponent(
         'adk-lib:on_player_destroy_spawn_item',
         new blockOnPlayerDestroy.spawnItem()
@@ -228,3 +244,18 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         new itemOnUseOn.wax()
     );
 });
+
+// world.afterEvents.playerPlaceBlock.subscribe((eventData) => {
+//     let data: Object = logEventData(eventData, eventData.constructor.name);
+//     let result: string = JSON.stringify(
+//         Object.keys(data)
+//             .sort()
+//             .reduce((result, key) => {
+//                 result[key] = data[key];
+//                 return result;
+//             }, {}),
+//         null,
+//         4
+//     );
+//     console.log(result);
+// });

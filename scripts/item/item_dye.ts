@@ -8,7 +8,7 @@ import {
     Player
 } from '@minecraft/server';
 import { areVectorsEqual } from '../utils/math';
-import { decrementStack } from '../utils/decrement_stack';
+import { decrementStack } from '../utils/helper';
 
 export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
     const REGEX: RegExp = new RegExp(

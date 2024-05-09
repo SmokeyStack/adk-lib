@@ -2,7 +2,6 @@ import {
     Block,
     BlockPermutation,
     Container,
-    Dimension,
     Direction,
     ItemComponentUseOnEvent,
     ItemStack,
@@ -10,7 +9,7 @@ import {
     Vector3
 } from '@minecraft/server';
 import { directionToVector3 } from '../utils/math';
-import { decrementStack } from 'utils/decrement_stack';
+import { decrementStack, updateIfAir, updateLiquidBlock } from 'utils/helper';
 
 export function onUseOnBucket(componentData: ItemComponentUseOnEvent) {
     let tags: string[] = componentData.itemStack.getTags();
@@ -92,31 +91,6 @@ export function onUseOnBucket(componentData: ItemComponentUseOnEvent) {
         componentData.source.dimension.getBlock(blockLocation).west(),
         { x: blockLocation.x - 1, y: blockLocation.y, z: blockLocation.z }
     );
-}
-
-/**
- * @brief Updates the liquid block since placing a liquid by itself won't make it flow.
- * @param dimension The dimension to execute in
- * @param location The world location
- */
-function updateLiquidBlock(dimension: Dimension, location: Vector3) {
-    dimension.setBlockType(location, 'minecraft:bedrock');
-    dimension.setBlockType(location, 'minecraft:air');
-}
-
-/**
- * @brief Updates the block if it is air.
- * @param dimension Dimension to execute in
- * @param block Block to check
- * @param blockLocation Block location
- */
-function updateIfAir(
-    dimension: Dimension,
-    block: Block,
-    blockLocation: Vector3
-): void {
-    if (block.typeId == 'minecraft:air')
-        updateLiquidBlock(dimension, blockLocation);
 }
 
 /**

@@ -9,7 +9,7 @@ import {
     Dimension,
     Vector3
 } from '@minecraft/server';
-import { decrementStack } from '../utils/decrement_stack';
+import { decrementStack } from '../utils/helper';
 import {
     directionToVector3,
     getRandomVelocity,

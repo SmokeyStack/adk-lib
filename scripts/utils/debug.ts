@@ -244,6 +244,7 @@ function logBlockFunctions(data: any, key: string, skip: string[]): any {
             return result;
         }
         case 'getItemStack':
+            if (data[key]() === undefined) return;
             return logEventData(data[key]());
         case 'getRedstonePower':
             return data[key]();

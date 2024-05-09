@@ -12,7 +12,7 @@ import {
 import { BLOCK_MAP } from './fertilzeable';
 import { onUseOnBucket, pickupLiquid } from './item_bucket';
 import { onUseOnDye } from './item_dye';
-import { decrementStack } from '../utils/decrement_stack';
+import { decrementStack } from '../utils/helper';
 import { directionToVector3 } from 'utils/math';
 import { onUseOnWax } from './item_wax';
 import { logEventData } from 'utils/debug';

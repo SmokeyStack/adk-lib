@@ -1,9 +1,17 @@
 import {
+    Block,
     BlockComponentPlayerDestroyEvent,
     BlockCustomComponent,
+    BlockPermutation,
+    Direction,
+    EquipmentSlot,
     ItemStack,
+    Player,
     world
 } from '@minecraft/server';
+import { logEventData } from 'utils/debug';
+import { decrementStack } from 'utils/helper';
+import { directionToVector3 } from 'utils/math';
 
 class onPlayerDestroy implements BlockCustomComponent {
     constructor() {
@@ -14,23 +22,42 @@ class onPlayerDestroy implements BlockCustomComponent {
 
 export class debug extends onPlayerDestroy {
     onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent) {
-        world.sendMessage(
-            `Destroyed Block Permutation: ${componentData.destroyedBlockPermutation.type.id}`
+        let data: Object = logEventData(
+            componentData,
+            componentData.constructor.name
         );
-        world.sendMessage(`Player: ${componentData.player.name}`);
+        let result: string = JSON.stringify(
+            Object.keys(data)
+                .sort()
+                .reduce((result, key) => {
+                    result[key] = data[key];
+                    return result;
+                }, {}),
+            null,
+            4
+        );
+        console.log(result);
     }
 }
 
 export class spawnItem extends onPlayerDestroy {
     onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent) {
-        componentData.dimension.spawnItem(
-            new ItemStack('minecraft:diamond'),
-            componentData.block.location
-        );
+        if (componentData.player.getGameMode() == 'creative') return;
 
-        world.sendMessage(
-            `Player destroyed ${componentData.destroyedBlockPermutation.type.id} at ${componentData.block.location.x}, ${componentData.block.location.y}, ${componentData.block.location.z}`
-        );
+        const REGEX: RegExp = new RegExp('adk-lib:spawn_item_([^]+)');
+        const tags: string[] =
+            componentData.destroyedBlockPermutation.getTags();
+        let results: string[] = [];
+
+        for (const tag of tags)
+            if (REGEX.exec(tag)) results.push(REGEX.exec(tag)[1]);
+
+        results.forEach((result) => {
+            componentData.dimension.spawnItem(
+                new ItemStack(result),
+                componentData.block.location
+            );
+        });
     }
 }
 
