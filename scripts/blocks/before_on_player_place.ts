@@ -6,8 +6,7 @@ import {
     Direction,
     EquipmentSlot,
     ItemStack,
-    Player,
-    world
+    Player
 } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
 import { DirectionType, decrementStack } from 'utils/helper';
@@ -177,77 +176,260 @@ export class stairs extends beforeOnPlayerPlace {
     beforeOnPlayerPlace(
         componentData: BlockComponentPlayerPlaceBeforeEvent
     ): void {
-        let face = componentData.permutationToPlace.getState(
+        let face: string = componentData.permutationToPlace.getState(
             'minecraft:cardinal_direction'
-        );
-        let half = componentData.permutationToPlace.getState(
+        ) as string;
+        let half: string = componentData.permutationToPlace.getState(
             'minecraft:vertical_half'
-        );
+        ) as string;
         const namespace: string =
             componentData.permutationToPlace.type.id.split(':')[0];
         let block: BlockPermutation = componentData.permutationToPlace;
         let blockToCheck: Block;
-        console.warn(face);
         switch (face) {
             case 'north':
                 {
-                    block = block.withState(namespace + ':north_east', true);
-                    block = block.withState(namespace + ':south_east', false);
-                    block = block.withState(namespace + ':south_west', false);
-                    block = block.withState(namespace + ':north_west', true);
-                    blockToCheck = componentData.block.south();
+                    for (const direction of DirectionType.HORIZONTAL) {
+                        blockToCheck = componentData.block.offset(
+                            directionToVector3(direction)
+                        );
 
-                    if (blockToCheck.typeId !== block.type.id) return;
+                        if (blockToCheck.typeId !== block.type.id) continue;
 
-                    let blockToCheckHalf = blockToCheck.permutation.getState(
-                        'minecraft:vertical_half'
-                    );
-
-                    if (half !== blockToCheckHalf) return;
-
-                    let state = blockToCheck.permutation.getState(
-                        'minecraft:cardinal_direction'
-                    );
-                    switch (state) {
-                        case 'east':
-                            block = block.withState(
-                                namespace + ':south_east',
-                                true
+                        const blockToCheckHalf =
+                            blockToCheck.permutation.getState(
+                                'minecraft:vertical_half'
                             );
-                            break;
-                        case 'west':
-                            block = block.withState(
-                                namespace + ':south_west',
-                                true
+
+                        if (blockToCheckHalf !== half) continue;
+
+                        const blockToCheckDirection =
+                            blockToCheck.permutation.getState(
+                                'minecraft:cardinal_direction'
                             );
-                            break;
-                        default:
-                            break;
+
+                        switch (direction) {
+                            case Direction.North:
+                                {
+                                    if (blockToCheckDirection === 'west') {
+                                        block = block.withState(
+                                            namespace + ':shape',
+                                            'outer_left'
+                                        );
+                                    }
+                                    if (blockToCheckDirection === 'east') {
+                                        block = block.withState(
+                                            namespace + ':shape',
+                                            'outer_right'
+                                        );
+                                    }
+                                }
+                                break;
+                            case Direction.South:
+                                {
+                                    if (blockToCheckDirection === 'east') {
+                                        block = block.withState(
+                                            namespace + ':shape',
+                                            'inner_left'
+                                        );
+                                    }
+                                    if (blockToCheckDirection === 'west') {
+                                        block = block.withState(
+                                            namespace + ':shape',
+                                            'inner_right'
+                                        );
+                                    }
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    }
+                }
+                break;
+            case 'south':
+                {
+                    block = block.withState(namespace + ':south', true);
+                    for (const direction of DirectionType.HORIZONTAL) {
+                        blockToCheck = componentData.block.offset(
+                            directionToVector3(direction)
+                        );
+
+                        if (blockToCheck.typeId !== block.type.id) continue;
+
+                        const blockToCheckHalf =
+                            blockToCheck.permutation.getState(
+                                'minecraft:vertical_half'
+                            );
+
+                        if (blockToCheckHalf !== half) continue;
+
+                        const blockToCheckDirection =
+                            blockToCheck.permutation.getState(
+                                'minecraft:cardinal_direction'
+                            );
+
+                        switch (direction) {
+                            case Direction.North:
+                                {
+                                    if (blockToCheckDirection === 'west') {
+                                        block = block.withState(
+                                            namespace + ':shape',
+                                            'inner_left'
+                                        );
+                                    }
+                                    if (blockToCheckDirection === 'east') {
+                                        block = block.withState(
+                                            namespace + ':shape',
+                                            'inner_right'
+                                        );
+                                    }
+                                }
+                                break;
+                            case Direction.South:
+                                {
+                                    if (blockToCheckDirection === 'east') {
+                                        block = block.withState(
+                                            namespace + ':shape',
+                                            'outer_left'
+                                        );
+                                    }
+                                    if (blockToCheckDirection === 'west') {
+                                        block = block.withState(
+                                            namespace + ':shape',
+                                            'outer_right'
+                                        );
+                                    }
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
                     }
                 }
                 break;
             case 'east':
                 {
-                    block = block.withState(namespace + ':north_east', true);
-                    block = block.withState(namespace + ':south_east', true);
-                    block = block.withState(namespace + ':south_west', false);
-                    block = block.withState(namespace + ':north_west', false);
-                }
-                break;
-            case 'south':
-                {
-                    block = block.withState(namespace + ':north_east', false);
-                    block = block.withState(namespace + ':south_east', true);
-                    block = block.withState(namespace + ':south_west', true);
-                    block = block.withState(namespace + ':north_west', false);
+                    for (const direction of DirectionType.HORIZONTAL) {
+                        blockToCheck = componentData.block.offset(
+                            directionToVector3(direction)
+                        );
+
+                        if (blockToCheck.typeId !== block.type.id) continue;
+
+                        const blockToCheckHalf =
+                            blockToCheck.permutation.getState(
+                                'minecraft:vertical_half'
+                            );
+
+                        if (blockToCheckHalf !== half) continue;
+
+                        const blockToCheckDirection =
+                            blockToCheck.permutation.getState(
+                                'minecraft:cardinal_direction'
+                            );
+
+                        switch (direction) {
+                            case Direction.East:
+                                {
+                                    if (blockToCheckDirection === 'north') {
+                                        block = block.withState(
+                                            namespace + ':shape',
+                                            'outer_left'
+                                        );
+                                    }
+                                    if (blockToCheckDirection === 'south') {
+                                        block = block.withState(
+                                            namespace + ':shape',
+                                            'outer_right'
+                                        );
+                                    }
+                                }
+                                break;
+                            case Direction.West:
+                                {
+                                    if (blockToCheckDirection === 'south') {
+                                        block = block.withState(
+                                            namespace + ':shape',
+                                            'inner_left'
+                                        );
+                                    }
+                                    if (blockToCheckDirection === 'north') {
+                                        block = block.withState(
+                                            namespace + ':shape',
+                                            'inner_right'
+                                        );
+                                    }
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    }
                 }
                 break;
             case 'west':
                 {
-                    block = block.withState(namespace + ':north_east', false);
-                    block = block.withState(namespace + ':south_east', false);
-                    block = block.withState(namespace + ':south_west', true);
-                    block = block.withState(namespace + ':north_west', true);
+                    for (const direction of DirectionType.HORIZONTAL) {
+                        blockToCheck = componentData.block.offset(
+                            directionToVector3(direction)
+                        );
+
+                        if (blockToCheck.typeId !== block.type.id) continue;
+
+                        const blockToCheckHalf =
+                            blockToCheck.permutation.getState(
+                                'minecraft:vertical_half'
+                            );
+
+                        if (blockToCheckHalf !== half) continue;
+
+                        const blockToCheckDirection =
+                            blockToCheck.permutation.getState(
+                                'minecraft:cardinal_direction'
+                            );
+
+                        switch (direction) {
+                            case Direction.East:
+                                {
+                                    if (blockToCheckDirection === 'north') {
+                                        block = block.withState(
+                                            namespace + ':shape',
+                                            'inner_left'
+                                        );
+                                    }
+                                    if (blockToCheckDirection === 'south') {
+                                        block = block.withState(
+                                            namespace + ':shape',
+                                            'inner_right'
+                                        );
+                                    }
+                                }
+                                break;
+                            case Direction.West:
+                                {
+                                    if (blockToCheckDirection === 'south') {
+                                        block = block.withState(
+                                            namespace + ':shape',
+                                            'outer_left'
+                                        );
+                                    }
+                                    if (blockToCheckDirection === 'north') {
+                                        block = block.withState(
+                                            namespace + ':shape',
+                                            'outer_right'
+                                        );
+                                    }
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    }
                 }
                 break;
             default:
