@@ -184,7 +184,8 @@ export class stairs extends beforeOnPlayerPlace {
         ) as string;
         const namespace: string =
             componentData.permutationToPlace.type.id.split(':')[0];
-        let block: BlockPermutation = componentData.permutationToPlace;
+        let blockPermutation: BlockPermutation =
+            componentData.permutationToPlace;
         let blockToCheck: Block;
         switch (face) {
             case 'north':
@@ -194,7 +195,8 @@ export class stairs extends beforeOnPlayerPlace {
                             directionToVector3(direction)
                         );
 
-                        if (blockToCheck.typeId !== block.type.id) continue;
+                        if (blockToCheck.typeId !== blockPermutation.type.id)
+                            continue;
 
                         const blockToCheckHalf =
                             blockToCheck.permutation.getState(
@@ -212,31 +214,75 @@ export class stairs extends beforeOnPlayerPlace {
                             case Direction.North:
                                 {
                                     if (blockToCheckDirection === 'west') {
-                                        block = block.withState(
-                                            namespace + ':shape',
-                                            'outer_left'
-                                        );
+                                        blockPermutation =
+                                            blockPermutation.withState(
+                                                namespace + ':shape',
+                                                'outer_left'
+                                            );
                                     }
                                     if (blockToCheckDirection === 'east') {
-                                        block = block.withState(
-                                            namespace + ':shape',
-                                            'outer_right'
-                                        );
+                                        blockPermutation =
+                                            blockPermutation.withState(
+                                                namespace + ':shape',
+                                                'outer_right'
+                                            );
                                     }
                                 }
                                 break;
                             case Direction.South:
                                 {
                                     if (blockToCheckDirection === 'east') {
-                                        block = block.withState(
-                                            namespace + ':shape',
-                                            'inner_left'
+                                        blockPermutation =
+                                            blockPermutation.withState(
+                                                namespace + ':shape',
+                                                'inner_left'
+                                            );
+                                    }
+                                    if (blockToCheckDirection === 'west') {
+                                        blockPermutation =
+                                            blockPermutation.withState(
+                                                namespace + ':shape',
+                                                'inner_right'
+                                            );
+                                    }
+                                }
+                                break;
+                            case Direction.East:
+                                {
+                                    if (blockToCheckDirection === 'east') {
+                                        blockToCheck.setPermutation(
+                                            blockToCheck.permutation.withState(
+                                                namespace + ':shape',
+                                                'inner_right'
+                                            )
                                         );
                                     }
                                     if (blockToCheckDirection === 'west') {
-                                        block = block.withState(
-                                            namespace + ':shape',
-                                            'inner_right'
+                                        blockToCheck.setPermutation(
+                                            blockToCheck.permutation.withState(
+                                                namespace + ':shape',
+                                                'outer_right'
+                                            )
+                                        );
+                                    }
+                                }
+                                break;
+                            case Direction.West:
+                                {
+                                    if (blockToCheckDirection === 'west') {
+                                        blockToCheck.setPermutation(
+                                            blockToCheck.permutation.withState(
+                                                namespace + ':shape',
+                                                'inner_left'
+                                            )
+                                        );
+                                    }
+                                    if (blockToCheckDirection === 'east') {
+                                        blockToCheck.setPermutation(
+                                            blockToCheck.permutation.withState(
+                                                namespace + ':shape',
+                                                'outer_left'
+                                            )
                                         );
                                     }
                                 }
@@ -244,19 +290,22 @@ export class stairs extends beforeOnPlayerPlace {
                             default:
                                 break;
                         }
-                        break;
                     }
                 }
                 break;
             case 'south':
                 {
-                    block = block.withState(namespace + ':south', true);
+                    blockPermutation = blockPermutation.withState(
+                        namespace + ':south',
+                        true
+                    );
                     for (const direction of DirectionType.HORIZONTAL) {
                         blockToCheck = componentData.block.offset(
                             directionToVector3(direction)
                         );
 
-                        if (blockToCheck.typeId !== block.type.id) continue;
+                        if (blockToCheck.typeId !== blockPermutation.type.id)
+                            continue;
 
                         const blockToCheckHalf =
                             blockToCheck.permutation.getState(
@@ -274,31 +323,75 @@ export class stairs extends beforeOnPlayerPlace {
                             case Direction.North:
                                 {
                                     if (blockToCheckDirection === 'west') {
-                                        block = block.withState(
-                                            namespace + ':shape',
-                                            'inner_left'
-                                        );
+                                        blockPermutation =
+                                            blockPermutation.withState(
+                                                namespace + ':shape',
+                                                'inner_left'
+                                            );
                                     }
                                     if (blockToCheckDirection === 'east') {
-                                        block = block.withState(
-                                            namespace + ':shape',
-                                            'inner_right'
-                                        );
+                                        blockPermutation =
+                                            blockPermutation.withState(
+                                                namespace + ':shape',
+                                                'inner_right'
+                                            );
                                     }
                                 }
                                 break;
                             case Direction.South:
                                 {
                                     if (blockToCheckDirection === 'east') {
-                                        block = block.withState(
-                                            namespace + ':shape',
-                                            'outer_left'
+                                        blockPermutation =
+                                            blockPermutation.withState(
+                                                namespace + ':shape',
+                                                'outer_left'
+                                            );
+                                    }
+                                    if (blockToCheckDirection === 'west') {
+                                        blockPermutation =
+                                            blockPermutation.withState(
+                                                namespace + ':shape',
+                                                'outer_right'
+                                            );
+                                    }
+                                }
+                                break;
+                            case Direction.East:
+                                {
+                                    if (blockToCheckDirection === 'east') {
+                                        blockToCheck.setPermutation(
+                                            blockToCheck.permutation.withState(
+                                                namespace + ':shape',
+                                                'inner_left'
+                                            )
                                         );
                                     }
                                     if (blockToCheckDirection === 'west') {
-                                        block = block.withState(
-                                            namespace + ':shape',
-                                            'outer_right'
+                                        blockToCheck.setPermutation(
+                                            blockToCheck.permutation.withState(
+                                                namespace + ':shape',
+                                                'outer_left'
+                                            )
+                                        );
+                                    }
+                                }
+                                break;
+                            case Direction.West:
+                                {
+                                    if (blockToCheckDirection === 'west') {
+                                        blockToCheck.setPermutation(
+                                            blockToCheck.permutation.withState(
+                                                namespace + ':shape',
+                                                'inner_right'
+                                            )
+                                        );
+                                    }
+                                    if (blockToCheckDirection === 'east') {
+                                        blockToCheck.setPermutation(
+                                            blockToCheck.permutation.withState(
+                                                namespace + ':shape',
+                                                'outer_right'
+                                            )
                                         );
                                     }
                                 }
@@ -306,7 +399,6 @@ export class stairs extends beforeOnPlayerPlace {
                             default:
                                 break;
                         }
-                        break;
                     }
                 }
                 break;
@@ -317,7 +409,8 @@ export class stairs extends beforeOnPlayerPlace {
                             directionToVector3(direction)
                         );
 
-                        if (blockToCheck.typeId !== block.type.id) continue;
+                        if (blockToCheck.typeId !== blockPermutation.type.id)
+                            continue;
 
                         const blockToCheckHalf =
                             blockToCheck.permutation.getState(
@@ -335,31 +428,75 @@ export class stairs extends beforeOnPlayerPlace {
                             case Direction.East:
                                 {
                                     if (blockToCheckDirection === 'north') {
-                                        block = block.withState(
-                                            namespace + ':shape',
-                                            'outer_left'
-                                        );
+                                        blockPermutation =
+                                            blockPermutation.withState(
+                                                namespace + ':shape',
+                                                'outer_left'
+                                            );
                                     }
                                     if (blockToCheckDirection === 'south') {
-                                        block = block.withState(
-                                            namespace + ':shape',
-                                            'outer_right'
-                                        );
+                                        blockPermutation =
+                                            blockPermutation.withState(
+                                                namespace + ':shape',
+                                                'outer_right'
+                                            );
                                     }
                                 }
                                 break;
                             case Direction.West:
                                 {
                                     if (blockToCheckDirection === 'south') {
-                                        block = block.withState(
-                                            namespace + ':shape',
-                                            'inner_left'
-                                        );
+                                        blockPermutation =
+                                            blockPermutation.withState(
+                                                namespace + ':shape',
+                                                'inner_left'
+                                            );
                                     }
                                     if (blockToCheckDirection === 'north') {
-                                        block = block.withState(
-                                            namespace + ':shape',
-                                            'inner_right'
+                                        blockPermutation =
+                                            blockPermutation.withState(
+                                                namespace + ':shape',
+                                                'inner_right'
+                                            );
+                                    }
+                                }
+                                break;
+                            case Direction.North:
+                                {
+                                    if (blockToCheckDirection === 'north') {
+                                        blockToCheck.setPermutation(
+                                            blockToCheck.permutation.withState(
+                                                namespace + ':shape',
+                                                'inner_left'
+                                            )
+                                        );
+                                    }
+                                    if (blockToCheckDirection === 'south') {
+                                        blockToCheck.setPermutation(
+                                            blockToCheck.permutation.withState(
+                                                namespace + ':shape',
+                                                'outer_left'
+                                            )
+                                        );
+                                    }
+                                }
+                                break;
+                            case Direction.South:
+                                {
+                                    if (blockToCheckDirection === 'north') {
+                                        blockToCheck.setPermutation(
+                                            blockToCheck.permutation.withState(
+                                                namespace + ':shape',
+                                                'outer_right'
+                                            )
+                                        );
+                                    }
+                                    if (blockToCheckDirection === 'south') {
+                                        blockToCheck.setPermutation(
+                                            blockToCheck.permutation.withState(
+                                                namespace + ':shape',
+                                                'inner_right'
+                                            )
                                         );
                                     }
                                 }
@@ -367,7 +504,6 @@ export class stairs extends beforeOnPlayerPlace {
                             default:
                                 break;
                         }
-                        break;
                     }
                 }
                 break;
@@ -378,7 +514,8 @@ export class stairs extends beforeOnPlayerPlace {
                             directionToVector3(direction)
                         );
 
-                        if (blockToCheck.typeId !== block.type.id) continue;
+                        if (blockToCheck.typeId !== blockPermutation.type.id)
+                            continue;
 
                         const blockToCheckHalf =
                             blockToCheck.permutation.getState(
@@ -396,31 +533,75 @@ export class stairs extends beforeOnPlayerPlace {
                             case Direction.East:
                                 {
                                     if (blockToCheckDirection === 'north') {
-                                        block = block.withState(
-                                            namespace + ':shape',
-                                            'inner_left'
-                                        );
+                                        blockPermutation =
+                                            blockPermutation.withState(
+                                                namespace + ':shape',
+                                                'inner_left'
+                                            );
                                     }
                                     if (blockToCheckDirection === 'south') {
-                                        block = block.withState(
-                                            namespace + ':shape',
-                                            'inner_right'
-                                        );
+                                        blockPermutation =
+                                            blockPermutation.withState(
+                                                namespace + ':shape',
+                                                'inner_right'
+                                            );
                                     }
                                 }
                                 break;
                             case Direction.West:
                                 {
                                     if (blockToCheckDirection === 'south') {
-                                        block = block.withState(
-                                            namespace + ':shape',
-                                            'outer_left'
-                                        );
+                                        blockPermutation =
+                                            blockPermutation.withState(
+                                                namespace + ':shape',
+                                                'outer_left'
+                                            );
                                     }
                                     if (blockToCheckDirection === 'north') {
-                                        block = block.withState(
-                                            namespace + ':shape',
-                                            'outer_right'
+                                        blockPermutation =
+                                            blockPermutation.withState(
+                                                namespace + ':shape',
+                                                'outer_right'
+                                            );
+                                    }
+                                }
+                                break;
+                            case Direction.North:
+                                {
+                                    if (blockToCheckDirection === 'north') {
+                                        blockToCheck.setPermutation(
+                                            blockToCheck.permutation.withState(
+                                                namespace + ':shape',
+                                                'inner_right'
+                                            )
+                                        );
+                                    }
+                                    if (blockToCheckDirection === 'south') {
+                                        blockToCheck.setPermutation(
+                                            blockToCheck.permutation.withState(
+                                                namespace + ':shape',
+                                                'outer_right'
+                                            )
+                                        );
+                                    }
+                                }
+                                break;
+                            case Direction.South:
+                                {
+                                    if (blockToCheckDirection === 'north') {
+                                        blockToCheck.setPermutation(
+                                            blockToCheck.permutation.withState(
+                                                namespace + ':shape',
+                                                'outer_left'
+                                            )
+                                        );
+                                    }
+                                    if (blockToCheckDirection === 'south') {
+                                        blockToCheck.setPermutation(
+                                            blockToCheck.permutation.withState(
+                                                namespace + ':shape',
+                                                'inner_left'
+                                            )
                                         );
                                     }
                                 }
@@ -428,7 +609,6 @@ export class stairs extends beforeOnPlayerPlace {
                             default:
                                 break;
                         }
-                        break;
                     }
                 }
                 break;
@@ -436,6 +616,6 @@ export class stairs extends beforeOnPlayerPlace {
                 break;
         }
 
-        componentData.permutationToPlace = block;
+        componentData.permutationToPlace = blockPermutation;
     }
 }
