@@ -34,7 +34,7 @@ export function directionToVector3(direction: Direction): Vector3 {
     }
 }
 
-export function velocityOfCenter(vector: Vector3): Vector3 {
+export function vectorOfCenter(vector: Vector3): Vector3 {
     return { x: vector.x + 0.5, y: vector.y + 0.5, z: vector.z + 0.5 };
 }
 

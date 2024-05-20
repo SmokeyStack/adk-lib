@@ -1,17 +1,11 @@
 import {
-    Block,
     BlockComponentPlayerDestroyEvent,
     BlockCustomComponent,
-    BlockPermutation,
-    Direction,
-    EquipmentSlot,
     ItemStack,
-    Player,
     world
 } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
-import { decrementStack } from 'utils/helper';
-import { directionToVector3 } from 'utils/math';
+import { vectorOfCenter } from 'utils/math';
 
 class onPlayerDestroy implements BlockCustomComponent {
     constructor() {
@@ -71,5 +65,29 @@ export class regenerate extends onPlayerDestroy {
             `Player destroyed ${componentData.destroyedBlockPermutation.type.id} at ${componentData.block.location.x}, ${componentData.block.location.y}, ${componentData.block.location.z}`
         );
         world.sendMessage('Regenerating block...');
+    }
+}
+
+export class dropExperience extends onPlayerDestroy {
+    onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent) {
+        if (componentData.player.getGameMode() == 'creative') return;
+        if (!world.gameRules.doTileDrops) return;
+
+        const REGEX: RegExp = new RegExp('adk-lib:drop_experience_([0-9]+)');
+        const tags: string[] =
+            componentData.destroyedBlockPermutation.getTags();
+        let experienceDrop: number;
+
+        for (let tag of tags)
+            if (REGEX.exec(tag)) {
+                experienceDrop = parseInt(REGEX.exec(tag)[1]);
+                break;
+            }
+
+        for (let a = 0; a < experienceDrop; a++)
+            componentData.dimension.spawnEntity(
+                'minecraft:xp_orb',
+                vectorOfCenter(componentData.block.location)
+            );
     }
 }

@@ -1,4 +1,4 @@
-import { world } from '@minecraft/server';
+import { BlockTypes, ItemStack, system, world } from '@minecraft/server';
 import * as blockOnStepOn from 'blocks/on_step_on';
 import * as blockOnStepOff from 'blocks/on_step_off';
 import * as blockOnRandomTick from 'blocks/on_random_tick';
@@ -127,6 +127,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:on_player_destroy_regenerate',
         new blockOnPlayerDestroy.regenerate()
     );
+    eventData.blockTypeRegistry.registerCustomComponent(
+        'adk-lib:on_player_destroy_drop_experience',
+        new blockOnPlayerDestroy.dropExperience()
+    );
 
     // On Player Interact
     eventData.blockTypeRegistry.registerCustomComponent(
@@ -142,6 +146,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
     eventData.blockTypeRegistry.registerCustomComponent(
         'adk-lib:on_tick_debug',
         new blockOnTick.debug()
+    );
+    eventData.blockTypeRegistry.registerCustomComponent(
+        'adk-lib:on_tick_torch_particles',
+        new blockOnTick.torchParticles()
     );
 
     // Items
@@ -245,17 +253,17 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
     );
 });
 
-// world.afterEvents.playerPlaceBlock.subscribe((eventData) => {
-//     let data: Object = logEventData(eventData, eventData.constructor.name);
-//     let result: string = JSON.stringify(
-//         Object.keys(data)
-//             .sort()
-//             .reduce((result, key) => {
-//                 result[key] = data[key];
-//                 return result;
-//             }, {}),
-//         null,
-//         4
-//     );
-//     console.log(result);
-// });
+world.afterEvents.playerPlaceBlock.subscribe((eventData) => {
+    let data: Object = logEventData(eventData, eventData.constructor.name);
+    let result: string = JSON.stringify(
+        Object.keys(data)
+            .sort()
+            .reduce((result, key) => {
+                result[key] = data[key];
+                return result;
+            }, {}),
+        null,
+        4
+    );
+    console.log(result);
+});

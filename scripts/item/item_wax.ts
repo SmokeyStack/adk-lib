@@ -14,7 +14,7 @@ import {
     directionToVector3,
     getRandomVelocity,
     nextDouble,
-    velocityOfCenter
+    vectorOfCenter
 } from 'utils/math';
 
 export function onUseOnWax(componentData: ItemComponentUseOnEvent) {
@@ -114,7 +114,7 @@ function spawnParticle(
     velocity: Vector3,
     offsetMultiplier: number
 ): void {
-    let vector: Vector3 = velocityOfCenter(blockPosition);
+    let vector: Vector3 = vectorOfCenter(blockPosition);
     let { x, y, z } = directionToVector3(direction);
     let worldX: number =
         vector.x + (x == 0 ? nextDouble(-0.5, 0.5) : x * offsetMultiplier);

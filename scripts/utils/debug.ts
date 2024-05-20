@@ -2,6 +2,7 @@ import {
     Block,
     BlockComponentTypes,
     BlockInventoryComponent,
+    BlockPermutation,
     BlockPistonComponent,
     BlockRecordPlayerComponent,
     BlockSignComponent,
@@ -58,6 +59,9 @@ export function logEventData(
                     break;
                 case Block:
                     result[fullKey] = logBlockFunctions(data, key, skip);
+                    break;
+                case BlockPermutation:
+                    result[fullKey] = logBlockPermutationFunctions(data, key);
                     break;
                 case ItemStack:
                     result[fullKey] = logItemStackFunctions(data, key, skip);
@@ -248,6 +252,20 @@ function logBlockFunctions(data: any, key: string, skip: string[]): any {
             return logEventData(data[key]());
         case 'getRedstonePower':
             return data[key]();
+        case 'getTags':
+            return data[key]();
+        default:
+            break;
+    }
+}
+
+function logBlockPermutationFunctions(data: any, key: string): any {
+    switch (key) {
+        case 'getAllStates':
+            return data[key]();
+        case 'getItemStack':
+            if (data[key]() === undefined) return;
+            return logEventData(data[key]());
         case 'getTags':
             return data[key]();
         default:

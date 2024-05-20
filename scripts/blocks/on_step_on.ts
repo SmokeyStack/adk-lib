@@ -3,6 +3,7 @@ import {
     BlockCustomComponent,
     world
 } from '@minecraft/server';
+import { logEventData } from 'utils/debug';
 
 class onStepOn implements BlockCustomComponent {
     constructor() {
@@ -13,8 +14,21 @@ class onStepOn implements BlockCustomComponent {
 
 export class debug extends onStepOn {
     onStepOn(componentData: BlockComponentStepOnEvent) {
-        world.sendMessage(`Block: ${componentData.block.typeId}`);
-        world.sendMessage(`Entity: ${componentData.entity.typeId}`);
+        let data: Object = logEventData(
+            componentData,
+            componentData.constructor.name
+        );
+        let result: string = JSON.stringify(
+            Object.keys(data)
+                .sort()
+                .reduce((result, key) => {
+                    result[key] = data[key];
+                    return result;
+                }, {}),
+            null,
+            4
+        );
+        console.log(result);
     }
 }
 
