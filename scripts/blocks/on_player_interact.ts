@@ -2,10 +2,13 @@ import {
     Block,
     BlockComponentPlayerInteractEvent,
     BlockCustomComponent,
+    Entity,
     EquipmentSlot,
+    ItemStack,
     Player
 } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
+import { vectorOfCenter } from 'utils/math';
 
 class onPlayerInteract implements BlockCustomComponent {
     constructor() {
@@ -57,6 +60,24 @@ export class turnInto extends onPlayerInteract {
 
                 break;
             }
+        }
+    }
+}
+
+export class primeTnt extends onPlayerInteract {
+    onPlayerInteract(componentData: BlockComponentPlayerInteractEvent) {
+        let item: ItemStack = componentData.player
+            .getComponent('equippable')
+            .getEquipment(EquipmentSlot.Mainhand);
+        if (
+            item.typeId == 'minecraft:flint_and_steel' ||
+            item.typeId == 'minecraft:fire_charge'
+        ) {
+            componentData.dimension.spawnEntity(
+                'minecraft:tnt',
+                vectorOfCenter(componentData.block.location)
+            );
+            componentData.block.setType('minecraft:air');
         }
     }
 }

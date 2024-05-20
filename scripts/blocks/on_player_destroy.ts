@@ -1,10 +1,13 @@
 import {
+    Block,
     BlockComponentPlayerDestroyEvent,
     BlockCustomComponent,
     ItemStack,
+    MinecraftDimensionTypes,
     world
 } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
+import { doesBlockBlockkMovement } from 'utils/helper';
 import { vectorOfCenter } from 'utils/math';
 
 class onPlayerDestroy implements BlockCustomComponent {
@@ -89,5 +92,23 @@ export class dropExperience extends onPlayerDestroy {
                 'minecraft:xp_orb',
                 vectorOfCenter(componentData.block.location)
             );
+    }
+}
+
+export class destroyIce extends onPlayerDestroy {
+    onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent): void {
+        const block: Block = componentData.block;
+
+        if (block.dimension.id == MinecraftDimensionTypes.nether) {
+            block.setType('minecraft:air');
+            return;
+        }
+
+        const blockBelow: Block = block.below();
+
+        if (doesBlockBlockkMovement(blockBelow) || block.isLiquid) {
+            block.setType('minecraft:water');
+            return;
+        }
     }
 }

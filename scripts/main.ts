@@ -67,6 +67,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:on_random_tick_sugar_cane',
         new blockOnRandomTick.sugarCane()
     );
+    eventData.blockTypeRegistry.registerCustomComponent(
+        'adk-lib:on_random_tick_melt_ice',
+        new blockOnRandomTick.meltIce()
+    );
 
     // Before On Player Place
     eventData.blockTypeRegistry.registerCustomComponent(
@@ -140,6 +144,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
     eventData.blockTypeRegistry.registerCustomComponent(
         'adk-lib:on_player_interact_turn_into',
         new blockOnPlayerInteract.turnInto()
+    );
+    eventData.blockTypeRegistry.registerCustomComponent(
+        'adk-lib:on_player_interact_prime_tnt',
+        new blockOnPlayerInteract.primeTnt()
     );
 
     // On Tick

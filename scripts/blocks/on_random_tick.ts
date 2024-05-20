@@ -4,8 +4,10 @@ import {
     BlockCustomComponent,
     BlockPermutation,
     BlockStates,
+    MinecraftDimensionTypes,
     world
 } from '@minecraft/server';
+import { updateLiquidBlock } from 'utils/helper';
 
 class onRandomTick implements BlockCustomComponent {
     constructor() {
@@ -143,5 +145,19 @@ export class sugarCane extends onRandomTick {
                 );
             }
         }
+    }
+}
+
+export class meltIce extends onRandomTick {
+    onRandomTick(componentData: BlockComponentRandomTickEvent): void {
+        const block: Block = componentData.block;
+
+        if (block.dimension.id == MinecraftDimensionTypes.nether) {
+            block.setType('minecraft:air');
+            return;
+        }
+
+        block.setType('minecraft:water');
+        updateLiquidBlock(block.dimension, block.location);
     }
 }

@@ -59,6 +59,9 @@ export function updateIfAir(
         updateLiquidBlock(dimension, blockLocation);
 }
 
+/**
+ * Structure to hold the direction types that can be iterable.
+ */
 export const DirectionType = {
     HORIZONTAL: [
         Direction.North,
@@ -67,3 +70,11 @@ export const DirectionType = {
         Direction.East
     ]
 };
+
+export function doesBlockBlockkMovement(block: Block): boolean {
+    return (
+        block.typeId != 'minecraft:cobweb' &&
+        block.typeId != 'minecraft:bamboo_sapling' &&
+        block.isSolid
+    );
+}
