@@ -1,4 +1,4 @@
-import { BlockTypes, ItemStack, system, world } from '@minecraft/server';
+import { world } from '@minecraft/server';
 import * as blockOnStepOn from 'blocks/on_step_on';
 import * as blockOnStepOff from 'blocks/on_step_off';
 import * as blockOnRandomTick from 'blocks/on_random_tick';
@@ -259,19 +259,4 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:on_use_on_wax',
         new itemOnUseOn.wax()
     );
-});
-
-world.afterEvents.playerPlaceBlock.subscribe((eventData) => {
-    let data: Object = logEventData(eventData, eventData.constructor.name);
-    let result: string = JSON.stringify(
-        Object.keys(data)
-            .sort()
-            .reduce((result, key) => {
-                result[key] = data[key];
-                return result;
-            }, {}),
-        null,
-        4
-    );
-    console.log(result);
 });
