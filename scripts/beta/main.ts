@@ -71,6 +71,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:on_random_tick_melt_ice',
         new blockOnRandomTick.meltIce()
     );
+    eventData.blockTypeRegistry.registerCustomComponent(
+        'adk-lib:on_random_tick_candle_particles',
+        new blockOnRandomTick.candleParticles()
+    );
 
     // Before On Player Place
     eventData.blockTypeRegistry.registerCustomComponent(

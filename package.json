@@ -1,16 +1,24 @@
 {
-  "dependencies": {
-    "@minecraft/server": "^1.13.0-beta.1.21.10-preview.20"
-  },
-  "name": "adk-lib",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "compile": "tsc && regolith run preview",
-    "build": "tsc && regolith run build"
-  },
-  "keywords": [],
-  "author": "SmokeyStack",
-  "license": "GPL-3.0-only",
-  "description": ""
+    "name": "adk-lib",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "dev-beta": "rmdir /s /q \"packs/BP/scripts\" && gulp dev-beta && regolith run dev",
+        "build-beta": "rmdir /s /q \"packs/BP/scripts\" && gulp build-beta && regolith run build",
+        "dev-stable": "rmdir /s /q \"packs/BP/scripts\" && gulp dev-stable && regolith run dev",
+        "build-stable": "rmdir /s /q \"packs/BP/scripts\" && gulp build-stable && regolith run build"
+    },
+    "keywords": [],
+    "author": "SmokeyStack",
+    "license": "GPL-3.0-only",
+    "description": "",
+    "dependencies": {
+        "@minecraft/server": "^1.13.0-beta.1.21.10-preview.20"
+    },
+    "devDependencies": {
+        "gulp": "^5.0.0",
+        "gulp-typescript": "^6.0.0-alpha.1",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.4.5"
+    }
 }
