@@ -12,12 +12,12 @@ import {
     EntityBreathableComponent,
     EntityRideableComponent,
     EntityTypeFamilyComponent,
+    ItemCooldownComponent,
     ItemDurabilityComponent,
     ItemEnchantableComponent,
     ItemStack,
     Player,
-    SignSide,
-    world
+    SignSide
 } from '@minecraft/server';
 
 export function logEventData(
@@ -30,11 +30,6 @@ export function logEventData(
     let parentName: string = '';
 
     for (const key in data) {
-        // console.warn(
-        //     `Key: ${key}, Does prototype own key?: ${prototype.hasOwnProperty(
-        //         key
-        //     )}. ${getParentPrototypeName(data, key)}`
-        // );
         if (skip.includes(key)) continue;
         const value: any = data[key];
         parentName = getParentPrototypeName(data, key);
@@ -441,6 +436,9 @@ function logBlockRecordPlayerComponentFunctions(data: any, key: string): any {
     switch (key) {
         case 'isPlaying':
             return data[key]();
+        case 'getRecord':
+            if (data[key]() === undefined) return;
+            return logEventData(data[key]());
         default:
             break;
     }
@@ -476,7 +474,7 @@ function logItemEnchantableComponentFunctions(data: any, key: string): any {
 function getParentPrototypeName(obj: any, key: string): string {
     const prototype = Object.getPrototypeOf(obj);
 
-    if (!prototype) return null; // No parent prototype (reached the top of the chain)
+    if (!prototype) return ''; // No parent prototype (reached the top of the chain)
     if (prototype.hasOwnProperty(key))
         return prototype.constructor.name; // Prototype has own properties
     else return getParentPrototypeName(prototype, key); // Recurse to the parent prototype

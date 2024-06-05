@@ -12,7 +12,7 @@
         "module": "ES2020",
         "moduleResolution": "Node",
         "noEmitHelpers": true,
-        "noImplicitAny": true,
+        "noImplicitAny": false,
         "noImplicitReturns": false,
         "noImplicitUseStrict": false,
         "noLib": false,

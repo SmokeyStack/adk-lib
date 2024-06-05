@@ -1,21 +1,20 @@
 import { world } from '@minecraft/server';
-import * as blockOnStepOn from 'blocks/on_step_on';
-import * as blockOnStepOff from 'blocks/on_step_off';
-import * as blockOnRandomTick from 'blocks/on_random_tick';
-import * as blockBeforeOnPlayerPlace from 'blocks/before_on_player_place';
-import * as blockOnEntityFallOn from 'blocks/on_entity_fall_on';
-import * as blockOnPlace from 'blocks/on_place';
-import * as blockOnPlayerDestroy from 'blocks/on_player_destroy';
-import * as blockOnPlayerInteract from 'blocks/on_player_interact';
-import * as blockOnTick from 'blocks/on_tick';
-import * as itemOnBeforeDurabilityDamage from 'item/on_before_durability_damage';
-import * as itemOnCompleteUse from 'item/on_complete_use';
-import * as itemOnConsume from 'item/on_consume';
-import * as itemUse from 'item/on_use';
-import * as itemOnMineBlock from 'item/on_mine_block';
-import * as itemOnHitEntity from 'item/on_hit_entity';
-import * as itemOnUseOn from 'item/on_use_on';
-import { logEventData } from 'utils/debug';
+import * as blockOnStepOn from './blocks/on_step_on';
+import * as blockOnStepOff from './blocks/on_step_off';
+import * as blockOnRandomTick from './blocks/on_random_tick';
+import * as blockBeforeOnPlayerPlace from './blocks/before_on_player_place';
+import * as blockOnEntityFallOn from './blocks/on_entity_fall_on';
+import * as blockOnPlace from './blocks/on_place';
+import * as blockOnPlayerDestroy from './blocks/on_player_destroy';
+import * as blockOnPlayerInteract from './blocks/on_player_interact';
+import * as blockOnTick from './blocks/on_tick';
+import * as itemOnBeforeDurabilityDamage from './item/on_before_durability_damage';
+import * as itemOnCompleteUse from './item/on_complete_use';
+import * as itemOnConsume from './item/on_consume';
+import * as itemUse from './item/on_use';
+import * as itemOnMineBlock from './item/on_mine_block';
+import * as itemOnHitEntity from './item/on_hit_entity';
+import * as itemOnUseOn from './item/on_use_on';
 
 world.beforeEvents.worldInitialize.subscribe((eventData) => {
     // On Step On
