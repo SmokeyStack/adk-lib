@@ -1,10 +1,6 @@
 import {
-    Block,
-    Dimension,
-    Entity,
     ItemComponentConsumeEvent,
-    ItemCustomComponent,
-    world
+    ItemCustomComponent
 } from '@minecraft/server';
 import { clamp } from '../utils/math';
 import { dimensionMap, teleportEntity } from './teleport';

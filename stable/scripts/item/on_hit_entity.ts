@@ -4,8 +4,7 @@ import {
     ItemComponentHitEntityEvent,
     ItemCustomComponent,
     ItemDurabilityComponent,
-    ItemStack,
-    world
+    ItemStack
 } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
 

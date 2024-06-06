@@ -1,8 +1,7 @@
 import {
     ItemComponentUseEvent,
     ItemCooldownComponent,
-    ItemCustomComponent,
-    world
+    ItemCustomComponent
 } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
 
