@@ -7,7 +7,7 @@ import {
     ItemStack
 } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
-import { canHarvest } from './item_pickaxe';
+import { canHarvest } from '../item_pickaxe';
 
 class onMineBlock implements ItemCustomComponent {
     constructor() {

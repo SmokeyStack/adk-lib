@@ -9,10 +9,10 @@ import {
     Vector3
 } from '@minecraft/server';
 
-import { BLOCK_MAP } from './fertilzeable';
-import { onUseOnBucket, pickupLiquid } from './item_bucket';
-import { onUseOnDye } from './item_dye';
-import { decrementStack } from '../utils/helper';
+import { BLOCK_MAP } from '../fertilzeable';
+import { onUseOnBucket, pickupLiquid } from '../item_bucket';
+import { onUseOnDye } from '../item_dye';
+import { decrementStack } from '../../utils/helper';
 import { directionToVector3 } from 'utils/math';
 import { onUseOnWax } from './item_wax';
 import { logEventData } from 'utils/debug';
