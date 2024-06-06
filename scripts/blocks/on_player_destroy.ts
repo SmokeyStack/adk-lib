@@ -9,6 +9,7 @@ import {
 import { logEventData } from 'utils/debug';
 import { doesBlockBlockkMovement } from 'utils/helper';
 import { vectorOfCenter } from 'utils/math';
+import { onPlayerDestroyDoubleSlab } from './double_slab';
 
 class onPlayerDestroy implements BlockCustomComponent {
     constructor() {
@@ -110,5 +111,11 @@ export class destroyIce extends onPlayerDestroy {
             block.setType('minecraft:water');
             return;
         }
+    }
+}
+
+export class doubleSlab extends onPlayerDestroy {
+    onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent): void {
+        onPlayerDestroyDoubleSlab(componentData);
     }
 }

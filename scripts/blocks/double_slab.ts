@@ -5,7 +5,9 @@ import {
     ItemStack,
     EquipmentSlot,
     Direction,
-    BlockPermutation
+    BlockPermutation,
+    BlockComponentPlayerDestroyEvent,
+    Enchantment
 } from '@minecraft/server';
 import { decrementStack, getOppositeDirection } from 'utils/helper';
 import { directionToVector3 } from 'utils/math';
@@ -44,4 +46,27 @@ export function beforeOnPlayerPlaceDoubleSlab(
             decrementStack(player);
         }
     }
+}
+
+export function onPlayerDestroyDoubleSlab(
+    data: BlockComponentPlayerDestroyEvent
+): void {
+    const player: Player = data.player;
+    const playerEquipment: ItemStack = player
+        .getComponent('equippable')
+        .getEquipment(EquipmentSlot.Mainhand);
+
+    if (data.player.getGameMode() == 'creative') return;
+    if (playerEquipment === undefined) return;
+
+    const silkTouchEnchantment: Enchantment = playerEquipment
+        .getComponent('enchantable')
+        .getEnchantment('silk_touch');
+
+    if (silkTouchEnchantment === undefined) return;
+
+    data.dimension.spawnItem(
+        new ItemStack(data.destroyedBlockPermutation.type.id),
+        data.block.location
+    );
 }
