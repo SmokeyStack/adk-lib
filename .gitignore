@@ -1,5 +1,5 @@
 /build
 /.regolith
-/node_modules
+/**/node_modules
 /packs/BP/scripts/*
 !/packs/BP/scripts/.gitkeep
