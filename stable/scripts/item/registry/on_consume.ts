@@ -2,9 +2,9 @@ import {
     ItemComponentConsumeEvent,
     ItemCustomComponent
 } from '@minecraft/server';
-import { clamp } from '../utils/math';
-import { dimensionMap, teleportEntity } from './teleport';
-import { giveFoodEffect } from './item_food';
+import { clamp } from '../../utils/math';
+import { dimensionMap, teleportEntity } from '../teleport';
+import { giveFoodEffect } from '../item_food';
 import { logEventData } from 'utils/debug';
 
 class onConsume implements ItemCustomComponent {

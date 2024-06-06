@@ -1,11 +1,11 @@
 import { world } from '@minecraft/server';
-import * as itemOnBeforeDurabilityDamage from './item/on_before_durability_damage';
-import * as itemOnCompleteUse from './item/on_complete_use';
-import * as itemOnConsume from './item/on_consume';
-import * as itemUse from './item/on_use';
-import * as itemOnMineBlock from './item/on_mine_block';
-import * as itemOnHitEntity from './item/on_hit_entity';
-import * as itemOnUseOn from './item/on_use_on';
+import * as itemOnBeforeDurabilityDamage from './item/registry/on_before_durability_damage';
+import * as itemOnCompleteUse from './item/registry/on_complete_use';
+import * as itemOnConsume from './item/registry/on_consume';
+import * as itemUse from './item/registry/on_use';
+import * as itemOnMineBlock from './item/registry/on_mine_block';
+import * as itemOnHitEntity from './item/registry/on_hit_entity';
+import * as itemOnUseOn from './item/registry/on_use_on';
 
 world.beforeEvents.worldInitialize.subscribe((eventData) => {
     // Items
