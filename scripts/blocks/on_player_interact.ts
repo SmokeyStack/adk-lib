@@ -9,6 +9,7 @@ import {
 } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
 import { vectorOfCenter } from 'utils/math';
+import { onInteractCandle } from './candle';
 
 class onPlayerInteract implements BlockCustomComponent {
     constructor() {
@@ -79,5 +80,11 @@ export class primeTnt extends onPlayerInteract {
             );
             componentData.block.setType('minecraft:air');
         }
+    }
+}
+
+export class candle extends onPlayerInteract {
+    onPlayerInteract(componentData: BlockComponentPlayerInteractEvent): void {
+        onInteractCandle(componentData);
     }
 }

@@ -7,7 +7,7 @@ import * as blockOnEntityFallOn from './blocks/on_entity_fall_on';
 import * as blockOnPlace from './blocks/on_place';
 import * as blockOnPlayerDestroy from './blocks/on_player_destroy';
 import * as blockOnPlayerInteract from './blocks/on_player_interact';
-import * as blockOnTick from './blocks/on_tick';
+import * as blockOnTick from './blocks/registry/on_tick';
 import * as itemOnBeforeDurabilityDamage from './item/on_before_durability_damage';
 import * as itemOnCompleteUse from './item/on_complete_use';
 import * as itemOnConsume from './item/on_consume';
@@ -69,10 +69,6 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
     eventData.blockTypeRegistry.registerCustomComponent(
         'adk-lib:on_random_tick_melt_ice',
         new blockOnRandomTick.meltIce()
-    );
-    eventData.blockTypeRegistry.registerCustomComponent(
-        'adk-lib:on_random_tick_candle_particles',
-        new blockOnRandomTick.candleParticles()
     );
 
     // Before On Player Place
@@ -138,6 +134,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:on_player_destroy_drop_experience',
         new blockOnPlayerDestroy.dropExperience()
     );
+    eventData.blockTypeRegistry.registerCustomComponent(
+        'adk-lib:on_player_destroy_double_slab',
+        new blockOnPlayerDestroy.doubleSlab()
+    );
 
     // On Player Interact
     eventData.blockTypeRegistry.registerCustomComponent(
@@ -152,6 +152,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:on_player_interact_prime_tnt',
         new blockOnPlayerInteract.primeTnt()
     );
+    eventData.blockTypeRegistry.registerCustomComponent(
+        'adk-lib:on_player_interact_candle',
+        new blockOnPlayerInteract.candle()
+    );
 
     // On Tick
     eventData.blockTypeRegistry.registerCustomComponent(
@@ -161,6 +165,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
     eventData.blockTypeRegistry.registerCustomComponent(
         'adk-lib:on_tick_torch_particles',
         new blockOnTick.torchParticles()
+    );
+    eventData.blockTypeRegistry.registerCustomComponent(
+        'adk-lib:on_tick_candle_particles',
+        new blockOnTick.candleParticles()
     );
 
     // Items

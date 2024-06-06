@@ -3,9 +3,9 @@ import {
     BlockCustomComponent,
     Dimension,
     Direction,
-    Vector3,
-    world
+    Vector3
 } from '@minecraft/server';
+import { onTickCandle } from 'blocks/candle';
 import { logEventData } from 'utils/debug';
 import { directionToVector3 } from 'utils/math';
 
@@ -86,5 +86,11 @@ export class torchParticles extends onTick {
                 z: location.z + xzOffset * directionToVector3(direction).z
             });
         }
+    }
+}
+
+export class candleParticles extends onTick {
+    onTick(componentData: BlockComponentTickEvent): void {
+        onTickCandle(componentData);
     }
 }

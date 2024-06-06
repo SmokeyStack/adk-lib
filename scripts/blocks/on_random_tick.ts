@@ -4,9 +4,7 @@ import {
     BlockCustomComponent,
     BlockPermutation,
     BlockStates,
-    Dimension,
     MinecraftDimensionTypes,
-    Vector3,
     world
 } from '@minecraft/server';
 import { updateLiquidBlock } from 'utils/helper';
@@ -163,44 +161,3 @@ export class meltIce extends onRandomTick {
         updateLiquidBlock(block.dimension, block.location);
     }
 }
-
-export class candleParticles extends onRandomTick {
-    onRandomTick(componentData: BlockComponentRandomTickEvent): void {
-        let candles: number = componentData.block.permutation.getState(
-            componentData.block.typeId.split(':')[0] + ':candles'
-        ) as number;
-
-        ParticleOffsets[candles].forEach((offset) => {
-            this.spawnParticle(componentData.dimension, {
-                x: componentData.block.location.x + offset.x,
-                y: componentData.block.location.y + offset.y,
-                z: componentData.block.location.z + offset.z
-            });
-        });
-    }
-
-    spawnParticle(world: Dimension, vector: Vector3): void {
-        let float: number = Math.random();
-        // if(float<0.3)
-        world.spawnParticle('minecraft:candle_flame_particle', vector);
-    }
-}
-
-export const ParticleOffsets = {
-    1: [{ x: 0.5, y: 0.5, z: 0.5 }],
-    2: [
-        { x: 0.375, y: 0.44, z: 0.56 },
-        { x: 0.625, y: 0.5, z: 0.5 }
-    ],
-    3: [
-        { x: 0.5, y: 0.313, z: 0.625 },
-        { x: 0.375, y: 0.44, z: 0.5 },
-        { x: 0.56, y: 0.5, z: 0.44 }
-    ],
-    4: [
-        { x: 0.44, y: 0.313, z: 0.56 },
-        { x: 0.625, y: 0.44, z: 0.56 },
-        { x: 0.375, y: 0.44, z: 0.375 },
-        { x: 0.56, y: 0.5, z: 0.375 }
-    ]
-};
