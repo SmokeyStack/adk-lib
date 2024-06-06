@@ -9,7 +9,8 @@
         "build-stable": "tsc && regolith run build"
     },
     "workspaces": [
-        "beta"
+        "beta",
+        "stable"
     ],
     "keywords": [],
     "author": "SmokeyStack",

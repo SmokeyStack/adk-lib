@@ -1,5 +1,5 @@
 {
-    "name": "adk-lib-beta",
+    "name": "adk-lib-stable",
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
@@ -11,6 +11,6 @@
     "license": "GPL-3.0-only",
     "description": "",
     "dependencies": {
-        "@minecraft/server": "^1.13.0-beta.1.21.10-preview.22"
+        "@minecraft/server": "^1.12.0-rc.1.21.10-preview.22"
     }
 }
