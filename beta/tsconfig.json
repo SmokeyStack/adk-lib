@@ -16,7 +16,7 @@
         "noImplicitReturns": false,
         "noImplicitUseStrict": false,
         "noLib": false,
-        "outDir": "./packs/BP",
+        "outDir": "../packs/BP",
         "pretty": true,
         "rootDir": ".",
         "skipLibCheck": true,
