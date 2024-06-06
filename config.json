@@ -10,17 +10,10 @@
 		"dataPath": "./packs/data",
 		"filterDefinitions": {},
 		"profiles": {
-			"dev-beta": {
+			"dev": {
 				"export": {
 					"readOnly": false,
 					"target": "preview"
-				},
-				"filters": []
-			},
-			"dev-stable": {
-				"export": {
-					"readOnly": false,
-					"target": "development"
 				},
 				"filters": []
 			},
