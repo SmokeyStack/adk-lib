@@ -5,8 +5,7 @@ import {
     Vector3,
     DyeColor,
     SignSide,
-    Player,
-    EntityInventoryComponent
+    Player
 } from '@minecraft/server';
 import { areVectorsEqual } from '../utils/math';
 import { decrementStack } from '../utils/helper';
