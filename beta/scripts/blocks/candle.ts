@@ -7,8 +7,7 @@ import {
     EquipmentSlot,
     ItemStack,
     Player,
-    Vector3,
-    world
+    Vector3
 } from '@minecraft/server';
 
 const ParticleOffsets = {

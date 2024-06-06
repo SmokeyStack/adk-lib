@@ -1,13 +1,8 @@
 import {
-    Block,
     BlockComponentPlayerPlaceBeforeEvent,
-    BlockCustomComponent,
-    BlockPermutation,
-    Direction
+    BlockCustomComponent
 } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
-import { DirectionType } from 'utils/helper';
-import { directionToVector3 } from 'utils/math';
 import { beforeOnPlayerPlaceTurnInto } from 'blocks/turn_into';
 import { beforeOnPlayerPlaceDoubleSlab } from 'blocks/double_slab';
 import { beforeOnPlayerPlaceSugarCane } from 'blocks/sugar_cane';

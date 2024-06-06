@@ -12,7 +12,6 @@ import {
     EntityBreathableComponent,
     EntityRideableComponent,
     EntityTypeFamilyComponent,
-    ItemCooldownComponent,
     ItemDurabilityComponent,
     ItemEnchantableComponent,
     ItemStack,

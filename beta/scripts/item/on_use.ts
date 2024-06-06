@@ -1,8 +1,4 @@
-import {
-    ItemComponentUseEvent,
-    ItemCustomComponent,
-    world
-} from '@minecraft/server';
+import { ItemComponentUseEvent, ItemCustomComponent } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
 
 class onUse implements ItemCustomComponent {
