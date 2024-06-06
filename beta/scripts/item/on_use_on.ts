@@ -5,8 +5,7 @@ import {
     ItemComponentUseOnEvent,
     ItemCustomComponent,
     Player,
-    Vector3,
-    world
+    Vector3
 } from '@minecraft/server';
 
 import { BLOCK_MAP } from './fertilzeable';

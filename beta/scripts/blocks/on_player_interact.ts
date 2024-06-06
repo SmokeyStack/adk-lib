@@ -2,7 +2,6 @@ import {
     Block,
     BlockComponentPlayerInteractEvent,
     BlockCustomComponent,
-    Entity,
     EquipmentSlot,
     ItemStack,
     Player

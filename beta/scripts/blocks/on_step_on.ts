@@ -1,7 +1,6 @@
 import {
     BlockComponentStepOnEvent,
-    BlockCustomComponent,
-    world
+    BlockCustomComponent
 } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
 

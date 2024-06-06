@@ -1,7 +1,6 @@
 import {
     BlockComponentPlayerPlaceBeforeEvent,
-    BlockPermutation,
-    world
+    BlockPermutation
 } from '@minecraft/server';
 
 export function beforeOnPlayerPlaceTurnInto(

@@ -1,7 +1,6 @@
 import {
     ItemComponentBeforeDurabilityDamageEvent,
-    ItemCustomComponent,
-    world
+    ItemCustomComponent
 } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
 
