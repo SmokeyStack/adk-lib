@@ -2,7 +2,7 @@ import { world } from '@minecraft/server';
 import * as blockOnStepOn from './blocks/on_step_on';
 import * as blockOnStepOff from './blocks/on_step_off';
 import * as blockOnRandomTick from './blocks/on_random_tick';
-import * as blockBeforeOnPlayerPlace from './blocks/before_on_player_place';
+import * as blockBeforeOnPlayerPlace from './blocks/registry/before_on_player_place';
 import * as blockOnEntityFallOn from './blocks/on_entity_fall_on';
 import * as blockOnPlace from './blocks/on_place';
 import * as blockOnPlayerDestroy from './blocks/on_player_destroy';
@@ -85,8 +85,8 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         new blockBeforeOnPlayerPlace.cancel()
     );
     eventData.blockTypeRegistry.registerCustomComponent(
-        'adk-lib:before_on_player_place_change_into_bedrock',
-        new blockBeforeOnPlayerPlace.changeIntoBedrock()
+        'adk-lib:before_on_player_place_turn_into',
+        new blockBeforeOnPlayerPlace.turnInto()
     );
     eventData.blockTypeRegistry.registerCustomComponent(
         'adk-lib:before_on_player_place_double_slab',

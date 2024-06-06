@@ -4,7 +4,8 @@ import {
     Dimension,
     Vector3,
     Block,
-    Direction
+    Direction,
+    Container
 } from '@minecraft/server';
 
 /**
@@ -17,18 +18,15 @@ export function decrementStack(player: Player): void {
     let item = player
         .getComponent('inventory')
         .container.getItem(player.selectedSlotIndex);
+    let inventory: Container = player.getComponent('inventory').container;
 
     if (item.amount == 1)
-        player
-            .getComponent('inventory')
-            .container.setItem(player.selectedSlotIndex, undefined);
+        inventory.setItem(player.selectedSlotIndex, undefined);
     else
-        player
-            .getComponent('inventory')
-            .container.setItem(
-                player.selectedSlotIndex,
-                new ItemStack(item.typeId, item.amount - 1)
-            );
+        inventory.setItem(
+            player.selectedSlotIndex,
+            new ItemStack(item.typeId, item.amount - 1)
+        );
 }
 
 /**
@@ -70,6 +68,30 @@ export const DirectionType = {
         Direction.East
     ]
 };
+
+/**
+ * @brief This function gets the direction of the direction provided.
+ * @param direction Direction to get the opposite of
+ * @returns The opposite direction
+ */
+export function getOppositeDirection(direction: Direction): Direction {
+    switch (direction) {
+        case Direction.Up:
+            return Direction.Down;
+        case Direction.Down:
+            return Direction.Up;
+        case Direction.North:
+            return Direction.South;
+        case Direction.East:
+            return Direction.West;
+        case Direction.South:
+            return Direction.North;
+        case Direction.West:
+            return Direction.East;
+        default:
+            break;
+    }
+}
 
 export function doesBlockBlockkMovement(block: Block): boolean {
     return (
