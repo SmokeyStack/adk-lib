@@ -16,13 +16,13 @@
         "noImplicitReturns": false,
         "noImplicitUseStrict": false,
         "noLib": false,
-        "outDir": "./packs/BP/scripts",
+        "outDir": "./packs/BP",
         "pretty": true,
         "rootDir": ".",
         "skipLibCheck": true,
-        "sourceMap": true,
-        "strict": true,
-        "target": "es6"
+        "sourceMap": false,
+        "strict": false,
+        "target": "ES2022"
     },
     "exclude": ["lib", "dist", "node_modules"],
     "include": ["scripts/**/*"]
