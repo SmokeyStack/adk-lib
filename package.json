@@ -3,13 +3,13 @@
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
-        "dev-beta": "npm run dev --workspace=beta && regolith run dev",
+        "dev-experimental": "npm run dev --workspace=experimental && regolith run dev-experimental",
         "build-beta": "tsc && regolith run build",
         "dev-stable": "npm run dev --workspace=stable && regolith run dev",
         "build-stable": "tsc && regolith run build"
     },
     "workspaces": [
-        "beta",
+        "experimental",
         "stable"
     ],
     "keywords": [],

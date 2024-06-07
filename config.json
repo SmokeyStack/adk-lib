@@ -15,7 +15,7 @@
 			}
 		},
 		"profiles": {
-			"dev": {
+			"dev-experimental": {
 				"export": {
 					"readOnly": false,
 					"target": "preview"
@@ -23,7 +23,7 @@
 				"filters": [
 					{
 						"arguments": [
-							"manifest.beta.json"
+							"experimental"
 						],
 						"filter": "move-manifest"
 					}
