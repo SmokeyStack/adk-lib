@@ -2,7 +2,7 @@
 
 ## What does it do?
 
-This component will spawn flame particles for the adk::BlockCandleAbstract class. This component has no customization.
+This component will spawn flame particles for the `adk::BlockCandleAbstract` class. This component has no customization.
 
 ## How to use
 

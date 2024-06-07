@@ -6,7 +6,7 @@ This component allows the block to turn into another block before the player pla
 
 ## How to use
 
-Add `adk-lib:before_on_player_place_turn_into` to the `minecraft:custom_components` array in your item json file. Since custom components do not have parameter support yet, this component utilizes block tags.
+Add `adk-lib:before_on_player_place_turn_into` to the `minecraft:custom_components` array in your block json file. Since custom components do not have parameter support yet, this component utilizes block tags.
 
 To indicate what block your block should turn into, add the following tag: `adk-lib:before_on_player_place_turn_into_[identifier of the block]`
 
