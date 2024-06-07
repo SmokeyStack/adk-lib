@@ -1,0 +1,33 @@
+{
+    "dependencies": [
+        {
+            "module_name": "@minecraft/server",
+            "version": "1.12.0-rc"
+        }
+    ],
+    "format_version": 2,
+    "header": {
+        "description": "Made By SmokeyStack",
+        "min_engine_version": [
+            1,
+            21,
+            0
+        ],
+        "name": "ADK LIB",
+        "uuid": "5e2eda3e-6eaf-4068-9076-0a7f0587b8bb",
+        "version": "0.1.0-rc.1.21.0.22"
+    },
+    "modules": [
+        {
+            "type": "data",
+            "uuid": "bb174344-46c7-46a5-87bf-d2535876b70f",
+            "version": "0.1.0-rc.1.21.0.22"
+        },
+        {
+            "entry": "scripts/main.js",
+            "type": "script",
+            "uuid": "c57c9003-0630-4432-8275-200ee08e6796",
+            "version": "0.1.0-rc.1.21.0.22"
+        }
+    ]
+}

@@ -29,6 +29,20 @@
 					}
 				]
 			},
+			"dev-rc": {
+				"export": {
+					"readOnly": false,
+					"target": "preview"
+				},
+				"filters": [
+					{
+						"arguments": [
+							"rc"
+						],
+						"filter": "move-manifest"
+					}
+				]
+			},
 			"build": {
 				"export": {
 					"readOnly": false,
