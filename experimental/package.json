@@ -1,10 +1,9 @@
 {
-    "name": "adk-lib-beta",
+    "name": "adk-lib-experimental",
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
-        "dev": "tsc",
-        "build": "tsc && regolith run build"
+        "compile": "tsc"
     },
     "keywords": [],
     "author": "SmokeyStack",

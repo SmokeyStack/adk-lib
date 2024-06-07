@@ -3,11 +3,12 @@
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
-        "dev-experimental": "npm run dev --workspace=experimental && regolith run dev-experimental",
-        "dev-rc": "npm run dev --workspace=rc && regolith run dev-rc",
-        "build-beta": "tsc && regolith run build",
-        "dev-stable": "npm run dev --workspace=stable && regolith run dev",
-        "build-stable": "tsc && regolith run build"
+        "dev-experimental": "npm run compile --workspace=experimental && regolith run dev-experimental",
+        "dev-rc": "npm run compile --workspace=rc && regolith run dev-rc",
+        "dev-stable": "npm run compile --workspace=stable && regolith run dev-stable",
+        "build-experimental": "npm run compile --workspace=experimental && regolith run build-experimental",
+        "build-rc": "npm run compile --workspace=rc && regolith run build-rc",
+        "build-stable": "npm run compile --workspace=stable && regolith run build-stable"
     },
     "workspaces": [
         "experimental",
