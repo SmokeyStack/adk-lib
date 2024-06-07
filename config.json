@@ -8,14 +8,26 @@
 	},
 	"regolith": {
 		"dataPath": "./packs/data",
-		"filterDefinitions": {},
+		"filterDefinitions": {
+			"move-manifest": {
+				"script": "./filters/move-manifest.py",
+				"runWith": "python"
+			}
+		},
 		"profiles": {
 			"dev": {
 				"export": {
 					"readOnly": false,
 					"target": "preview"
 				},
-				"filters": []
+				"filters": [
+					{
+						"arguments": [
+							"manifest.beta.json"
+						],
+						"filter": "move-manifest"
+					}
+				]
 			},
 			"build": {
 				"export": {
