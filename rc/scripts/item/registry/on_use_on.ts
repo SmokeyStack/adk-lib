@@ -14,7 +14,7 @@ import { onUseOnBucket, pickupLiquid } from '../item_bucket';
 import { onUseOnDye } from '../item_dye';
 import { decrementStack } from '../../utils/helper';
 import { directionToVector3 } from 'utils/math';
-import { onUseOnWax } from './item_wax';
+import { onUseOnWax } from '../item_wax';
 import { logEventData } from 'utils/debug';
 
 class onUseOn implements ItemCustomComponent {
@@ -113,15 +113,9 @@ export class glassBottle extends onUseOn {
             'adk-lib:fluid_([a-z]\\w+:[a-z]\\w+)_turn_into_([a-z]\\w+:[a-z]\\w+)'
         );
         let player: Player = componentData.source as Player;
-
-        // ==================================================
-        // Workaround since stable doesn't have EntityComponentTypeMap
-        let inventoryTemp: EntityInventoryComponent = player.getComponent(
-            'inventory'
-        ) as EntityInventoryComponent;
-        // ==================================================
-
-        let inventory: Container = inventoryTemp.container;
+        let inventory: Container = (
+            player.getComponent('inventory') as EntityInventoryComponent
+        ).container;
         let sourceIntoItem: Map<string, string> = new Map();
 
         for (let tag of tags) {

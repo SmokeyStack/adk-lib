@@ -48,15 +48,10 @@ export class goatHorn extends onUse {
         componentData.source.playSound(instrument, {
             volume: 16
         });
-
-        // ==================================================
-        // Workaround since stable doesn't have ItemComponentTypeMap
-        let cooldown: ItemCooldownComponent =
+        (
             componentData.itemStack.getComponent(
                 'cooldown'
-            ) as ItemCooldownComponent;
-        // ==================================================
-
-        cooldown.startCooldown(componentData.source);
+            ) as ItemCooldownComponent
+        ).startCooldown(componentData.source);
     }
 }

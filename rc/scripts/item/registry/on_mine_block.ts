@@ -41,15 +41,10 @@ export class digger extends onMineBlock {
         let player = componentData.source;
         let item = new ItemStack(componentData.itemStack.typeId, 1);
 
-        // ==================================================
-        // Workaround since stable doesn't have ItemComponentTypeMap
-        let durability: ItemDurabilityComponent = item.getComponent(
-            'durability'
-        ) as ItemDurabilityComponent;
-        // ==================================================
-
         if (componentData.minedBlockPermutation.type.id === 'minecraft:glass') {
-            durability.damage +=
+            (
+                item.getComponent('durability') as ItemDurabilityComponent
+            ).damage +=
                 (
                     componentData.itemStack.getComponent(
                         'durability'
@@ -59,14 +54,18 @@ export class digger extends onMineBlock {
             componentData.minedBlockPermutation.type.id ===
             'minecraft:oak_planks'
         ) {
-            durability.damage +=
+            (
+                item.getComponent('durability') as ItemDurabilityComponent
+            ).damage +=
                 (
                     componentData.itemStack.getComponent(
                         'durability'
                     ) as ItemDurabilityComponent
                 ).damage + 5;
         } else {
-            durability.damage +=
+            (
+                item.getComponent('durability') as ItemDurabilityComponent
+            ).damage +=
                 (
                     componentData.itemStack.getComponent(
                         'durability'
@@ -74,14 +73,11 @@ export class digger extends onMineBlock {
                 ).damage + 1;
         }
 
-        // ==================================================
-        // Workaround since stable doesn't have EntityComponentTypeMap
-        let equippableTemp: EntityEquippableComponent = player.getComponent(
-            'equippable'
-        ) as EntityEquippableComponent;
-        // ==================================================
-
-        equippableTemp.setEquipment(EquipmentSlot.Mainhand, item);
+        (
+            player.getComponent(
+                'minecraft:equippable'
+            ) as EntityEquippableComponent
+        ).setEquipment(EquipmentSlot.Mainhand, item);
     }
 }
 

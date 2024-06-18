@@ -21,15 +21,9 @@ export function onUseOnBucket(componentData: ItemComponentUseOnEvent) {
         'adk-lib:fluid_([a-z]\\w+:[a-z]\\w+)_turn_into_([a-z]\\w+:[a-z]\\w+)'
     );
     let player: Player = componentData.source as Player;
-
-    // ==================================================
-    // Workaround since stable doesn't have EntityComponentTypeMap
-    let inventoryTemp: EntityInventoryComponent = player.getComponent(
-        'inventory'
-    ) as EntityInventoryComponent;
-    // ==================================================
-
-    let inventory: Container = inventoryTemp.container;
+    let inventory: Container = (
+        player.getComponent('inventory') as EntityInventoryComponent
+    ).container;
     let fluid: string;
     let sourceIntoItem: Map<string, string> = new Map();
 

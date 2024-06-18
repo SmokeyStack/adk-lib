@@ -49,29 +49,28 @@ export class differentDamageDurability extends onHitEntity {
         let player = componentData.attackingEntity;
         let item = new ItemStack(componentData.itemStack.typeId, 1);
 
-        // ==================================================
-        // Workaround since stable doesn't have ItemComponentTypeMap
-        let durability: ItemDurabilityComponent = item.getComponent(
-            'durability'
-        ) as ItemDurabilityComponent;
-        // ==================================================
-
         if (componentData.hitEntity.typeId === 'minecraft:sheep') {
-            durability.damage +=
+            (
+                item.getComponent('durability') as ItemDurabilityComponent
+            ).damage +=
                 (
                     componentData.itemStack.getComponent(
                         'durability'
                     ) as ItemDurabilityComponent
                 ).damage + 0;
         } else if (componentData.hitEntity.typeId === 'minecraft:armadillo') {
-            durability.damage +=
+            (
+                item.getComponent('durability') as ItemDurabilityComponent
+            ).damage +=
                 (
                     componentData.itemStack.getComponent(
                         'durability'
                     ) as ItemDurabilityComponent
                 ).damage + 5;
         } else {
-            durability.damage +=
+            (
+                item.getComponent('durability') as ItemDurabilityComponent
+            ).damage +=
                 (
                     componentData.itemStack.getComponent(
                         'durability'
@@ -79,14 +78,11 @@ export class differentDamageDurability extends onHitEntity {
                 ).damage + 1;
         }
 
-        // ==================================================
-        // Workaround since stable doesn't have EntityComponentTypeMap
-        let equippableTemp: EntityEquippableComponent = player.getComponent(
-            'equippable'
-        ) as EntityEquippableComponent;
-        // ==================================================
-
-        equippableTemp.setEquipment(EquipmentSlot.Mainhand, item);
+        (
+            player.getComponent(
+                'minecraft:equippable'
+            ) as EntityEquippableComponent
+        ).setEquipment(EquipmentSlot.Mainhand, item);
     }
 }
 
@@ -94,27 +90,15 @@ export class preventDamageDurability extends onHitEntity {
     onHitEntity(componentData: ItemComponentHitEntityEvent) {
         let player = componentData.attackingEntity;
         let item = new ItemStack(componentData.itemStack.typeId, 1);
-
-        // ==================================================
-        // Workaround since stable doesn't have ItemComponentTypeMap
-        let durability: ItemDurabilityComponent = item.getComponent(
-            'durability'
-        ) as ItemDurabilityComponent;
-        // ==================================================
-
-        durability.damage += (
+        (item.getComponent('durability') as ItemDurabilityComponent).damage += (
             componentData.itemStack.getComponent(
                 'durability'
             ) as ItemDurabilityComponent
         ).damage;
-
-        // ==================================================
-        // Workaround since stable doesn't have EntityComponentTypeMap
-        let equippableTemp: EntityEquippableComponent = player.getComponent(
-            'equippable'
-        ) as EntityEquippableComponent;
-        // ==================================================
-
-        equippableTemp.setEquipment(EquipmentSlot.Mainhand, item);
+        (
+            player.getComponent(
+                'minecraft:equippable'
+            ) as EntityEquippableComponent
+        ).setEquipment(EquipmentSlot.Mainhand, item);
     }
 }

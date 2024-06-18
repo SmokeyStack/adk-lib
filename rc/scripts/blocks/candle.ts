@@ -3,6 +3,7 @@ import {
     BlockComponentPlayerInteractEvent,
     BlockComponentTickEvent,
     Dimension,
+    EntityEquippableComponent,
     EquipmentSlot,
     ItemStack,
     Player,
@@ -87,9 +88,9 @@ export function onInteractCandle(
     data: BlockComponentPlayerInteractEvent
 ): void {
     const player: Player = data.player;
-    const playerEquipment: ItemStack = player
-        .getComponent('equippable')
-        .getEquipment(EquipmentSlot.Mainhand);
+    const playerEquipment: ItemStack = (
+        player.getComponent('equippable') as EntityEquippableComponent
+    ).getEquipment(EquipmentSlot.Mainhand);
     const namespace: string = data.block.typeId.split(':')[0];
     const isLit: boolean = data.block.permutation.getState(
         namespace + ':lit'

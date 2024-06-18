@@ -35,13 +35,10 @@ export function canHarvest(componentData: ItemComponentMineBlockEvent): void {
     componentData.source.dimension
         .getEntitiesAtBlockLocation(componentData.block.location)
         .forEach((entity) => {
-            // ==================================================
-            // Workaround since stable doesn't have EntityComponentTypeMap
-            let itemTemp: EntityItemComponent = entity.getComponent(
-                'item'
-            ) as EntityItemComponent;
-            // ==================================================
-            if (itemTemp.itemStack.typeId == minedBlockPermutation.type.id)
+            if (
+                (entity.getComponent('item') as EntityItemComponent)?.itemStack
+                    .typeId == minedBlockPermutation.type.id
+            )
                 entity.remove();
         });
 }

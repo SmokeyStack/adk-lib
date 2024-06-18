@@ -16,15 +16,12 @@ import {
 export function decrementStack(player: Player): void {
     if (player.getGameMode() == 'creative') return;
 
-    // ==================================================
-    // Workaround since stable doesn't have EntityComponentTypeMap
-    let inventoryTemp: EntityInventoryComponent = player.getComponent(
-        'inventory'
-    ) as EntityInventoryComponent;
-    // ==================================================
-
-    let item = inventoryTemp.container.getItem(player.selectedSlotIndex);
-    let inventory: Container = inventoryTemp.container;
+    let item = (
+        player.getComponent('inventory') as EntityInventoryComponent
+    ).container.getItem(player.selectedSlotIndex);
+    let inventory: Container = (
+        player.getComponent('inventory') as EntityInventoryComponent
+    ).container;
 
     if (item.amount == 1)
         inventory.setItem(player.selectedSlotIndex, undefined);
