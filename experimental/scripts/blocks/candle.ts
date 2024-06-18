@@ -1,14 +1,19 @@
 import {
     Block,
     BlockComponentPlayerInteractEvent,
+    BlockComponentPlayerPlaceBeforeEvent,
     BlockComponentTickEvent,
     BlockPermutation,
     Dimension,
+    Direction,
     EquipmentSlot,
     ItemStack,
     Player,
-    Vector3
+    Vector3,
+    world
 } from '@minecraft/server';
+import { getOppositeDirection, decrementStack } from 'utils/helper';
+import { directionToVector3 } from 'utils/math';
 
 const ParticleOffsets = {
     1: [{ x: 0.5, y: 0.5, z: 0.5 }],
@@ -54,9 +59,7 @@ function extinguish(block: Block, world: Dimension, vector: Vector3): void {
         namespace + ':candles'
     ) as number;
     const lit: string = namespace + ':lit';
-    block.setPermutation(
-        BlockPermutation.resolve(block.typeId, { [lit]: false })
-    );
+    block.setPermutation(block.permutation.withState(lit, false));
     world.playSound('extinguish.candle', vector, { volume: 1, pitch: 1 });
     ParticleOffsets[candles].forEach(
         (offset: { x: number; y: number; z: number }) => {
@@ -105,15 +108,23 @@ export function onInteractCandle(
         extinguish(data.block, data.dimension, data.block.location);
         return;
     }
+    if (playerEquipment.typeId === data.block.typeId && candles != 4) {
+        data.block.setPermutation(
+            data.block.permutation.withState(
+                namespace + ':candles',
+                candles + 1
+            )
+        );
+        decrementStack(player);
+        return;
+    }
     if (
         (playerEquipment.typeId == 'minecraft:flint_and_steel' ||
             playerEquipment.typeId == 'minecraft:fire_charge') &&
         !isLit
     ) {
         data.block.setPermutation(
-            BlockPermutation.resolve(data.block.typeId, {
-                [namespace + ':lit']: true
-            })
+            data.block.permutation.withState(namespace + ':lit', true)
         );
         data.dimension.playSound('fire.ignite', data.block.location);
         ParticleOffsets[candles].forEach(

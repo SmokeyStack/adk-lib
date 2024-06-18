@@ -8,7 +8,7 @@ import {
 } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
 import { vectorOfCenter } from 'utils/math';
-import { onInteractCandle } from './candle';
+import { onInteractCandle } from '../candle';
 
 class onPlayerInteract implements BlockCustomComponent {
     constructor() {

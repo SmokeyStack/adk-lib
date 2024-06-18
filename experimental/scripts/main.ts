@@ -6,7 +6,7 @@ import * as blockBeforeOnPlayerPlace from './blocks/registry/before_on_player_pl
 import * as blockOnEntityFallOn from './blocks/on_entity_fall_on';
 import * as blockOnPlace from './blocks/on_place';
 import * as blockOnPlayerDestroy from './blocks/on_player_destroy';
-import * as blockOnPlayerInteract from './blocks/on_player_interact';
+import * as blockOnPlayerInteract from './blocks/registry/on_player_interact';
 import * as blockOnTick from './blocks/registry/on_tick';
 import * as itemOnBeforeDurabilityDamage from './item/registry/on_before_durability_damage';
 import * as itemOnCompleteUse from './item/registry/on_complete_use';
@@ -15,158 +15,159 @@ import * as itemUse from './item/registry/on_use';
 import * as itemOnMineBlock from './item/registry/on_mine_block';
 import * as itemOnHitEntity from './item/registry/on_hit_entity';
 import * as itemOnUseOn from './item/registry/on_use_on';
+import { logEventData } from 'utils/debug';
 
 world.beforeEvents.worldInitialize.subscribe((eventData) => {
     // On Step On
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_step_on_debug',
         new blockOnStepOn.debug()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_step_on_effect',
         new blockOnStepOn.effect()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_step_on_impulse',
         new blockOnStepOn.impulse()
     );
 
     // On Step Off
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_step_off_debug',
         new blockOnStepOff.debug()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_step_off_effect',
         new blockOnStepOff.effect()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_step_off_disappearing',
         new blockOnStepOff.disappearing()
     );
 
     // On Random Tick
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_random_tick_debug',
         new blockOnRandomTick.debug()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_random_tick_effect',
         new blockOnRandomTick.effect()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_random_tick_grow',
         new blockOnRandomTick.grow()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_random_tick_plant_growth',
         new blockOnRandomTick.plantGrowth()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_random_tick_sugar_cane',
         new blockOnRandomTick.sugarCane()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_random_tick_melt_ice',
         new blockOnRandomTick.meltIce()
     );
 
     // Before On Player Place
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:before_on_player_place_debug',
         new blockBeforeOnPlayerPlace.debug()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:before_on_player_place_cancel',
         new blockBeforeOnPlayerPlace.cancel()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:before_on_player_place_turn_into',
         new blockBeforeOnPlayerPlace.turnInto()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:before_on_player_place_double_slab',
         new blockBeforeOnPlayerPlace.doubleSlab()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:before_on_player_place_sugar_cane',
         new blockBeforeOnPlayerPlace.sugarCane()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:before_on_player_place_stairs',
         new blockBeforeOnPlayerPlace.stairs()
     );
 
     // On Entity Fall On
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_entity_fall_on_debug',
         new blockOnEntityFallOn.debug()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_entity_fall_on_player_bounce',
         new blockOnEntityFallOn.player_bounce()
     );
 
     // On Place On
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_place_on_debug',
         new blockOnPlace.debug()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_place_on_change_into_bedrock',
         new blockOnPlace.changeIntoBedrock()
     );
 
     // On Player Destroy
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_player_destroy_debug',
         new blockOnPlayerDestroy.debug()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_player_destroy_spawn_item',
         new blockOnPlayerDestroy.spawnItem()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_player_destroy_regenerate',
         new blockOnPlayerDestroy.regenerate()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_player_destroy_drop_experience',
         new blockOnPlayerDestroy.dropExperience()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_player_destroy_double_slab',
         new blockOnPlayerDestroy.doubleSlab()
     );
 
     // On Player Interact
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_player_interact_debug',
         new blockOnPlayerInteract.debug()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_player_interact_turn_into',
         new blockOnPlayerInteract.turnInto()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_player_interact_prime_tnt',
         new blockOnPlayerInteract.primeTnt()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_player_interact_candle',
         new blockOnPlayerInteract.candle()
     );
 
     // On Tick
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_tick_debug',
         new blockOnTick.debug()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_tick_torch_particles',
         new blockOnTick.torchParticles()
     );
-    eventData.blockTypeRegistry.registerCustomComponent(
+    eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_tick_candle_particles',
         new blockOnTick.candleParticles()
     );
