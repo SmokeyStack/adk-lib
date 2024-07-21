@@ -1,11 +1,11 @@
 import { world } from '@minecraft/server';
-import * as blockOnStepOn from './blocks/on_step_on';
-import * as blockOnStepOff from './blocks/on_step_off';
-import * as blockOnRandomTick from './blocks/on_random_tick';
+import * as blockOnStepOn from './blocks/registry/on_step_on';
+import * as blockOnStepOff from './blocks/registry/on_step_off';
+import * as blockOnRandomTick from './blocks/registry/on_random_tick';
 import * as blockBeforeOnPlayerPlace from './blocks/registry/before_on_player_place';
-import * as blockOnEntityFallOn from './blocks/on_entity_fall_on';
-import * as blockOnPlace from './blocks/on_place';
-import * as blockOnPlayerDestroy from './blocks/on_player_destroy';
+import * as blockOnEntityFallOn from './blocks/registry/on_entity_fall_on';
+import * as blockOnPlace from './blocks/registry/on_place';
+import * as blockOnPlayerDestroy from './blocks/registry/on_player_destroy';
 import * as blockOnPlayerInteract from './blocks/registry/on_player_interact';
 import * as blockOnTick from './blocks/registry/on_tick';
 import * as itemOnBeforeDurabilityDamage from './item/registry/on_before_durability_damage';
@@ -15,7 +15,6 @@ import * as itemUse from './item/registry/on_use';
 import * as itemOnMineBlock from './item/registry/on_mine_block';
 import * as itemOnHitEntity from './item/registry/on_hit_entity';
 import * as itemOnUseOn from './item/registry/on_use_on';
-import { logEventData } from 'utils/debug';
 
 world.beforeEvents.worldInitialize.subscribe((eventData) => {
     // On Step On

@@ -9,7 +9,7 @@ import {
 import { logEventData } from 'utils/debug';
 import { doesBlockBlockkMovement } from 'utils/helper';
 import { vectorOfCenter } from 'utils/math';
-import { onPlayerDestroyDoubleSlab } from './double_slab';
+import { onPlayerDestroyDoubleSlab } from '../double_slab';
 
 class onPlayerDestroy implements BlockCustomComponent {
     constructor() {
