@@ -1,5 +1,7 @@
 # adk-lib:on_use_run_command
 
+# \***\*EXPERIMENTAL\*\***
+
 ## What does it do?
 
 This component allows the item to run a command when used.
