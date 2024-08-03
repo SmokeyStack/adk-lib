@@ -1,6 +1,6 @@
 # adk-lib:on_use_run_command
 
-# \***\*EXPERIMENTAL\*\***
+# **EXPERIMENTAL**
 
 ## What does it do?
 
