@@ -182,11 +182,19 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:before_durability_damage_elytra_is_useable',
         new itemOnBeforeDurabilityDamage.elytraIsUseable()
     );
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:before_durability_damage_run_command',
+        new itemOnBeforeDurabilityDamage.runCommand()
+    );
 
     // On Complete Use
     eventData.itemComponentRegistry.registerCustomComponent(
         'adk-lib:on_complete_use_debug',
         new itemOnCompleteUse.debug()
+    );
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:on_complete_use_run_command',
+        new itemOnCompleteUse.runCommand()
     );
 
     // On Consume
@@ -197,6 +205,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
     eventData.itemComponentRegistry.registerCustomComponent(
         'adk-lib:on_consume_food_effect',
         new itemOnConsume.foodEffect()
+    );
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:on_consume_run_command',
+        new itemOnConsume.runCommand()
     );
 
     // On Hit Entity
@@ -216,6 +228,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:on_hit_entity_different_damage_durability',
         new itemOnHitEntity.differentDamageDurability()
     );
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:on_hit_entity_run_command',
+        new itemOnHitEntity.differentDamageDurability()
+    );
 
     // On Mine Block
     eventData.itemComponentRegistry.registerCustomComponent(
@@ -230,6 +246,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:on_mine_block_pickaxe',
         new itemOnMineBlock.pickaxe()
     );
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:on_mine_block_run_command',
+        new itemOnMineBlock.runCommand()
+    );
 
     // On Use
     eventData.itemComponentRegistry.registerCustomComponent(
@@ -239,6 +259,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
     eventData.itemComponentRegistry.registerCustomComponent(
         'adk-lib:on_use_goat_horn',
         new itemUse.goatHorn()
+    );
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:on_use_run_command',
+        new itemUse.runCommand()
     );
 
     // On Use On
@@ -269,5 +293,9 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
     eventData.itemComponentRegistry.registerCustomComponent(
         'adk-lib:on_use_on_wax',
         new itemOnUseOn.wax()
+    );
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:on_use_on_run_command',
+        new itemOnUseOn.runCommand()
     );
 });

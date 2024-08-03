@@ -49,3 +49,18 @@ export class goatHorn extends onUse {
             .startCooldown(componentData.source);
     }
 }
+
+export class runCommand extends onUse {
+    onUse(componentData: ItemComponentUseEvent) {
+        const REGEX: RegExp = new RegExp('adk-lib:on_use_([^]+)');
+        let tags: string[] = componentData.itemStack.getTags();
+        let commands: string[] = [];
+
+        for (let tag of tags)
+            if (REGEX.exec(tag)) commands.push(REGEX.exec(tag)[1]);
+
+        commands.forEach((command) => {
+            componentData.source.runCommand(command);
+        });
+    }
+}

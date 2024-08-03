@@ -75,3 +75,18 @@ export class preventDamageDurability extends onHitEntity {
             .setEquipment(EquipmentSlot.Mainhand, item);
     }
 }
+
+export class runCommand extends onHitEntity {
+    onHitEntity(componentData: ItemComponentHitEntityEvent) {
+        const REGEX: RegExp = new RegExp('adk-lib:on_hit_entity_([^]+)');
+        let tags: string[] = componentData.itemStack.getTags();
+        let commands: string[] = [];
+
+        for (let tag of tags)
+            if (REGEX.exec(tag)) commands.push(REGEX.exec(tag)[1]);
+
+        commands.forEach((command) => {
+            componentData.attackingEntity.runCommand(command);
+        });
+    }
+}

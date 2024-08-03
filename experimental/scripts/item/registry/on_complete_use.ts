@@ -30,3 +30,18 @@ export class debug extends onCompleteUse {
         console.log(result);
     }
 }
+
+export class runCommand extends onCompleteUse {
+    onUse(componentData: ItemComponentCompleteUseEvent) {
+        const REGEX: RegExp = new RegExp('adk-lib:on_complete_use_([^]+)');
+        let tags: string[] = componentData.itemStack.getTags();
+        let commands: string[] = [];
+
+        for (let tag of tags)
+            if (REGEX.exec(tag)) commands.push(REGEX.exec(tag)[1]);
+
+        commands.forEach((command) => {
+            componentData.source.runCommand(command);
+        });
+    }
+}

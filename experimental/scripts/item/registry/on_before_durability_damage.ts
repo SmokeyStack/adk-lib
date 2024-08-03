@@ -1,6 +1,7 @@
 import {
     ItemComponentBeforeDurabilityDamageEvent,
-    ItemCustomComponent
+    ItemCustomComponent,
+    system
 } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
 
@@ -49,5 +50,26 @@ export class elytraIsUseable extends onBeforeDurabilityDamage {
         const { maxDurability, damage } = itemStack.getComponent('durability');
         const potentialDurabilityDamage = maxDurability + 1 - (damage + 1);
         componentData.durabilityDamage = potentialDurabilityDamage > 0 ? 1 : 0;
+    }
+}
+
+export class runCommand extends onBeforeDurabilityDamage {
+    onBeforeDurabilityDamage(
+        componentData: ItemComponentBeforeDurabilityDamageEvent
+    ) {
+        const REGEX: RegExp = new RegExp(
+            'adk-lib:before_durability_damage_([^]+)'
+        );
+        let tags: string[] = componentData.itemStack.getTags();
+        let commands: string[] = [];
+
+        for (let tag of tags)
+            if (REGEX.exec(tag)) commands.push(REGEX.exec(tag)[1]);
+
+        system.run(() => {
+            commands.forEach((command) => {
+                componentData.attackingEntity.runCommand(command);
+            });
+        });
     }
 }
