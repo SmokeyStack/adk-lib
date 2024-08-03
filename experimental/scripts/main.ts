@@ -186,6 +186,10 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         'adk-lib:before_durability_damage_run_command',
         new itemOnBeforeDurabilityDamage.runCommand()
     );
+    eventData.itemComponentRegistry.registerCustomComponent(
+        'adk-lib:before_durability_damage_modify_durability_damage',
+        new itemOnBeforeDurabilityDamage.modifyDurabilityDamageAmount()
+    );
 
     // On Complete Use
     eventData.itemComponentRegistry.registerCustomComponent(

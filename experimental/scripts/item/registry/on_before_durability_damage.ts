@@ -73,3 +73,22 @@ export class runCommand extends onBeforeDurabilityDamage {
         });
     }
 }
+
+export class modifyDurabilityDamageAmount extends onBeforeDurabilityDamage {
+    onBeforeDurabilityDamage(
+        componentData: ItemComponentBeforeDurabilityDamageEvent
+    ): void {
+        const REGEX: RegExp = new RegExp(
+            'adk-lib:modify_durability_damage_([0-9]+)'
+        );
+        let tags: string[] = componentData.itemStack.getTags();
+
+        for (let tag of tags)
+            if (REGEX.exec(tag)) {
+                componentData.durabilityDamage +=
+                    parseInt(REGEX.exec(tag)[1]) - 2;
+
+                break;
+            }
+    }
+}
