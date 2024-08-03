@@ -243,10 +243,6 @@ world.beforeEvents.worldInitialize.subscribe((eventData) => {
         new itemOnMineBlock.digger()
     );
     eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_mine_block_pickaxe',
-        new itemOnMineBlock.pickaxe()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
         'adk-lib:on_mine_block_run_command',
         new itemOnMineBlock.runCommand()
     );

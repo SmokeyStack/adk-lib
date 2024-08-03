@@ -5,7 +5,6 @@ import {
     ItemStack
 } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
-import { canHarvest } from '../item_pickaxe';
 
 class onMineBlock implements ItemCustomComponent {
     constructor() {
@@ -56,13 +55,6 @@ export class digger extends onMineBlock {
         player
             .getComponent('minecraft:equippable')
             .setEquipment(EquipmentSlot.Mainhand, item);
-    }
-}
-
-export class pickaxe extends onMineBlock {
-    onMineBlock(componentData: ItemComponentMineBlockEvent): void {
-        logEventData(componentData, componentData.constructor.name);
-        canHarvest(componentData);
     }
 }
 
