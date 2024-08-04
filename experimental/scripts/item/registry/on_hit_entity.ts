@@ -33,46 +33,41 @@ export class debug extends onHitEntity {
     }
 }
 
-export class summonLightning extends onHitEntity {
+export class summonEntity extends onHitEntity {
     onHitEntity(componentData: ItemComponentHitEntityEvent) {
-        componentData.hitEntity.dimension.spawnEntity(
-            'minecraft:lightning_bolt',
-            componentData.hitEntity.location
+        const REGEX: RegExp = new RegExp('adk-lib:on_hit_summon_entity_([^]+)');
+        let tags: string[] = componentData.itemStack.getTags();
+        let entities: string[] = [];
+
+        for (let tag of tags)
+            if (REGEX.exec(tag)) entities.push(REGEX.exec(tag)[1]);
+
+        entities.forEach((entity) => {
+            componentData.hitEntity.dimension.spawnEntity(
+                entity,
+                componentData.hitEntity.location
+            );
+        });
+    }
+}
+
+export class summonParticle extends onHitEntity {
+    onHitEntity(componentData: ItemComponentHitEntityEvent) {
+        const REGEX: RegExp = new RegExp(
+            'adk-lib:on_hit_summon_particle_([^]+)'
         );
-    }
-}
+        let tags: string[] = componentData.itemStack.getTags();
+        let particles: string[] = [];
 
-export class differentDamageDurability extends onHitEntity {
-    onHitEntity(componentData: ItemComponentHitEntityEvent) {
-        let player = componentData.attackingEntity;
-        let item = new ItemStack(componentData.itemStack.typeId, 1);
+        for (let tag of tags)
+            if (REGEX.exec(tag)) particles.push(REGEX.exec(tag)[1]);
 
-        if (componentData.hitEntity.typeId === 'minecraft:sheep') {
-            item.getComponent('durability').damage +=
-                componentData.itemStack.getComponent('durability').damage + 0;
-        } else if (componentData.hitEntity.typeId === 'minecraft:armadillo') {
-            item.getComponent('durability').damage +=
-                componentData.itemStack.getComponent('durability').damage + 5;
-        } else {
-            item.getComponent('durability').damage +=
-                componentData.itemStack.getComponent('durability').damage + 1;
-        }
-
-        player
-            .getComponent('minecraft:equippable')
-            .setEquipment(EquipmentSlot.Mainhand, item);
-    }
-}
-
-export class preventDamageDurability extends onHitEntity {
-    onHitEntity(componentData: ItemComponentHitEntityEvent) {
-        let player = componentData.attackingEntity;
-        let item = new ItemStack(componentData.itemStack.typeId, 1);
-        item.getComponent('durability').damage +=
-            componentData.itemStack.getComponent('durability').damage;
-        player
-            .getComponent('minecraft:equippable')
-            .setEquipment(EquipmentSlot.Mainhand, item);
+        particles.forEach((entity) => {
+            componentData.hitEntity.dimension.spawnParticle(
+                entity,
+                componentData.hitEntity.location
+            );
+        });
     }
 }
 

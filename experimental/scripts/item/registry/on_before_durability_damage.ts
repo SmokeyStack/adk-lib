@@ -92,3 +92,41 @@ export class modifyDurabilityDamageAmount extends onBeforeDurabilityDamage {
             }
     }
 }
+
+export class preventDamageDurability extends onBeforeDurabilityDamage {
+    onBeforeDurabilityDamage(
+        componentData: ItemComponentBeforeDurabilityDamageEvent
+    ): void {
+        componentData.durabilityDamage -= 2;
+    }
+}
+
+interface Condition {
+    entity: string;
+    amount: number;
+}
+
+export class modifyDurabilityDamageAmountConditional extends onBeforeDurabilityDamage {
+    onBeforeDurabilityDamage(
+        componentData: ItemComponentBeforeDurabilityDamageEvent
+    ): void {
+        const REGEX: RegExp = new RegExp(
+            'adk-lib:modify_durability_damage_conditional_entity_([^]+)_amount_([0-9]+)'
+        );
+        let tags: string[] = componentData.itemStack.getTags();
+        let conditions: Condition[] = [];
+
+        for (let tag of tags)
+            if (REGEX.exec(tag))
+                conditions.push({
+                    entity: REGEX.exec(tag)[1],
+                    amount: parseInt(REGEX.exec(tag)[2])
+                });
+
+        for (let condition of conditions)
+            if (componentData.hitEntity.typeId === condition.entity) {
+                componentData.durabilityDamage += condition.amount - 2;
+                break;
+            }
+    }
+}
