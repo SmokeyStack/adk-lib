@@ -57,3 +57,18 @@ export class foodEffect extends onConsume {
         giveFoodEffect(componentData);
     }
 }
+
+export class runCommand extends onConsume {
+    onConsume(componentData: ItemComponentConsumeEvent) {
+        const REGEX: RegExp = new RegExp('adk-lib:on_consume_([^]+)');
+        let tags: string[] = componentData.itemStack.getTags();
+        let commands: string[] = [];
+
+        for (let tag of tags)
+            if (REGEX.exec(tag)) commands.push(REGEX.exec(tag)[1]);
+
+        commands.forEach((command) => {
+            componentData.source.runCommand(command);
+        });
+    }
+}

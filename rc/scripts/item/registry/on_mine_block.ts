@@ -4,10 +4,10 @@ import {
     ItemComponentMineBlockEvent,
     ItemCustomComponent,
     ItemDurabilityComponent,
-    ItemStack
+    ItemStack,
+    Player
 } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
-import { canHarvest } from '../item_pickaxe';
 
 class onMineBlock implements ItemCustomComponent {
     constructor() {
@@ -38,52 +38,134 @@ export class debug extends onMineBlock {
 
 export class digger extends onMineBlock {
     onMineBlock(componentData: ItemComponentMineBlockEvent) {
-        let player = componentData.source;
-        let item = new ItemStack(componentData.itemStack.typeId, 1);
+        const REGEX: RegExp = new RegExp('adk-lib:digger_([0-9]+)');
+        let tags: string[] = componentData.itemStack.getTags();
+        let player: Player = componentData.source as Player;
 
-        if (componentData.minedBlockPermutation.type.id === 'minecraft:glass') {
-            (
-                item.getComponent('durability') as ItemDurabilityComponent
-            ).damage +=
-                (
-                    componentData.itemStack.getComponent(
-                        'durability'
-                    ) as ItemDurabilityComponent
-                ).damage + 0;
-        } else if (
-            componentData.minedBlockPermutation.type.id ===
-            'minecraft:oak_planks'
-        ) {
-            (
-                item.getComponent('durability') as ItemDurabilityComponent
-            ).damage +=
-                (
-                    componentData.itemStack.getComponent(
-                        'durability'
-                    ) as ItemDurabilityComponent
-                ).damage + 5;
-        } else {
-            (
-                item.getComponent('durability') as ItemDurabilityComponent
-            ).damage +=
-                (
-                    componentData.itemStack.getComponent(
-                        'durability'
-                    ) as ItemDurabilityComponent
-                ).damage + 1;
-        }
+        for (let tag of tags)
+            if (REGEX.exec(tag)) {
+                let item: ItemStack = (
+                    player.getComponent(
+                        'equippable'
+                    ) as EntityEquippableComponent
+                ).getEquipment(EquipmentSlot.Mainhand);
 
-        (
-            player.getComponent(
-                'minecraft:equippable'
-            ) as EntityEquippableComponent
-        ).setEquipment(EquipmentSlot.Mainhand, item);
+                if (
+                    (
+                        item.getComponent(
+                            'minecraft:durability'
+                        ) as ItemDurabilityComponent
+                    ).damage +
+                        parseInt(REGEX.exec(tag)[1]) >=
+                    (
+                        item.getComponent(
+                            'minecraft:durability'
+                        ) as ItemDurabilityComponent
+                    ).maxDurability
+                ) {
+                    (
+                        player.getComponent(
+                            'equippable'
+                        ) as EntityEquippableComponent
+                    ).setEquipment(EquipmentSlot.Mainhand, undefined);
+
+                    break;
+                }
+
+                (
+                    item.getComponent(
+                        'minecraft:durability'
+                    ) as ItemDurabilityComponent
+                ).damage += parseInt(REGEX.exec(tag)[1]);
+                (
+                    player.getComponent(
+                        'equippable'
+                    ) as EntityEquippableComponent
+                ).setEquipment(EquipmentSlot.Mainhand, item);
+
+                break;
+            }
     }
 }
 
-export class pickaxe extends onMineBlock {
-    onMineBlock(componentData: ItemComponentMineBlockEvent): void {
-        logEventData(componentData, componentData.constructor.name);
-        canHarvest(componentData);
+interface Condition {
+    block: string;
+    amount: number;
+}
+
+export class diggerConditional extends onMineBlock {
+    onMineBlock(componentData: ItemComponentMineBlockEvent) {
+        const REGEX: RegExp = new RegExp(
+            'adk-lib:digger_conditional_block_([^]+)_amount_([0-9]+)'
+        );
+        let tags: string[] = componentData.itemStack.getTags();
+        let conditions: Condition[] = [];
+        let player: Player = componentData.source as Player;
+
+        for (let tag of tags)
+            if (REGEX.exec(tag))
+                conditions.push({
+                    block: REGEX.exec(tag)[1],
+                    amount: parseInt(REGEX.exec(tag)[2])
+                });
+
+        for (let condition of conditions)
+            if (
+                componentData.minedBlockPermutation.type.id === condition.block
+            ) {
+                let item: ItemStack = (
+                    player.getComponent(
+                        'equippable'
+                    ) as EntityEquippableComponent
+                ).getEquipment(EquipmentSlot.Mainhand);
+
+                if (
+                    (
+                        item.getComponent(
+                            'minecraft:durability'
+                        ) as ItemDurabilityComponent
+                    ).damage +
+                        condition.amount >=
+                    (
+                        item.getComponent(
+                            'minecraft:durability'
+                        ) as ItemDurabilityComponent
+                    ).maxDurability
+                ) {
+                    (
+                        player.getComponent(
+                            'equippable'
+                        ) as EntityEquippableComponent
+                    ).setEquipment(EquipmentSlot.Mainhand, undefined);
+
+                    break;
+                }
+
+                (
+                    item.getComponent(
+                        'minecraft:durability'
+                    ) as ItemDurabilityComponent
+                ).damage += condition.amount;
+                (
+                    player.getComponent(
+                        'equippable'
+                    ) as EntityEquippableComponent
+                ).setEquipment(EquipmentSlot.Mainhand, item);
+            }
+    }
+}
+
+export class runCommand extends onMineBlock {
+    onMineBlock(componentData: ItemComponentMineBlockEvent) {
+        const REGEX: RegExp = new RegExp('adk-lib:on_mine_block_([^]+)');
+        let tags: string[] = componentData.itemStack.getTags();
+        let commands: string[] = [];
+
+        for (let tag of tags)
+            if (REGEX.exec(tag)) commands.push(REGEX.exec(tag)[1]);
+
+        commands.forEach((command) => {
+            componentData.source.runCommand(command);
+        });
     }
 }

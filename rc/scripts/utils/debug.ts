@@ -4,6 +4,7 @@ import {
     BlockInventoryComponent,
     BlockPermutation,
     BlockPistonComponent,
+    BlockRecordPlayerComponent,
     BlockSignComponent,
     Container,
     Dimension,
@@ -84,6 +85,12 @@ export function logEventData(
                     break;
                 case BlockPistonComponent:
                     result[fullKey] = logBlockPistonComponentFunctions(
+                        data,
+                        key
+                    );
+                    break;
+                case BlockRecordPlayerComponent:
+                    result[fullKey] = logBlockRecordPlayerComponentFunctions(
                         data,
                         key
                     );

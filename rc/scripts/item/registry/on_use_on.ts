@@ -142,3 +142,18 @@ export class wax extends onUseOn {
         onUseOnWax(componentData);
     }
 }
+
+export class runCommand extends onUseOn {
+    onUseOn(componentData: ItemComponentUseOnEvent) {
+        const REGEX: RegExp = new RegExp('adk-lib:on_use_on_([^]+)');
+        let tags: string[] = componentData.itemStack.getTags();
+        let commands: string[] = [];
+
+        for (let tag of tags)
+            if (REGEX.exec(tag)) commands.push(REGEX.exec(tag)[1]);
+
+        commands.forEach((command) => {
+            componentData.source.runCommand(command);
+        });
+    }
+}

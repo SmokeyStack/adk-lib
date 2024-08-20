@@ -10,16 +10,17 @@ import { directionToVector3 } from 'utils/math';
 export function beforeOnPlayerPlaceStairs(
     data: BlockComponentPlayerPlaceBeforeEvent
 ): void {
-    let face: string = data.permutationToPlace.getState(
+    let permutationToPlace: BlockPermutation = data.permutationToPlace;
+    let cardinalDirection: string = permutationToPlace.getState(
         'minecraft:cardinal_direction'
     ) as string;
-    let half: string = data.permutationToPlace.getState(
+    let verticalHalf: string = permutationToPlace.getState(
         'minecraft:vertical_half'
     ) as string;
-    const namespace: string = data.permutationToPlace.type.id.split(':')[0];
-    let blockPermutation: BlockPermutation = data.permutationToPlace;
+    const namespace: string = permutationToPlace.type.id.split(':')[0];
     let blockToCheck: Block;
-    switch (face) {
+
+    switch (cardinalDirection) {
         case 'north':
             {
                 for (const direction of DirectionType.HORIZONTAL) {
@@ -27,14 +28,15 @@ export function beforeOnPlayerPlaceStairs(
                         directionToVector3(direction)
                     );
 
-                    if (blockToCheck.typeId !== blockPermutation.type.id)
+                    if (blockToCheck.typeId !== permutationToPlace.type.id)
                         continue;
 
-                    const blockToCheckHalf = blockToCheck.permutation.getState(
-                        'minecraft:vertical_half'
-                    );
+                    const blockToCheckVerticalHalf =
+                        blockToCheck.permutation.getState(
+                            'minecraft:vertical_half'
+                        );
 
-                    if (blockToCheckHalf !== half) continue;
+                    if (blockToCheckVerticalHalf !== verticalHalf) continue;
 
                     const blockToCheckDirection =
                         blockToCheck.permutation.getState(
@@ -45,15 +47,15 @@ export function beforeOnPlayerPlaceStairs(
                         case Direction.North:
                             {
                                 if (blockToCheckDirection === 'west') {
-                                    blockPermutation =
-                                        blockPermutation.withState(
+                                    permutationToPlace =
+                                        permutationToPlace.withState(
                                             namespace + ':shape',
                                             'outer_left'
                                         );
                                 }
                                 if (blockToCheckDirection === 'east') {
-                                    blockPermutation =
-                                        blockPermutation.withState(
+                                    permutationToPlace =
+                                        permutationToPlace.withState(
                                             namespace + ':shape',
                                             'outer_right'
                                         );
@@ -63,15 +65,15 @@ export function beforeOnPlayerPlaceStairs(
                         case Direction.South:
                             {
                                 if (blockToCheckDirection === 'east') {
-                                    blockPermutation =
-                                        blockPermutation.withState(
+                                    permutationToPlace =
+                                        permutationToPlace.withState(
                                             namespace + ':shape',
                                             'inner_left'
                                         );
                                 }
                                 if (blockToCheckDirection === 'west') {
-                                    blockPermutation =
-                                        blockPermutation.withState(
+                                    permutationToPlace =
+                                        permutationToPlace.withState(
                                             namespace + ':shape',
                                             'inner_right'
                                         );
@@ -126,23 +128,19 @@ export function beforeOnPlayerPlaceStairs(
             break;
         case 'south':
             {
-                blockPermutation = blockPermutation.withState(
-                    namespace + ':south',
-                    true
-                );
                 for (const direction of DirectionType.HORIZONTAL) {
                     blockToCheck = data.block.offset(
                         directionToVector3(direction)
                     );
 
-                    if (blockToCheck.typeId !== blockPermutation.type.id)
+                    if (blockToCheck.typeId !== permutationToPlace.type.id)
                         continue;
 
                     const blockToCheckHalf = blockToCheck.permutation.getState(
                         'minecraft:vertical_half'
                     );
 
-                    if (blockToCheckHalf !== half) continue;
+                    if (blockToCheckHalf !== verticalHalf) continue;
 
                     const blockToCheckDirection =
                         blockToCheck.permutation.getState(
@@ -153,15 +151,15 @@ export function beforeOnPlayerPlaceStairs(
                         case Direction.North:
                             {
                                 if (blockToCheckDirection === 'west') {
-                                    blockPermutation =
-                                        blockPermutation.withState(
+                                    permutationToPlace =
+                                        permutationToPlace.withState(
                                             namespace + ':shape',
                                             'inner_left'
                                         );
                                 }
                                 if (blockToCheckDirection === 'east') {
-                                    blockPermutation =
-                                        blockPermutation.withState(
+                                    permutationToPlace =
+                                        permutationToPlace.withState(
                                             namespace + ':shape',
                                             'inner_right'
                                         );
@@ -171,15 +169,15 @@ export function beforeOnPlayerPlaceStairs(
                         case Direction.South:
                             {
                                 if (blockToCheckDirection === 'east') {
-                                    blockPermutation =
-                                        blockPermutation.withState(
+                                    permutationToPlace =
+                                        permutationToPlace.withState(
                                             namespace + ':shape',
                                             'outer_left'
                                         );
                                 }
                                 if (blockToCheckDirection === 'west') {
-                                    blockPermutation =
-                                        blockPermutation.withState(
+                                    permutationToPlace =
+                                        permutationToPlace.withState(
                                             namespace + ':shape',
                                             'outer_right'
                                         );
@@ -239,14 +237,14 @@ export function beforeOnPlayerPlaceStairs(
                         directionToVector3(direction)
                     );
 
-                    if (blockToCheck.typeId !== blockPermutation.type.id)
+                    if (blockToCheck.typeId !== permutationToPlace.type.id)
                         continue;
 
                     const blockToCheckHalf = blockToCheck.permutation.getState(
                         'minecraft:vertical_half'
                     );
 
-                    if (blockToCheckHalf !== half) continue;
+                    if (blockToCheckHalf !== verticalHalf) continue;
 
                     const blockToCheckDirection =
                         blockToCheck.permutation.getState(
@@ -257,15 +255,15 @@ export function beforeOnPlayerPlaceStairs(
                         case Direction.East:
                             {
                                 if (blockToCheckDirection === 'north') {
-                                    blockPermutation =
-                                        blockPermutation.withState(
+                                    permutationToPlace =
+                                        permutationToPlace.withState(
                                             namespace + ':shape',
                                             'outer_left'
                                         );
                                 }
                                 if (blockToCheckDirection === 'south') {
-                                    blockPermutation =
-                                        blockPermutation.withState(
+                                    permutationToPlace =
+                                        permutationToPlace.withState(
                                             namespace + ':shape',
                                             'outer_right'
                                         );
@@ -275,15 +273,15 @@ export function beforeOnPlayerPlaceStairs(
                         case Direction.West:
                             {
                                 if (blockToCheckDirection === 'south') {
-                                    blockPermutation =
-                                        blockPermutation.withState(
+                                    permutationToPlace =
+                                        permutationToPlace.withState(
                                             namespace + ':shape',
                                             'inner_left'
                                         );
                                 }
                                 if (blockToCheckDirection === 'north') {
-                                    blockPermutation =
-                                        blockPermutation.withState(
+                                    permutationToPlace =
+                                        permutationToPlace.withState(
                                             namespace + ':shape',
                                             'inner_right'
                                         );
@@ -343,14 +341,14 @@ export function beforeOnPlayerPlaceStairs(
                         directionToVector3(direction)
                     );
 
-                    if (blockToCheck.typeId !== blockPermutation.type.id)
+                    if (blockToCheck.typeId !== permutationToPlace.type.id)
                         continue;
 
                     const blockToCheckHalf = blockToCheck.permutation.getState(
                         'minecraft:vertical_half'
                     );
 
-                    if (blockToCheckHalf !== half) continue;
+                    if (blockToCheckHalf !== verticalHalf) continue;
 
                     const blockToCheckDirection =
                         blockToCheck.permutation.getState(
@@ -361,15 +359,15 @@ export function beforeOnPlayerPlaceStairs(
                         case Direction.East:
                             {
                                 if (blockToCheckDirection === 'north') {
-                                    blockPermutation =
-                                        blockPermutation.withState(
+                                    permutationToPlace =
+                                        permutationToPlace.withState(
                                             namespace + ':shape',
                                             'inner_left'
                                         );
                                 }
                                 if (blockToCheckDirection === 'south') {
-                                    blockPermutation =
-                                        blockPermutation.withState(
+                                    permutationToPlace =
+                                        permutationToPlace.withState(
                                             namespace + ':shape',
                                             'inner_right'
                                         );
@@ -379,15 +377,15 @@ export function beforeOnPlayerPlaceStairs(
                         case Direction.West:
                             {
                                 if (blockToCheckDirection === 'south') {
-                                    blockPermutation =
-                                        blockPermutation.withState(
+                                    permutationToPlace =
+                                        permutationToPlace.withState(
                                             namespace + ':shape',
                                             'outer_left'
                                         );
                                 }
                                 if (blockToCheckDirection === 'north') {
-                                    blockPermutation =
-                                        blockPermutation.withState(
+                                    permutationToPlace =
+                                        permutationToPlace.withState(
                                             namespace + ':shape',
                                             'outer_right'
                                         );
@@ -444,5 +442,5 @@ export function beforeOnPlayerPlaceStairs(
             break;
     }
 
-    data.permutationToPlace = blockPermutation;
+    data.permutationToPlace = permutationToPlace;
 }
