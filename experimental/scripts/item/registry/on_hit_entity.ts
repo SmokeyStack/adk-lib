@@ -1,8 +1,6 @@
 import {
-    EquipmentSlot,
     ItemComponentHitEntityEvent,
-    ItemCustomComponent,
-    ItemStack
+    ItemCustomComponent
 } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
 

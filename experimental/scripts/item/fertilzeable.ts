@@ -446,8 +446,6 @@ class NetherrackBlock implements Fertilizable {
         blockPosition: Vector3,
         blockPermutation: BlockPermutation
     ): boolean {
-        if (!dimension.getBlock(blockPosition).isAir) return false;
-
         for (let a: number = -1; a <= 1; a++) {
             for (let b: number = -1; b <= 1; b++) {
                 for (let c: number = -1; c <= 1; c++) {
@@ -457,7 +455,7 @@ class NetherrackBlock implements Fertilizable {
                         z: blockPosition.z + b
                     }).typeId;
                     if (
-                        id == 'minecraft:crimson_nylium' ||
+                        id == 'minecraft:warped_nylium' ||
                         id == 'minecraft:crimson_nylium'
                     )
                         return true;
