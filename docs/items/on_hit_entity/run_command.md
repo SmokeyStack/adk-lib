@@ -1,6 +1,6 @@
 # adk-lib:on_mine_block_run_command
 
-# **EXPERIMENTAL**
+# **RC**
 
 ## What does it do?
 

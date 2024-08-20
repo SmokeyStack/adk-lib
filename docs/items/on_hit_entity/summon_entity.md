@@ -1,6 +1,6 @@
 # adk-lib:on_hit_entity_summon_entity
 
-# **EXPERIMENTAL**
+# **RC**
 
 ## What does it do?
 

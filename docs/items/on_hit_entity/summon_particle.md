@@ -1,6 +1,6 @@
 # adk-lib:on_hit_entity_summon_particle
 
-# **EXPERIMENTAL**
+# **RC**
 
 ## What does it do?
 

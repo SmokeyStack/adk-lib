@@ -1,6 +1,6 @@
 # adk-lib:on_complete_use_run_command
 
-# **EXPERIMENTAL**
+# **RC**
 
 ## What does it do?
 

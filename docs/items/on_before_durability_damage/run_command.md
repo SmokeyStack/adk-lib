@@ -1,6 +1,6 @@
 # adk-lib:before_durability_damage_run_command
 
-# **EXPERIMENTAL**
+# **RC**
 
 ## What does it do?
 
