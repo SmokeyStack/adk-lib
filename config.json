@@ -43,6 +43,20 @@
 					}
 				]
 			},
+			"dev-stable": {
+				"export": {
+					"readOnly": false,
+					"target": "development"
+				},
+				"filters": [
+					{
+						"arguments": [
+							"stable"
+						],
+						"filter": "move-manifest"
+					}
+				]
+			},
 			"build-experimental": {
 				"export": {
 					"readOnly": false,
@@ -66,6 +80,20 @@
 					{
 						"arguments": [
 							"rc"
+						],
+						"filter": "move-manifest"
+					}
+				]
+			},
+			"build-stable": {
+				"export": {
+					"readOnly": false,
+					"target": "local"
+				},
+				"filters": [
+					{
+						"arguments": [
+							"stable"
 						],
 						"filter": "move-manifest"
 					}

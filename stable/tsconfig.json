@@ -1,0 +1,29 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "allowUnreachableCode": true,
+        "allowUnusedLabels": true,
+        "baseUrl": "./scripts",
+        "declaration": false,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "forceConsistentCasingInFileNames": true,
+        "listFiles": false,
+        "module": "ES2020",
+        "moduleResolution": "Node",
+        "noEmitHelpers": true,
+        "noImplicitAny": false,
+        "noImplicitReturns": false,
+        "noImplicitUseStrict": false,
+        "noLib": false,
+        "outDir": "../packs/BP",
+        "pretty": true,
+        "rootDir": ".",
+        "skipLibCheck": true,
+        "sourceMap": false,
+        "strict": false,
+        "target": "ES2022"
+    },
+    "exclude": ["lib", "dist", "node_modules"],
+    "include": ["scripts/**/*"]
+}

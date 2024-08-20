@@ -1,0 +1,15 @@
+{
+    "name": "adk-lib-stable",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "compile": "tsc"
+    },
+    "keywords": [],
+    "author": "SmokeyStack",
+    "license": "GPL-3.0-only",
+    "description": "",
+    "dependencies": {
+        "@minecraft/server": "1.13.0"
+    }
+}

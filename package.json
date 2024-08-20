@@ -12,7 +12,8 @@
     },
     "workspaces": [
         "experimental",
-        "rc"
+        "rc",
+        "stable"
     ],
     "keywords": [],
     "author": "SmokeyStack",
