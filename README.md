@@ -15,7 +15,7 @@ To use ADK LIB in your add-on, simply add the following to your behaviour pack's
 ```json
 {
     "uuid": "5e2eda3e-6eaf-4068-9076-0a7f0587b8bb",
-    "version": "0.1.0-1.21.0.23"
+    "version": "0.1.0"
 }
 ```
 
@@ -42,6 +42,12 @@ Under the [License](LICENSE), you are allowed to distribute this add-on with or 
 Help support the development and maintenance of this library.
 
 [![kofi](https://img.shields.io/badge/kofi-%23F16061.svg?&style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/smokeystack)
+
+## Discord
+
+I have a Discord server where you can ask for help or give suggestions for future components.
+
+Discord Server: https://discord.com/invite/YF8Jk8JSHh
 
 ## License
 
