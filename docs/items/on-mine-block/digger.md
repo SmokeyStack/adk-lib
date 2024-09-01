@@ -2,7 +2,7 @@
 
 ## What does it do?
 
-This component modifies the durability damage when you hit an entity.
+This component modifies the durability damage when you mine a block.
 
 ## How to use
 
