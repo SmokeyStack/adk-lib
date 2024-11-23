@@ -2,7 +2,7 @@
     "dependencies": [
         {
             "module_name": "@minecraft/server",
-            "version": "1.13.0"
+            "version": "1.15.0"
         }
     ],
     "format_version": 2,
@@ -11,7 +11,7 @@
         "min_engine_version": [
             1,
             21,
-            20
+            40
         ],
         "name": "ADK LIB",
         "uuid": "5e2eda3e-6eaf-4068-9076-0a7f0587b8bb",
