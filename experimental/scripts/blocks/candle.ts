@@ -8,6 +8,7 @@ import {
     Player,
     Vector3
 } from '@minecraft/server';
+import type * as minecraftvanilladata from '@minecraft/vanilla-data';
 import { decrementStack } from 'utils/helper';
 
 const ParticleOffsets = {
@@ -51,10 +52,16 @@ function spawnParticle(world: Dimension, vector: Vector3): void {
 function extinguish(block: Block, world: Dimension, vector: Vector3): void {
     const namespace: string = block.typeId.split(':')[0];
     const candles: number = block.permutation.getState(
-        namespace + ':candles'
+        (namespace +
+            ':candles') as keyof minecraftvanilladata.BlockStateSuperset
     ) as number;
     const lit: string = namespace + ':lit';
-    block.setPermutation(block.permutation.withState(lit, false));
+    block.setPermutation(
+        block.permutation.withState(
+            lit as keyof minecraftvanilladata.BlockStateSuperset,
+            false
+        )
+    );
     world.playSound('extinguish.candle', vector, { volume: 1, pitch: 1 });
     ParticleOffsets[candles].forEach(
         (offset: { x: number; y: number; z: number }) => {
@@ -69,7 +76,8 @@ function extinguish(block: Block, world: Dimension, vector: Vector3): void {
 
 export function onTickCandle(data: BlockComponentTickEvent): void {
     let candles: number = data.block.permutation.getState(
-        data.block.typeId.split(':')[0] + ':candles'
+        (data.block.typeId.split(':')[0] +
+            ':candles') as keyof minecraftvanilladata.BlockStateSuperset
     ) as number;
 
     ParticleOffsets[candles].forEach(
@@ -92,10 +100,11 @@ export function onInteractCandle(
         .getEquipment(EquipmentSlot.Mainhand);
     const namespace: string = data.block.typeId.split(':')[0];
     const isLit: boolean = data.block.permutation.getState(
-        namespace + ':lit'
+        (namespace + ':lit') as keyof minecraftvanilladata.BlockStateSuperset
     ) as boolean;
     const candles: number = data.block.permutation.getState(
-        namespace + ':candles'
+        (namespace +
+            ':candles') as keyof minecraftvanilladata.BlockStateSuperset
     ) as number;
 
     if (playerEquipment === undefined && !isLit) return;
@@ -106,7 +115,8 @@ export function onInteractCandle(
     if (playerEquipment.typeId === data.block.typeId && candles != 4) {
         data.block.setPermutation(
             data.block.permutation.withState(
-                namespace + ':candles',
+                (namespace +
+                    ':candles') as keyof minecraftvanilladata.BlockStateSuperset,
                 candles + 1
             )
         );
@@ -119,7 +129,11 @@ export function onInteractCandle(
         !isLit
     ) {
         data.block.setPermutation(
-            data.block.permutation.withState(namespace + ':lit', true)
+            data.block.permutation.withState(
+                (namespace +
+                    ':lit') as keyof minecraftvanilladata.BlockStateSuperset,
+                true
+            )
         );
         data.dimension.playSound('fire.ignite', data.block.location);
         ParticleOffsets[candles].forEach(

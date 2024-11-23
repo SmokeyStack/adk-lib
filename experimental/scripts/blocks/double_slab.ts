@@ -9,6 +9,7 @@ import {
     BlockComponentPlayerDestroyEvent,
     Enchantment
 } from '@minecraft/server';
+import type * as minecraftvanilladata from '@minecraft/vanilla-data';
 import { decrementStack, getOppositeDirection } from 'utils/helper';
 import { directionToVector3 } from 'utils/math';
 
@@ -29,10 +30,17 @@ export function beforeOnPlayerPlaceDoubleSlab(
     const blockStateDouble: string = namespace + ':is_double';
     const blockStateHalf: string = 'minecraft:vertical_half';
 
-    if (blockToCheck.permutation.getState(blockStateDouble)) return;
+    if (
+        blockToCheck.permutation.getState(
+            blockStateDouble as keyof minecraftvanilladata.BlockStateSuperset
+        )
+    )
+        return;
     if (blockToCheck.typeId !== playerEquipment.typeId) return;
     if (face === 'Up' || face === 'Down') {
-        const state = blockToCheck.permutation.getState(blockStateHalf);
+        const state = blockToCheck.permutation.getState(
+            blockStateHalf as keyof minecraftvanilladata.BlockStateSuperset
+        );
         if (
             (face === 'Up' && state === 'top') ||
             (face === 'Down' && state === 'bottom')

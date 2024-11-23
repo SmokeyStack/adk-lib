@@ -7,6 +7,7 @@ import {
     MinecraftDimensionTypes,
     world
 } from '@minecraft/server';
+import type * as minecraftvanilladata from '@minecraft/vanilla-data';
 import { updateLiquidBlock } from 'utils/helper';
 
 class onRandomTick implements BlockCustomComponent {
@@ -101,7 +102,9 @@ export class grow extends onRandomTick {
 export class plantGrowth extends onRandomTick {
     onRandomTick(componentData: BlockComponentRandomTickEvent) {
         let block = componentData.block;
-        let current_state = block.permutation.getState('adk-lib:age') as number;
+        let current_state = block.permutation.getState(
+            'adk-lib:age' as keyof minecraftvanilladata.BlockStateSuperset
+        ) as number;
         let valid_values = BlockStates.get('adk-lib:age').validValues;
         let max = valid_values[valid_values.length - 1] as number;
         if (current_state < max)
@@ -128,7 +131,7 @@ export class sugarCane extends onRandomTick {
 
         if (count < 3) {
             let age: number = block.permutation.getState(
-                blockStateAge
+                blockStateAge as keyof minecraftvanilladata.BlockStateSuperset
             ) as number;
             if (age == 15) {
                 block.above().setType(block.typeId);

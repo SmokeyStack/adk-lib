@@ -6,6 +6,7 @@ import {
     Block,
     ItemStack
 } from '@minecraft/server';
+import type * as minecraftvanilladata from '@minecraft/vanilla-data';
 import { areVectorsEqual } from '../utils/math';
 
 interface Fertilizable {
@@ -137,7 +138,9 @@ class BambooBlock implements Fertilizable {
             dimension
                 .getBlock(blockPosition)
                 .above(amountOfBamboosAbove)
-                .permutation.getState('age_bit') != 1
+                .permutation.getState(
+                    'age_bit' as keyof minecraftvanilladata.BlockStateSuperset
+                ) != 1
         );
     }
 
@@ -184,7 +187,9 @@ class BambooBlock implements Fertilizable {
 
             if (
                 totalBambooInColumn >= 16 ||
-                blockState.getState('age_bit') == 1 ||
+                blockState.getState(
+                    'age_bit' as keyof minecraftvanilladata.BlockStateSuperset
+                ) == 1 ||
                 !blockPos.above().isAir
             )
                 return;
@@ -255,8 +260,10 @@ class BambooBlock implements Fertilizable {
             blockPermutationBelow2.type.id == 'minecraft:bamboo'
                 ? 'thick'
                 : 'thin';
-        let ageBit: number =
-            (height >= 11 && Math.random() < 0.25) || height == 15 ? 1 : 0;
+        let ageBit: boolean =
+            (height >= 11 && Math.random() < 0.25) || height == 15
+                ? true
+                : false;
         dimension.setBlockPermutation(
             block.above(),
             BlockPermutation.resolve('minecraft:bamboo', {
