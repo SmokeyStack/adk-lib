@@ -10,6 +10,6 @@
     "license": "GPL-3.0-only",
     "description": "",
     "dependencies": {
-        "@minecraft/server": "1.18.0-beta.1.21.60-preview.21"
+        "@minecraft/server": "1.18.0-beta.1.21.60-preview.24"
     }
 }
