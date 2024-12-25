@@ -12,10 +12,8 @@ import {
 import { BLOCK_MAP } from '../fertilzeable';
 import { onUseOnBucket, pickupLiquid } from '../item_bucket';
 import { onUseOnDye } from '../item_dye';
-import { decrementStack } from '../../utils/helper';
-import { directionToVector3 } from 'utils/math';
 import { onUseOnWax } from '../item_wax';
-import { logEventData } from 'utils/debug';
+import { Debug, DirectionHelper, PlayerHelper } from 'adk-scripts-server';
 
 class onUseOn implements ItemCustomComponent {
     constructor() {
@@ -26,7 +24,7 @@ class onUseOn implements ItemCustomComponent {
 
 export class debug extends onUseOn {
     onUseOn(componentData: ItemComponentUseOnEvent) {
-        let data: Object = logEventData(
+        let data: Object = Debug.logEventData(
             componentData,
             componentData.constructor.name
         );
@@ -64,7 +62,7 @@ export class useOnFertilizable extends onUseOn {
                 componentData.usedOnBlockPermutation
             );
             let player: Player = componentData.source as Player;
-            decrementStack(player);
+            PlayerHelper.decrementStack(player);
         }
     }
 }
@@ -93,7 +91,9 @@ export class fire extends onUseOn {
         } else if (block.typeId.endsWith('candle')) {
             block.setPermutation(blockPermutation.withState('lit', true));
         } else {
-            let location: Vector3 = directionToVector3(componentData.blockFace);
+            let location: Vector3 = DirectionHelper.toVector3(
+                componentData.blockFace
+            );
             let blockOffset: Block = block.offset(location);
             let blockBelow: Block = blockOffset.below();
 
@@ -102,7 +102,7 @@ export class fire extends onUseOn {
             blockOffset.setType('minecraft:fire');
         }
 
-        decrementStack(componentData.source as Player);
+        PlayerHelper.decrementStack(componentData.source as Player);
     }
 }
 

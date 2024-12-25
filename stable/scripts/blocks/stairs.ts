@@ -4,8 +4,7 @@ import {
     BlockPermutation,
     Direction
 } from '@minecraft/server';
-import { DirectionType } from 'utils/helper';
-import { directionToVector3 } from 'utils/math';
+import { DirectionHelper, DirectionType } from 'adk-scripts-server';
 
 export function beforeOnPlayerPlaceStairs(
     data: BlockComponentPlayerPlaceBeforeEvent
@@ -22,9 +21,9 @@ export function beforeOnPlayerPlaceStairs(
     switch (face) {
         case 'north':
             {
-                for (const direction of DirectionType.HORIZONTAL) {
+                for (const direction of DirectionType.Horizontal) {
                     blockToCheck = data.block.offset(
-                        directionToVector3(direction)
+                        DirectionHelper.toVector3(direction)
                     );
 
                     if (blockToCheck.typeId !== blockPermutation.type.id)
@@ -130,9 +129,9 @@ export function beforeOnPlayerPlaceStairs(
                     namespace + ':south',
                     true
                 );
-                for (const direction of DirectionType.HORIZONTAL) {
+                for (const direction of DirectionType.Horizontal) {
                     blockToCheck = data.block.offset(
-                        directionToVector3(direction)
+                        DirectionHelper.toVector3(direction)
                     );
 
                     if (blockToCheck.typeId !== blockPermutation.type.id)
@@ -234,9 +233,9 @@ export function beforeOnPlayerPlaceStairs(
             break;
         case 'east':
             {
-                for (const direction of DirectionType.HORIZONTAL) {
+                for (const direction of DirectionType.Horizontal) {
                     blockToCheck = data.block.offset(
-                        directionToVector3(direction)
+                        DirectionHelper.toVector3(direction)
                     );
 
                     if (blockToCheck.typeId !== blockPermutation.type.id)
@@ -338,9 +337,9 @@ export function beforeOnPlayerPlaceStairs(
             break;
         case 'west':
             {
-                for (const direction of DirectionType.HORIZONTAL) {
+                for (const direction of DirectionType.Horizontal) {
                     blockToCheck = data.block.offset(
-                        directionToVector3(direction)
+                        DirectionHelper.toVector3(direction)
                     );
 
                     if (blockToCheck.typeId !== blockPermutation.type.id)

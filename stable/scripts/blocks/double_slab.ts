@@ -11,8 +11,8 @@ import {
     ItemEnchantableComponent,
     EntityEquippableComponent
 } from '@minecraft/server';
-import { decrementStack, getOppositeDirection } from 'utils/helper';
-import { directionToVector3 } from 'utils/math';
+import { PlayerHelper } from 'adk-scripts-server';
+import { DirectionHelper } from 'adk-scripts-server';
 
 export function beforeOnPlayerPlaceDoubleSlab(
     data: BlockComponentPlayerPlaceBeforeEvent
@@ -25,8 +25,8 @@ export function beforeOnPlayerPlaceDoubleSlab(
 
     if (playerEquipment === undefined) return;
 
-    let face: Direction = getOppositeDirection(data.face);
-    let blockToCheck: Block = block.offset(directionToVector3(face));
+    let face: Direction = DirectionHelper.getOpposite(data.face);
+    let blockToCheck: Block = block.offset(DirectionHelper.toVector3(face));
     const namespace: string = blockToCheck.typeId.split(':')[0];
     const blockStateDouble: string = namespace + ':is_double';
     const blockStateHalf: string = 'minecraft:vertical_half';
@@ -45,7 +45,7 @@ export function beforeOnPlayerPlaceDoubleSlab(
                 })
             );
             data.cancel = true;
-            decrementStack(player);
+            PlayerHelper.decrementStack(player);
         }
     }
 }

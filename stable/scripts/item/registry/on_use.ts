@@ -3,7 +3,7 @@ import {
     ItemCooldownComponent,
     ItemCustomComponent
 } from '@minecraft/server';
-import { logEventData } from 'utils/debug';
+import { Debug } from 'adk-scripts-server';
 
 class onUse implements ItemCustomComponent {
     constructor() {
@@ -14,7 +14,7 @@ class onUse implements ItemCustomComponent {
 
 export class debug extends onUse {
     onUse(componentData: ItemComponentUseEvent) {
-        let data: Object = logEventData(
+        let data: Object = Debug.logEventData(
             componentData,
             componentData.constructor.name
         );

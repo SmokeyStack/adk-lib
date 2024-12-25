@@ -3,8 +3,7 @@ import {
     BlockComponentPlayerPlaceBeforeEvent,
     BlockPermutation
 } from '@minecraft/server';
-import { DirectionType } from 'utils/helper';
-import { directionToVector3 } from 'utils/math';
+import { DirectionHelper, DirectionType } from 'adk-scripts-server';
 
 export function beforeOnPlayerPlaceSugarCane(
     data: BlockComponentPlayerPlaceBeforeEvent
@@ -18,9 +17,9 @@ export function beforeOnPlayerPlaceSugarCane(
         blockToCheck.getTags().includes('dirt') ||
         blockToCheck.getTags().includes('sand')
     ) {
-        for (const direction of DirectionType.HORIZONTAL) {
+        for (const direction of DirectionType.Horizontal) {
             let block2: Block = blockToCheck.offset(
-                directionToVector3(direction)
+                DirectionHelper.toVector3(direction)
             );
 
             if (

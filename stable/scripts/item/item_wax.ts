@@ -9,13 +9,8 @@ import {
     Dimension,
     Vector3
 } from '@minecraft/server';
-import { decrementStack } from '../utils/helper';
-import {
-    directionToVector3,
-    getRandomVelocity,
-    nextDouble,
-    vectorOfCenter
-} from 'utils/math';
+import { DirectionHelper, PlayerHelper } from 'adk-scripts-server';
+import { getRandomVelocity, nextDouble, vectorOfCenter } from 'utils/math';
 
 export function onUseOnWax(componentData: ItemComponentUseOnEvent) {
     const REGEX: RegExp = new RegExp(
@@ -29,13 +24,13 @@ export function onUseOnWax(componentData: ItemComponentUseOnEvent) {
 
     if (REGEX.test(block.typeId)) {
         signComponent.setWaxed(true);
-        decrementStack(player);
+        PlayerHelper.decrementStack(player);
         spawnWaxParticles(block);
 
         return;
     }
     if (block.typeId.includes('copper') && !block.typeId.includes('waxed')) {
-        decrementStack(player);
+        PlayerHelper.decrementStack(player);
         let newBlock: string = 'minecraft:waxed_' + block.typeId.substring(10);
         if (newBlock == 'minecraft:waxed_copper_block')
             newBlock = 'minecraft:waxed_copper';
@@ -116,7 +111,7 @@ function spawnParticle(
     offsetMultiplier: number
 ): void {
     let vector: Vector3 = vectorOfCenter(blockPosition);
-    let { x, y, z } = directionToVector3(direction);
+    let { x, y, z } = DirectionHelper.toVector3(direction);
     let worldX: number =
         vector.x + (x == 0 ? nextDouble(-0.5, 0.5) : x * offsetMultiplier);
     let worldY: number =

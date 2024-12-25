@@ -2,7 +2,7 @@ import {
     ItemComponentCompleteUseEvent,
     ItemCustomComponent
 } from '@minecraft/server';
-import { logEventData } from 'utils/debug';
+import { Debug } from 'adk-scripts-server';
 
 class onCompleteUse implements ItemCustomComponent {
     constructor() {
@@ -13,7 +13,7 @@ class onCompleteUse implements ItemCustomComponent {
 
 export class debug extends onCompleteUse {
     onCompleteUse(componentData: ItemComponentCompleteUseEvent) {
-        let data: Object = logEventData(
+        let data: Object = Debug.logEventData(
             componentData,
             componentData.constructor.name
         );

@@ -9,8 +9,8 @@ import {
     Player,
     Vector3
 } from '@minecraft/server';
-import { directionToVector3 } from '../utils/math';
-import { decrementStack, updateIfAir } from 'utils/helper';
+import { updateIfAir } from 'utils/helper';
+import { DirectionHelper, PlayerHelper } from 'adk-scripts-server';
 
 export function onUseOnBucket(componentData: ItemComponentUseOnEvent) {
     let tags: string[] = componentData.itemStack.getTags();
@@ -56,7 +56,7 @@ export function onUseOnBucket(componentData: ItemComponentUseOnEvent) {
     }
 
     let blockLocation: Vector3 = componentData.block.offset(
-        directionToVector3(componentData.blockFace)
+        DirectionHelper.toVector3(componentData.blockFace)
     );
     componentData.source.dimension.setBlockType(
         blockLocation,
@@ -120,7 +120,7 @@ export function pickupLiquid(
 ): void {
     for (let [source, turnInto] of sourceIntoItem) {
         if (blockPermutation.type.id != source) {
-            const OFFSET: Vector3 = directionToVector3(blockFace);
+            const OFFSET: Vector3 = DirectionHelper.toVector3(blockFace);
             block = block.offset(OFFSET);
         }
 
@@ -132,7 +132,7 @@ export function pickupLiquid(
 
         if (inventory.emptySlotsCount == 0 || item.amount != 1) {
             player.dimension.spawnItem(itemStack, player.location);
-            decrementStack(player);
+            PlayerHelper.decrementStack(player);
             return;
         }
 

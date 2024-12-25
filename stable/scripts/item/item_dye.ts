@@ -7,8 +7,7 @@ import {
     SignSide,
     Player
 } from '@minecraft/server';
-import { areVectorsEqual } from '../utils/math';
-import { decrementStack } from '../utils/helper';
+import { PlayerHelper } from 'adk-scripts-server';
 
 export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
     const REGEX: RegExp = new RegExp(
@@ -113,12 +112,12 @@ function dyeSign(
     color: DyeColor,
     player: Player
 ): void {
-    const side = areVectorsEqual(playerLocation, blockLocation)
+    const side = Vector3Helper.equals(playerLocation, blockLocation)
         ? SignSide.Front
         : SignSide.Back;
     if (signComponent.getTextDyeColor(side) !== color) {
         signComponent.setTextDyeColor(color, side);
-        decrementStack(player);
+        PlayerHelper.decrementStack(player);
     }
 }
 

@@ -2,7 +2,7 @@ import {
     BlockComponentStepOnEvent,
     BlockCustomComponent
 } from '@minecraft/server';
-import { logEventData } from 'utils/debug';
+import { Debug } from 'adk-scripts-server';
 
 class onStepOn implements BlockCustomComponent {
     constructor() {
@@ -13,7 +13,7 @@ class onStepOn implements BlockCustomComponent {
 
 export class debug extends onStepOn {
     onStepOn(componentData: BlockComponentStepOnEvent) {
-        let data: Object = logEventData(
+        let data: Object = Debug.logEventData(
             componentData,
             componentData.constructor.name
         );

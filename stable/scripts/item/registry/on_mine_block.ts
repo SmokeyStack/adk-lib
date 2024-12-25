@@ -6,7 +6,7 @@ import {
     ItemDurabilityComponent,
     ItemStack
 } from '@minecraft/server';
-import { logEventData } from 'utils/debug';
+import { Debug } from 'adk-scripts-server';
 import { canHarvest } from '../item_pickaxe';
 
 class onMineBlock implements ItemCustomComponent {
@@ -18,7 +18,7 @@ class onMineBlock implements ItemCustomComponent {
 
 export class debug extends onMineBlock {
     onMineBlock(componentData: ItemComponentMineBlockEvent) {
-        let data: Object = logEventData(
+        let data: Object = Debug.logEventData(
             componentData,
             componentData.constructor.name
         );
@@ -83,7 +83,7 @@ export class digger extends onMineBlock {
 
 export class pickaxe extends onMineBlock {
     onMineBlock(componentData: ItemComponentMineBlockEvent): void {
-        logEventData(componentData, componentData.constructor.name);
+        Debug.logEventData(componentData, componentData.constructor.name);
         canHarvest(componentData);
     }
 }

@@ -7,7 +7,7 @@ import {
     ItemStack,
     Player
 } from '@minecraft/server';
-import { logEventData } from 'utils/debug';
+import { Debug } from 'adk-scripts-server';
 import { vectorOfCenter } from 'utils/math';
 import { onInteractCandle } from '../candle';
 
@@ -20,7 +20,7 @@ class onPlayerInteract implements BlockCustomComponent {
 
 export class debug extends onPlayerInteract {
     onPlayerInteract(componentData: BlockComponentPlayerInteractEvent) {
-        let data: Object = logEventData(
+        let data: Object = Debug.logEventData(
             componentData,
             componentData.constructor.name
         );

@@ -3,7 +3,7 @@ import {
     ItemCustomComponent,
     ItemDurabilityComponent
 } from '@minecraft/server';
-import { logEventData } from 'utils/debug';
+import { Debug } from 'adk-scripts-server';
 
 class onBeforeDurabilityDamage implements ItemCustomComponent {
     constructor() {
@@ -19,7 +19,7 @@ export class debug extends onBeforeDurabilityDamage {
     onBeforeDurabilityDamage(
         componentData: ItemComponentBeforeDurabilityDamageEvent
     ) {
-        let data: Object = logEventData(
+        let data: Object = Debug.logEventData(
             componentData,
             componentData.constructor.name
         );

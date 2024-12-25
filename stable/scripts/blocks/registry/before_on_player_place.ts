@@ -2,7 +2,7 @@ import {
     BlockComponentPlayerPlaceBeforeEvent,
     BlockCustomComponent
 } from '@minecraft/server';
-import { logEventData } from 'utils/debug';
+import { Debug } from 'adk-scripts-server';
 import { beforeOnPlayerPlaceTurnInto } from 'blocks/turn_into';
 import { beforeOnPlayerPlaceDoubleSlab } from 'blocks/double_slab';
 import { beforeOnPlayerPlaceSugarCane } from 'blocks/sugar_cane';
@@ -17,7 +17,7 @@ class beforeOnPlayerPlace implements BlockCustomComponent {
 
 export class debug extends beforeOnPlayerPlace {
     beforeOnPlayerPlace(componentData: BlockComponentPlayerPlaceBeforeEvent) {
-        let data: Object = logEventData(
+        let data: Object = Debug.logEventData(
             componentData,
             componentData.constructor.name
         );

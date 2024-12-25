@@ -6,7 +6,7 @@ import {
     ItemDurabilityComponent,
     ItemStack
 } from '@minecraft/server';
-import { logEventData } from 'utils/debug';
+import { Debug } from 'adk-scripts-server';
 
 class onHitEntity implements ItemCustomComponent {
     constructor() {
@@ -17,7 +17,7 @@ class onHitEntity implements ItemCustomComponent {
 
 export class debug extends onHitEntity {
     onHitEntity(componentData: ItemComponentHitEntityEvent) {
-        let data: Object = logEventData(
+        let data: Object = Debug.logEventData(
             componentData,
             componentData.constructor.name
         );

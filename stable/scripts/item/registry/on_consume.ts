@@ -5,7 +5,7 @@ import {
 import { clamp } from '../../utils/math';
 import { dimensionMap, teleportEntity } from '../teleport';
 import { giveFoodEffect } from '../item_food';
-import { logEventData } from 'utils/debug';
+import { Debug } from 'adk-scripts-server';
 
 class onConsume implements ItemCustomComponent {
     constructor() {
@@ -16,7 +16,7 @@ class onConsume implements ItemCustomComponent {
 
 export class debug extends onConsume {
     onConsume(componentData: ItemComponentConsumeEvent): void {
-        let data: Object = logEventData(
+        let data: Object = Debug.logEventData(
             componentData,
             componentData.constructor.name
         );

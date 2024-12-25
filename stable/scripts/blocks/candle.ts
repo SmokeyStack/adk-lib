@@ -9,7 +9,6 @@ import {
     Player,
     Vector3
 } from '@minecraft/server';
-import { decrementStack } from 'utils/helper';
 
 const ParticleOffsets = {
     1: [{ x: 0.5, y: 0.5, z: 0.5 }],

@@ -6,8 +6,7 @@ import {
     Vector3
 } from '@minecraft/server';
 import { onTickCandle } from 'blocks/candle';
-import { logEventData } from 'utils/debug';
-import { directionToVector3 } from 'utils/math';
+import { Debug, DirectionHelper } from 'adk-scripts-server';
 
 class onTick implements BlockCustomComponent {
     constructor() {
@@ -18,7 +17,7 @@ class onTick implements BlockCustomComponent {
 
 export class debug extends onTick {
     onTick(componentData: BlockComponentTickEvent) {
-        let data: Object = logEventData(
+        let data: Object = Debug.logEventData(
             componentData,
             componentData.constructor.name
         );
@@ -76,14 +75,22 @@ export class torchParticles extends onTick {
             }
 
             dimension.spawnParticle('minecraft:basic_smoke_particle', {
-                x: location.x + xzOffset * directionToVector3(direction).x,
+                x:
+                    location.x +
+                    xzOffset * DirectionHelper.toVector3(direction).x,
                 y: location.y + yOffset,
-                z: location.z + xzOffset * directionToVector3(direction).z
+                z:
+                    location.z +
+                    xzOffset * DirectionHelper.toVector3(direction).z
             });
             dimension.spawnParticle('minecraft:basic_flame_particle', {
-                x: location.x + xzOffset * directionToVector3(direction).x,
+                x:
+                    location.x +
+                    xzOffset * DirectionHelper.toVector3(direction).x,
                 y: location.y + yOffset,
-                z: location.z + xzOffset * directionToVector3(direction).z
+                z:
+                    location.z +
+                    xzOffset * DirectionHelper.toVector3(direction).z
             });
         }
     }

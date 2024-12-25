@@ -6,7 +6,7 @@ import {
     Block,
     ItemStack
 } from '@minecraft/server';
-import { areVectorsEqual } from '../utils/math';
+import { Vector3Helper } from 'adk-scripts-server';
 
 interface Fertilizable {
     isFertilizable(
@@ -730,7 +730,10 @@ class SeaPickleBlock implements Fertilizable {
                         };
 
                         if (
-                            areVectorsEqual(newBlockPosition, blockPosition) ||
+                            Vector3Helper.equals(
+                                newBlockPosition,
+                                blockPosition
+                            ) ||
                             Math.floor(Math.random() * 6) != 0 ||
                             dimension.getBlock(newBlockPosition).typeId !=
                                 'minecraft:water' ||

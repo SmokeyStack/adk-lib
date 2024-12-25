@@ -18,5 +18,9 @@
     "keywords": [],
     "author": "SmokeyStack",
     "license": "GPL-3.0-only",
-    "description": ""
+    "description": "",
+    "devDependencies": {
+        "tsup": "^8.3.5",
+        "typescript": "^5.7.2"
+    }
 }

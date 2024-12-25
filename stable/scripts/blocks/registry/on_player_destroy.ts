@@ -6,8 +6,7 @@ import {
     MinecraftDimensionTypes,
     world
 } from '@minecraft/server';
-import { logEventData } from 'utils/debug';
-import { doesBlockBlockkMovement } from 'utils/helper';
+import { BlockHelper, Debug } from 'adk-scripts-server';
 import { vectorOfCenter } from 'utils/math';
 import { onPlayerDestroyDoubleSlab } from '../double_slab';
 
@@ -20,7 +19,7 @@ class onPlayerDestroy implements BlockCustomComponent {
 
 export class debug extends onPlayerDestroy {
     onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent) {
-        let data: Object = logEventData(
+        let data: Object = Debug.logEventData(
             componentData,
             componentData.constructor.name
         );
@@ -107,7 +106,7 @@ export class destroyIce extends onPlayerDestroy {
 
         const blockBelow: Block = block.below();
 
-        if (doesBlockBlockkMovement(blockBelow) || block.isLiquid) {
+        if (BlockHelper.blocksMovement(blockBelow) || block.isLiquid) {
             block.setType('minecraft:water');
             return;
         }
