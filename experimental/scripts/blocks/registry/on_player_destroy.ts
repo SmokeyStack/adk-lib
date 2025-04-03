@@ -3,7 +3,6 @@ import {
     BlockComponentPlayerDestroyEvent,
     BlockCustomComponent,
     ItemStack,
-    MinecraftDimensionTypes,
     world
 } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
@@ -100,7 +99,7 @@ export class destroyIce extends onPlayerDestroy {
     onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent): void {
         const block: Block = componentData.block;
 
-        if (block.dimension.id == MinecraftDimensionTypes.nether) {
+        if (block.dimension.id == 'minecraft:nether') {
             block.setType('minecraft:air');
             return;
         }

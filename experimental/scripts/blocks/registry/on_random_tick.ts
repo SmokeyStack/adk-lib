@@ -4,7 +4,6 @@ import {
     BlockCustomComponent,
     BlockPermutation,
     BlockStates,
-    MinecraftDimensionTypes,
     world
 } from '@minecraft/server';
 import type * as minecraftvanilladata from '@minecraft/vanilla-data';
@@ -155,7 +154,7 @@ export class meltIce extends onRandomTick {
     onRandomTick(componentData: BlockComponentRandomTickEvent): void {
         const block: Block = componentData.block;
 
-        if (block.dimension.id == MinecraftDimensionTypes.nether) {
+        if (block.dimension.id == 'minecraft:nether') {
             block.setType('minecraft:air');
             return;
         }
