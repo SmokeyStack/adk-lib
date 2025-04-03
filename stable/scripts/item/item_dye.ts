@@ -7,7 +7,11 @@ import {
     SignSide,
     Player
 } from '@minecraft/server';
-import { PlayerHelper } from 'adk-scripts-server';
+import {
+    PlayerHelper,
+    Vector3Builder,
+    Vector3Helper
+} from 'adk-scripts-server';
 
 export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
     const REGEX: RegExp = new RegExp(
@@ -19,14 +23,18 @@ export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
     let tags: string[] = componentData.itemStack.getTags();
     const REGEX_DYE: RegExp = new RegExp('adk-lib:dye_([a-zA-Z]\\w+)');
 
-    let signComponent: BlockSignComponent = componentData.block.getComponent(
+    let sign_component: BlockSignComponent = componentData.block.getComponent(
         'sign'
     ) as BlockSignComponent;
-    let blockPermutation: BlockPermutation =
+    let block_permutation: BlockPermutation =
         componentData.usedOnBlockPermutation;
-    let playerLocation: Vector3 = componentData.source.location;
-    let blockLocation: Vector3 = componentData.block.location;
-    let flooredX: number, flooredZ: number;
+    let player_location: Vector3Builder = new Vector3Builder(
+        componentData.source.location
+    );
+    let block_location: Vector3Builder = new Vector3Builder(
+        componentData.block.location
+    );
+    let floored_x: number, floored_z: number;
     let color: string;
     let player: Player = componentData.source as Player;
 
@@ -37,19 +45,19 @@ export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
             break;
         }
     }
-    if (playerLocation.x > 0) flooredX = Math.floor(playerLocation.x);
-    else flooredX = signedFloor(playerLocation.x);
-    if (playerLocation.z > 0) flooredZ = Math.floor(playerLocation.z);
-    else flooredZ = signedFloor(playerLocation.z);
+    if (player_location.x > 0) floored_x = Math.floor(player_location.x);
+    else floored_x = signedFloor(player_location.x);
+    if (player_location.z > 0) floored_z = Math.floor(player_location.z);
+    else floored_z = signedFloor(player_location.z);
     if (componentData.block.typeId.endsWith('wall_sign')) {
         dyeSignFacingDirection(
-            blockPermutation,
-            signComponent,
-            playerLocation,
-            blockLocation,
+            block_permutation,
+            sign_component,
+            player_location,
+            block_location,
             DyeColor[color],
-            flooredX,
-            flooredZ,
+            floored_x,
+            floored_z,
             player
         );
 
@@ -57,28 +65,28 @@ export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
     }
     if (componentData.block.typeId.endsWith('standing_sign')) {
         dyeSignGroundDirection(
-            blockPermutation,
-            signComponent,
-            playerLocation,
-            blockLocation,
+            block_permutation,
+            sign_component,
+            player_location,
+            block_location,
             DyeColor[color],
-            flooredX,
-            flooredZ,
+            floored_x,
+            floored_z,
             player
         );
 
         return;
     }
     if (componentData.block.typeId.endsWith('hanging_sign')) {
-        if (!blockPermutation.getState('attached_bit')) {
+        if (!block_permutation.getState('attached_bit')) {
             dyeSignFacingDirection(
-                blockPermutation,
-                signComponent,
-                playerLocation,
-                blockLocation,
+                block_permutation,
+                sign_component,
+                player_location,
+                block_location,
                 DyeColor[color],
-                flooredX,
-                flooredZ,
+                floored_x,
+                floored_z,
                 player
             );
 
@@ -86,13 +94,13 @@ export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
         }
 
         dyeSignGroundDirection(
-            blockPermutation,
-            signComponent,
-            playerLocation,
-            blockLocation,
+            block_permutation,
+            sign_component,
+            player_location,
+            block_location,
             DyeColor[color],
-            flooredX,
-            flooredZ,
+            floored_x,
+            floored_z,
             player
         );
     }
@@ -100,61 +108,61 @@ export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
 
 /**
  * @brief Dye the sign based on the player's location.
- * @param signComponent SignComponent
- * @param playerLocation Player's location
- * @param blockLocation Block's location
+ * @param sign_component SignComponent
+ * @param player_location Player's location
+ * @param block_location Block's location
  * @param color DyeColor
  */
 function dyeSign(
-    signComponent: BlockSignComponent,
-    playerLocation: Vector3,
-    blockLocation: Vector3,
+    sign_component: BlockSignComponent,
+    player_location: Vector3Builder,
+    block_location: Vector3Builder,
     color: DyeColor,
     player: Player
 ): void {
-    const side = Vector3Helper.equals(playerLocation, blockLocation)
+    const side = Vector3Helper.equals(player_location, block_location)
         ? SignSide.Front
         : SignSide.Back;
-    if (signComponent.getTextDyeColor(side) !== color) {
-        signComponent.setTextDyeColor(color, side);
+    if (sign_component.getTextDyeColor(side) !== color) {
+        sign_component.setTextDyeColor(color, side);
         PlayerHelper.decrementStack(player);
     }
 }
 
 /**
  * @brief This function is for dyeing the sign if it's a wall sign, or hanging sign.
- * @param blockPermutation BlockPermutation
- * @param signComponent SignComponent
- * @param playerLocation Player's location
- * @param blockLocation Block's location
+ * @param block_permutation BlockPermutation
+ * @param sign_component SignComponent
+ * @param player_location Player's location
+ * @param block_location Block's location
  * @param color DyeColor
- * @param flooredX Floored X
- * @param flooredZ Floored Z
+ * @param floored_x Floored X
+ * @param floored_z Floored Z
  * @param player Player
  */
 function dyeSignFacingDirection(
-    blockPermutation: BlockPermutation,
-    signComponent: BlockSignComponent,
-    playerLocation: Vector3,
-    blockLocation: Vector3,
+    block_permutation: BlockPermutation,
+    sign_component: BlockSignComponent,
+    player_location: Vector3Builder,
+    block_location: Vector3Builder,
     color: DyeColor,
-    flooredX: number,
-    flooredZ: number,
+    floored_x: number,
+    floored_z: number,
     player: Player
 ): void {
-    switch (blockPermutation.getState('facing_direction')) {
+    switch (block_permutation.getState('facing_direction')) {
         case 2:
             {
-                if (playerLocation.z < blockLocation.z)
-                    flooredZ = blockLocation.z;
+                if (player_location.z < block_location.z)
+                    floored_z = block_location.z;
                 dyeSign(
-                    signComponent,
-                    {
-                        x: blockLocation.x,
-                        y: blockLocation.y,
-                        z: flooredZ
-                    },
-                    blockLocation,
+                    sign_component,
+                    new Vector3Builder(
+                        block_location.x,
+                        block_location.y,
+                        floored_z
+                    ),
+                    block_location,
                     color,
                     player
                 );
@@ -162,16 +170,16 @@ function dyeSignFacingDirection(
             break;
         case 3:
             {
-                if (playerLocation.z > blockLocation.z)
-                    flooredZ = blockLocation.z;
+                if (player_location.z > block_location.z)
+                    floored_z = block_location.z;
                 dyeSign(
-                    signComponent,
-                    {
-                        x: blockLocation.x,
-                        y: blockLocation.y,
-                        z: flooredZ
-                    },
-                    blockLocation,
+                    sign_component,
+                    new Vector3Builder(
+                        block_location.x,
+                        block_location.y,
+                        floored_z
+                    ),
+                    block_location,
                     color,
                     player
                 );
@@ -179,16 +187,16 @@ function dyeSignFacingDirection(
             break;
         case 4:
             {
-                if (playerLocation.x < blockLocation.x)
-                    flooredX = blockLocation.x;
+                if (player_location.x < block_location.x)
+                    floored_x = block_location.x;
                 dyeSign(
-                    signComponent,
-                    {
-                        x: flooredX,
-                        y: blockLocation.y,
-                        z: blockLocation.z
-                    },
-                    blockLocation,
+                    sign_component,
+                    new Vector3Builder(
+                        floored_x,
+                        block_location.y,
+                        block_location.z
+                    ),
+                    block_location,
                     color,
                     player
                 );
@@ -196,16 +204,16 @@ function dyeSignFacingDirection(
             break;
         case 5:
             {
-                if (playerLocation.x > blockLocation.x)
-                    flooredX = blockLocation.x;
+                if (player_location.x > block_location.x)
+                    floored_x = block_location.x;
                 dyeSign(
-                    signComponent,
-                    {
-                        x: flooredX,
-                        y: blockLocation.y,
-                        z: blockLocation.z
-                    },
-                    blockLocation,
+                    sign_component,
+                    new Vector3Builder(
+                        floored_x,
+                        block_location.y,
+                        block_location.z
+                    ),
+                    block_location,
                     color,
                     player
                 );
@@ -218,42 +226,42 @@ function dyeSignFacingDirection(
 
 /**
  * @brief This function is for dyeing the sign if it's a standing sign or hanging sign(chains are connected to one point).
- * @param blockPermutation BlockPermutation
- * @param signComponent SignComponent
- * @param playerLocation Player's location
- * @param blockLocation Block's location
+ * @param block_permutation BlockPermutation
+ * @param sign_component SignComponent
+ * @param player_location Player's location
+ * @param block_location Block's location
  * @param color DyeColor
- * @param flooredX Floored X
- * @param flooredZ Floored Z
+ * @param floored_x Floored X
+ * @param floored_z Floored Z
  * @param player Player
  */
 function dyeSignGroundDirection(
-    blockPermutation: BlockPermutation,
-    signComponent: BlockSignComponent,
-    playerLocation: Vector3,
-    blockLocation: Vector3,
+    block_permutation: BlockPermutation,
+    sign_component: BlockSignComponent,
+    player_location: Vector3Builder,
+    block_location: Vector3Builder,
     color: DyeColor,
-    flooredX: number,
-    flooredZ: number,
+    floored_x: number,
+    floored_z: number,
     player: Player
 ): void {
-    switch (blockPermutation.getState('ground_sign_direction')) {
+    switch (block_permutation.getState('ground_sign_direction')) {
         case 0:
         case 1:
         case 2:
         case 14:
         case 15:
             {
-                if (playerLocation.z > blockLocation.z)
-                    flooredZ = blockLocation.z;
+                if (player_location.z > block_location.z)
+                    floored_z = block_location.z;
                 dyeSign(
-                    signComponent,
-                    {
-                        x: blockLocation.x,
-                        y: blockLocation.y,
-                        z: flooredZ
-                    },
-                    blockLocation,
+                    sign_component,
+                    new Vector3Builder(
+                        block_location.x,
+                        block_location.y,
+                        floored_z
+                    ),
+                    block_location,
                     color,
                     player
                 );
@@ -265,16 +273,16 @@ function dyeSignGroundDirection(
         case 9:
         case 10:
             {
-                if (playerLocation.z < blockLocation.z)
-                    flooredZ = blockLocation.z;
+                if (player_location.z < block_location.z)
+                    floored_z = block_location.z;
                 dyeSign(
-                    signComponent,
-                    {
-                        x: blockLocation.x,
-                        y: blockLocation.y,
-                        z: flooredZ
-                    },
-                    blockLocation,
+                    sign_component,
+                    new Vector3Builder(
+                        block_location.x,
+                        block_location.y,
+                        floored_z
+                    ),
+                    block_location,
                     color,
                     player
                 );
@@ -284,16 +292,16 @@ function dyeSignGroundDirection(
         case 4:
         case 5:
             {
-                if (playerLocation.x < blockLocation.x)
-                    flooredX = blockLocation.x;
+                if (player_location.x < block_location.x)
+                    floored_x = block_location.x;
                 dyeSign(
-                    signComponent,
-                    {
-                        x: flooredX,
-                        y: blockLocation.y,
-                        z: blockLocation.z
-                    },
-                    blockLocation,
+                    sign_component,
+                    new Vector3Builder(
+                        floored_x,
+                        block_location.y,
+                        block_location.z
+                    ),
+                    block_location,
                     color,
                     player
                 );
@@ -303,16 +311,16 @@ function dyeSignGroundDirection(
         case 12:
         case 13:
             {
-                if (playerLocation.x > blockLocation.x)
-                    flooredX = blockLocation.x;
+                if (player_location.x > block_location.x)
+                    floored_x = block_location.x;
                 dyeSign(
-                    signComponent,
-                    {
-                        x: flooredX,
-                        y: blockLocation.y,
-                        z: blockLocation.z
-                    },
-                    blockLocation,
+                    sign_component,
+                    new Vector3Builder(
+                        floored_x,
+                        block_location.y,
+                        block_location.z
+                    ),
+                    block_location,
                     color,
                     player
                 );

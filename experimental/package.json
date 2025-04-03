@@ -1,15 +1,15 @@
 {
-    "name": "adk-lib-experimental",
-    "version": "1.0.0",
+    "author": "SmokeyStack",
+    "dependencies": {
+        "@minecraft/server": "1.18.0-beta.1.21.60-preview.24"
+    },
+    "description": "",
+    "keywords": [],
+    "license": "GPL-3.0-only",
     "main": "index.js",
+    "name": "adk-lib-experimental",
     "scripts": {
         "compile": "tsc"
     },
-    "keywords": [],
-    "author": "SmokeyStack",
-    "license": "GPL-3.0-only",
-    "description": "",
-    "dependencies": {
-        "@minecraft/server": "1.18.0-beta.1.21.60-preview.24"
-    }
+    "version": "1.0.0"
 }

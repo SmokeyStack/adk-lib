@@ -2,6 +2,7 @@ import {
     Block,
     BlockPermutation,
     Container,
+    Dimension,
     Direction,
     EntityInventoryComponent,
     ItemComponentUseOnEvent,
@@ -10,7 +11,12 @@ import {
     Vector3
 } from '@minecraft/server';
 import { updateIfAir } from 'utils/helper';
-import { DirectionHelper, PlayerHelper } from 'adk-scripts-server';
+import {
+    Cache,
+    DirectionHelper,
+    PlayerHelper,
+    Vector3Builder
+} from 'adk-scripts-server';
 
 export function onUseOnBucket(componentData: ItemComponentUseOnEvent) {
     let tags: string[] = componentData.itemStack.getTags();
@@ -25,7 +31,10 @@ export function onUseOnBucket(componentData: ItemComponentUseOnEvent) {
         player.getComponent('inventory') as EntityInventoryComponent
     ).container;
     let fluid: string;
-    let sourceIntoItem: Map<string, string> = new Map();
+    let source_into_item: Map<string, string> = new Map();
+    const block: Block = componentData.block;
+    const block_face: Direction = componentData.blockFace;
+    const dimension: Dimension = Cache.getDimension(player.dimension.id);
 
     for (let tag of tags) {
         if (REGEX_FLUID.test(tag) || tag == 'adk-lib:fluid_empty') {
@@ -37,15 +46,15 @@ export function onUseOnBucket(componentData: ItemComponentUseOnEvent) {
     for (let tag of tags) {
         const match = REGEX_TURN_INTO.exec(tag);
 
-        if (match) sourceIntoItem.set(match[1], match[2]);
+        if (match) source_into_item.set(match[1], match[2]);
     }
 
     if (fluid == 'adk-lib:fluid_empty') {
         pickupLiquid(
-            sourceIntoItem,
-            componentData.block,
+            source_into_item,
+            block,
             componentData.usedOnBlockPermutation,
-            componentData.blockFace,
+            block_face,
             player,
             inventory,
             componentData.itemStack,
@@ -55,45 +64,42 @@ export function onUseOnBucket(componentData: ItemComponentUseOnEvent) {
         return;
     }
 
-    let blockLocation: Vector3 = componentData.block.offset(
-        DirectionHelper.toVector3(componentData.blockFace)
+    let block_location: Vector3Builder = new Vector3Builder(block).add(
+        DirectionHelper.toVector3(block_face)
     );
-    componentData.source.dimension.setBlockType(
-        blockLocation,
-        REGEX_FLUID.exec(fluid)[1]
-    );
+    dimension.setBlockType(block_location, REGEX_FLUID.exec(fluid)[1]);
     let itemStack: ItemStack = new ItemStack(REGEX_FLUID.exec(fluid)[2]);
     inventory.setItem(player.selectedSlotIndex, itemStack);
-    updateIfAir(
-        componentData.source.dimension,
-        componentData.source.dimension.getBlock(blockLocation).above(),
-        { x: blockLocation.x, y: blockLocation.y + 1, z: blockLocation.z }
-    );
-    updateIfAir(
-        componentData.source.dimension,
-        componentData.source.dimension.getBlock(blockLocation).below(),
-        { x: blockLocation.x, y: blockLocation.y - 1, z: blockLocation.z }
-    );
-    updateIfAir(
-        componentData.source.dimension,
-        componentData.source.dimension.getBlock(blockLocation).north(),
-        { x: blockLocation.x, y: blockLocation.y, z: blockLocation.z - 1 }
-    );
-    updateIfAir(
-        componentData.source.dimension,
-        componentData.source.dimension.getBlock(blockLocation).east(),
-        { x: blockLocation.x + 1, y: blockLocation.y, z: blockLocation.z }
-    );
-    updateIfAir(
-        componentData.source.dimension,
-        componentData.source.dimension.getBlock(blockLocation).south(),
-        { x: blockLocation.x, y: blockLocation.y, z: blockLocation.z + 1 }
-    );
-    updateIfAir(
-        componentData.source.dimension,
-        componentData.source.dimension.getBlock(blockLocation).west(),
-        { x: blockLocation.x - 1, y: blockLocation.y, z: blockLocation.z }
-    );
+    updateIfAir(dimension, dimension.getBlock(block_location).above(), {
+        x: block_location.x,
+        y: block_location.y + 1,
+        z: block_location.z
+    });
+    updateIfAir(dimension, dimension.getBlock(block_location).below(), {
+        x: block_location.x,
+        y: block_location.y - 1,
+        z: block_location.z
+    });
+    updateIfAir(dimension, dimension.getBlock(block_location).north(), {
+        x: block_location.x,
+        y: block_location.y,
+        z: block_location.z - 1
+    });
+    updateIfAir(dimension, dimension.getBlock(block_location).east(), {
+        x: block_location.x + 1,
+        y: block_location.y,
+        z: block_location.z
+    });
+    updateIfAir(dimension, dimension.getBlock(block_location).south(), {
+        x: block_location.x,
+        y: block_location.y,
+        z: block_location.z + 1
+    });
+    updateIfAir(dimension, dimension.getBlock(block_location).west(), {
+        x: block_location.x - 1,
+        y: block_location.y,
+        z: block_location.z
+    });
 }
 
 /**

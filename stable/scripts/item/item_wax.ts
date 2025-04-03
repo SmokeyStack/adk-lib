@@ -9,21 +9,25 @@ import {
     Dimension,
     Vector3
 } from '@minecraft/server';
-import { DirectionHelper, PlayerHelper } from 'adk-scripts-server';
+import {
+    DirectionHelper,
+    PlayerHelper,
+    Vector3Builder
+} from 'adk-scripts-server';
 import { getRandomVelocity, nextDouble, vectorOfCenter } from 'utils/math';
 
 export function onUseOnWax(componentData: ItemComponentUseOnEvent) {
     const REGEX: RegExp = new RegExp(
         'minecraft:(?:[a-z]\\w+_)?(?:standing|wall|hanging)_sign'
     );
-    let signComponent: BlockSignComponent = componentData.block.getComponent(
+    let sign_component: BlockSignComponent = componentData.block.getComponent(
         'sign'
     ) as BlockSignComponent;
     let player: Player = componentData.source as Player;
     let block: Block = componentData.block;
 
     if (REGEX.test(block.typeId)) {
-        signComponent.setWaxed(true);
+        sign_component.setWaxed(true);
         PlayerHelper.decrementStack(player);
         spawnWaxParticles(block);
 
@@ -112,29 +116,37 @@ function spawnParticle(
 ): void {
     let vector: Vector3 = vectorOfCenter(blockPosition);
     let { x, y, z } = DirectionHelper.toVector3(direction);
-    let worldX: number =
+    let world_x: number =
         vector.x + (x == 0 ? nextDouble(-0.5, 0.5) : x * offsetMultiplier);
-    let worldY: number =
+    let world_y: number =
         vector.y + (y == 0 ? nextDouble(-0.5, 0.5) : y * offsetMultiplier);
-    let worldZ: number =
+    let world_z: number =
         vector.z + (z == 0 ? nextDouble(-0.5, 0.5) : z * offsetMultiplier);
-    let particleVelocityX: number = x == 0 ? velocity.x : 0;
-    let particleVelocityY: number = y == 0 ? velocity.y : 0;
-    let particleVelocityZ: number = z == 0 ? velocity.z : 0;
+    let particle_velocity_x: number = x == 0 ? velocity.x : 0;
+    let particle_velocity_y: number = y == 0 ? velocity.y : 0;
+    let particle_velocity_z: number = z == 0 ? velocity.z : 0;
     let molang: MolangVariableMap = new MolangVariableMap();
     molang.setColorRGB('variable.color', {
         red: 0.91,
         green: 0.55,
         blue: 0.08
     });
-    molang.setVector3('variable.direction', {
-        x: (particleVelocityX * 0.01) / 2.0,
-        y: particleVelocityY * 0.01,
-        z: (particleVelocityZ * 0.01) / 2.0
-    });
+    new Vector3Builder(
+        (particle_velocity_x * 0.01) / 2.0,
+        particle_velocity_y * 0.01,
+        (particle_velocity_z * 0.01) / 2.0
+    );
+    molang.setVector3(
+        'variable.direction',
+        new Vector3Builder(
+            (particle_velocity_x * 0.01) / 2.0,
+            particle_velocity_y * 0.01,
+            (particle_velocity_z * 0.01) / 2.0
+        )
+    );
     dimension.spawnParticle(
         effect,
-        { x: worldX, y: worldY, z: worldZ },
+        new Vector3Builder(world_x, world_y, world_z),
         molang
     );
 }

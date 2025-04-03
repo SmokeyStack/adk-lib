@@ -1,11 +1,12 @@
 import {
+    Entity,
     ItemComponentConsumeEvent,
     ItemCustomComponent
 } from '@minecraft/server';
 import { clamp } from '../../utils/math';
-import { dimensionMap, teleportEntity } from '../teleport';
+import { teleportEntity } from '../teleport';
 import { giveFoodEffect } from '../item_food';
-import { Debug } from 'adk-scripts-server';
+import { Cache, Debug, Vector3Builder } from 'adk-scripts-server';
 
 class onConsume implements ItemCustomComponent {
     constructor() {
@@ -37,17 +38,20 @@ export class debug extends onConsume {
 export class teleport extends onConsume {
     onCompleteUse(componentData: ItemComponentConsumeEvent) {
         for (let a = 0; a < 16; ++a) {
-            const x: number =
-                componentData.source.location.x + (Math.random() - 0.5) * 16.0;
-            const y: number = clamp(
-                componentData.source.location.y + (Math.random() * 16 - 8),
-                componentData.source.dimension.heightRange.min,
-                dimensionMap.get(componentData.source.dimension)
+            const source: Entity = componentData.source;
+            const dimension = Cache.getDimension(source.dimension.id);
+            const location: Vector3Builder = new Vector3Builder(
+                source.location
             );
-            const z: number =
-                componentData.source.location.z + (Math.random() - 0.5) * 16.0;
+            const x: number = location.x + (Math.random() - 0.5) * 16.0;
+            const y: number = clamp(
+                location.y + (Math.random() * 16 - 8),
+                Cache.getDimensionHeightRange(dimension.id)[0],
+                Cache.getDimensionHeightRange(dimension.id)[1]
+            );
+            const z: number = location.z + (Math.random() - 0.5) * 16.0;
 
-            if (teleportEntity(componentData.source, x, y, z)) break;
+            if (teleportEntity(source, x, y, z)) break;
         }
     }
 }
