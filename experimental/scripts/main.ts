@@ -1,4 +1,4 @@
-import { world } from '@minecraft/server';
+import { system, world } from '@minecraft/server';
 import * as blockOnStepOn from './blocks/registry/on_step_on';
 import * as blockOnStepOff from './blocks/registry/on_step_off';
 import * as blockOnRandomTick from './blocks/registry/on_random_tick';
@@ -16,7 +16,7 @@ import * as itemOnMineBlock from './item/registry/on_mine_block';
 import * as itemOnHitEntity from './item/registry/on_hit_entity';
 import * as itemOnUseOn from './item/registry/on_use_on';
 
-world.beforeEvents.worldInitialize.subscribe((eventData) => {
+system.beforeEvents.startup.subscribe((eventData) => {
     // On Step On
     eventData.blockComponentRegistry.registerCustomComponent(
         'adk-lib:on_step_on_debug',

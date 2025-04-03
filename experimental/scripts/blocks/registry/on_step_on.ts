@@ -43,9 +43,10 @@ export class effect extends onStepOn {
 export class impulse extends onStepOn {
     onStepOn(componentData: BlockComponentStepOnEvent) {
         componentData.entity.applyKnockback(
-            componentData.entity.getVelocity().x,
-            componentData.entity.getVelocity().z,
-            1,
+            {
+                x: componentData.entity.getVelocity().x,
+                z: componentData.entity.getVelocity().z
+            },
             1
         );
     }

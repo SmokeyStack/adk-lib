@@ -1,6 +1,9 @@
 import {
     ItemComponentHitEntityEvent,
-    ItemCustomComponent
+    ItemCustomComponent,
+    EntityIdentifierType,
+    EntityTypes,
+    VanillaEntityIdentifier
 } from '@minecraft/server';
 import { logEventData } from 'utils/debug';
 
@@ -41,7 +44,7 @@ export class summonEntity extends onHitEntity {
             if (REGEX.exec(tag)) entities.push(REGEX.exec(tag)[1]);
 
         entities.forEach((entity) => {
-            componentData.hitEntity.dimension.spawnEntity(
+            componentData.hitEntity.dimension.spawnEntity<string>(
                 entity,
                 componentData.hitEntity.location
             );
