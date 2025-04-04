@@ -1,24 +1,25 @@
 import {
     BlockComponentStepOffEvent,
     BlockCustomComponent,
-    system,
-    world
+    CustomComponentParameters,
+    system
 } from '@minecraft/server';
+import * as adk from 'adk-scripts-server';
 
-class onStepOff implements BlockCustomComponent {
-    constructor() {
-        this.onStepOff = this.onStepOff.bind(this);
-    }
-    onStepOff(_componentData: BlockComponentStepOffEvent) {}
+abstract class OnStepOff implements BlockCustomComponent {
+    abstract onStepOff(
+        componentData: BlockComponentStepOffEvent,
+        paramData?: CustomComponentParameters
+    ): void;
 }
 
-export class debug extends onStepOff {
+class Debug extends OnStepOff {
     onStepOff(componentData: BlockComponentStepOffEvent) {
-        world.sendMessage(`Block: ${componentData.block.typeId}`);
+        console.log(adk.Debug.logEventData(componentData));
     }
 }
 
-export class effect extends onStepOff {
+class Effect extends OnStepOff {
     onStepOff(componentData: BlockComponentStepOffEvent) {
         componentData.entity.addEffect('slowness', 200, {
             showParticles: false,
@@ -27,7 +28,7 @@ export class effect extends onStepOff {
     }
 }
 
-export class disappearing extends onStepOff {
+class Disappearing extends OnStepOff {
     onStepOff(componentData: BlockComponentStepOffEvent) {
         let block = componentData.block.typeId;
 
@@ -37,3 +38,15 @@ export class disappearing extends onStepOff {
         }, 100);
     }
 }
+
+enum OnStepOffKey {
+    Debug = 'debug',
+    Effect = 'effect',
+    Disappearing = 'disappearing'
+}
+
+export const ON_STEP_OFF_REGISTRY: Map<OnStepOffKey, OnStepOff> = new Map([
+    [OnStepOffKey.Debug, new Debug()],
+    [OnStepOffKey.Effect, new Effect()],
+    [OnStepOffKey.Disappearing, new Disappearing()]
+]);
