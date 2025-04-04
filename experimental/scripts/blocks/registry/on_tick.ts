@@ -1,42 +1,29 @@
 import {
     BlockComponentTickEvent,
     BlockCustomComponent,
+    CustomComponentParameters,
     Dimension,
     Direction,
     Vector3
 } from '@minecraft/server';
 import { onTickCandle } from 'blocks/candle';
-import { logEventData } from 'utils/debug';
 import { directionToVector3 } from 'utils/math';
+import * as adk from 'adk-scripts-server';
 
-class onTick implements BlockCustomComponent {
-    constructor() {
-        this.onTick = this.onTick.bind(this);
-    }
-    onTick(_componentData: BlockComponentTickEvent) {}
+abstract class OnTick implements BlockCustomComponent {
+    abstract onTick(
+        componentData: BlockComponentTickEvent,
+        paramData?: CustomComponentParameters
+    ): void;
 }
 
-export class debug extends onTick {
+class Debug extends OnTick {
     onTick(componentData: BlockComponentTickEvent) {
-        let data: Object = logEventData(
-            componentData,
-            componentData.constructor.name
-        );
-        let result: string = JSON.stringify(
-            Object.keys(data)
-                .sort()
-                .reduce((result, key) => {
-                    result[key] = data[key];
-                    return result;
-                }, {}),
-            null,
-            4
-        );
-        console.log(result);
+        console.log(adk.Debug.logEventData(componentData));
     }
 }
 
-export class torchParticles extends onTick {
+class TorchParticles extends OnTick {
     onTick(componentData: BlockComponentTickEvent): void {
         if (Math.floor(Math.random() * 10) != 0) return;
 
@@ -89,8 +76,20 @@ export class torchParticles extends onTick {
     }
 }
 
-export class candleParticles extends onTick {
+class CandleParticles extends OnTick {
     onTick(componentData: BlockComponentTickEvent): void {
         onTickCandle(componentData);
     }
 }
+
+enum OnTickKey {
+    Debug = 'debug',
+    TorchParticles = 'torch_particles',
+    CandleParticles = 'candle_particles'
+}
+
+export const ON_TICK_REGISTRY: Map<OnTickKey, OnTick> = new Map([
+    [OnTickKey.Debug, new Debug()],
+    [OnTickKey.TorchParticles, new TorchParticles()],
+    [OnTickKey.CandleParticles, new CandleParticles()]
+]);

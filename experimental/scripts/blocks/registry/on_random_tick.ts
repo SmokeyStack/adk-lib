@@ -4,25 +4,26 @@ import {
     BlockCustomComponent,
     BlockPermutation,
     BlockStates,
-    world
+    CustomComponentParameters
 } from '@minecraft/server';
 import type * as minecraftvanilladata from '@minecraft/vanilla-data';
 import { updateLiquidBlock } from 'utils/helper';
+import * as adk from 'adk-scripts-server';
 
-class onRandomTick implements BlockCustomComponent {
-    constructor() {
-        this.onRandomTick = this.onRandomTick.bind(this);
-    }
-    onRandomTick(_componentData: BlockComponentRandomTickEvent) {}
+abstract class OnRandomTick implements BlockCustomComponent {
+    abstract onRandomTick(
+        componentData: BlockComponentRandomTickEvent,
+        paramData?: CustomComponentParameters
+    ): void;
 }
 
-export class debug extends onRandomTick {
+class Debug extends OnRandomTick {
     onRandomTick(componentData: BlockComponentRandomTickEvent) {
-        world.sendMessage(`Block: ${componentData.block.typeId}`);
+        console.log(adk.Debug.logEventData(componentData));
     }
 }
 
-export class effect extends onRandomTick {
+class Effect extends OnRandomTick {
     onRandomTick(componentData: BlockComponentRandomTickEvent) {
         componentData.dimension
             .getEntities({
@@ -38,7 +39,7 @@ export class effect extends onRandomTick {
     }
 }
 
-export class grow extends onRandomTick {
+class Grow extends OnRandomTick {
     onRandomTick(componentData: BlockComponentRandomTickEvent) {
         let direction = Math.floor(Math.random() * 6);
 
@@ -98,7 +99,7 @@ export class grow extends onRandomTick {
     }
 }
 
-export class plantGrowth extends onRandomTick {
+class PlantGrowth extends OnRandomTick {
     onRandomTick(componentData: BlockComponentRandomTickEvent) {
         let block = componentData.block;
         let current_state = block.permutation.getState(
@@ -115,7 +116,7 @@ export class plantGrowth extends onRandomTick {
     }
 }
 
-export class sugarCane extends onRandomTick {
+class SugarCane extends OnRandomTick {
     onRandomTick(componentData: BlockComponentRandomTickEvent): void {
         const block: Block = componentData.block;
 
@@ -150,7 +151,7 @@ export class sugarCane extends onRandomTick {
     }
 }
 
-export class meltIce extends onRandomTick {
+class MeltIce extends OnRandomTick {
     onRandomTick(componentData: BlockComponentRandomTickEvent): void {
         const block: Block = componentData.block;
 
@@ -163,3 +164,22 @@ export class meltIce extends onRandomTick {
         updateLiquidBlock(block.dimension, block.location);
     }
 }
+
+enum OnRandomTickKey {
+    Debug = 'debug',
+    Effect = 'effect',
+    Grow = 'grow',
+    PlantGrowth = 'plant_growth',
+    SugarCane = 'sugar_cane',
+    MeltIce = 'melt_ice'
+}
+
+export const ON_RANDOM_TICK_REGISTRY: Map<OnRandomTickKey, OnRandomTick> =
+    new Map([
+        [OnRandomTickKey.Debug, new Debug()],
+        [OnRandomTickKey.Effect, new Effect()],
+        [OnRandomTickKey.Grow, new Grow()],
+        [OnRandomTickKey.PlantGrowth, new PlantGrowth()],
+        [OnRandomTickKey.SugarCane, new SugarCane()],
+        [OnRandomTickKey.MeltIce, new MeltIce()]
+    ]);

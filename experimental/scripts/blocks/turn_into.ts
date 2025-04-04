@@ -1,10 +1,12 @@
 import {
     BlockComponentPlayerPlaceBeforeEvent,
-    BlockPermutation
+    BlockPermutation,
+    CustomComponentParameters
 } from '@minecraft/server';
 
 export function beforeOnPlayerPlaceTurnInto(
-    data: BlockComponentPlayerPlaceBeforeEvent
+    data: BlockComponentPlayerPlaceBeforeEvent,
+    paramData: CustomComponentParameters
 ): void {
     let blockPermutation: BlockPermutation = data.permutationToPlace;
     const tags: string[] = blockPermutation.getTags();

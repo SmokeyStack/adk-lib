@@ -2,42 +2,29 @@ import {
     Block,
     BlockComponentPlayerInteractEvent,
     BlockCustomComponent,
+    CustomComponentParameters,
     EquipmentSlot,
     ItemStack,
     Player
 } from '@minecraft/server';
-import { logEventData } from 'utils/debug';
 import { vectorOfCenter } from 'utils/math';
 import { onInteractCandle } from '../candle';
+import * as adk from 'adk-scripts-server';
 
-class onPlayerInteract implements BlockCustomComponent {
-    constructor() {
-        this.onPlayerInteract = this.onPlayerInteract.bind(this);
-    }
-    onPlayerInteract(_componentData: BlockComponentPlayerInteractEvent) {}
+abstract class OnPlayerInteract implements BlockCustomComponent {
+    abstract onPlayerInteract(
+        componentData: BlockComponentPlayerInteractEvent,
+        paramData?: CustomComponentParameters
+    ): void;
 }
 
-export class debug extends onPlayerInteract {
+class Debug extends OnPlayerInteract {
     onPlayerInteract(componentData: BlockComponentPlayerInteractEvent) {
-        let data: Object = logEventData(
-            componentData,
-            componentData.constructor.name
-        );
-        let result: string = JSON.stringify(
-            Object.keys(data)
-                .sort()
-                .reduce((result, key) => {
-                    result[key] = data[key];
-                    return result;
-                }, {}),
-            null,
-            4
-        );
-        console.log(result);
+        console.log(adk.Debug.logEventData(componentData));
     }
 }
 
-export class turnInto extends onPlayerInteract {
+class TurnInto extends OnPlayerInteract {
     onPlayerInteract(componentData: BlockComponentPlayerInteractEvent) {
         let block: Block = componentData.block;
         let player: Player = componentData.player;
@@ -64,7 +51,7 @@ export class turnInto extends onPlayerInteract {
     }
 }
 
-export class primeTnt extends onPlayerInteract {
+class PrimeTnt extends OnPlayerInteract {
     onPlayerInteract(componentData: BlockComponentPlayerInteractEvent) {
         let item: ItemStack = componentData.player
             .getComponent('equippable')
@@ -82,8 +69,25 @@ export class primeTnt extends onPlayerInteract {
     }
 }
 
-export class candle extends onPlayerInteract {
+class Candle extends OnPlayerInteract {
     onPlayerInteract(componentData: BlockComponentPlayerInteractEvent): void {
         onInteractCandle(componentData);
     }
 }
+
+enum OnPlayerInteractKey {
+    Debug = 'debug',
+    TurnInto = 'turn_into',
+    PrimeTnt = 'prime_tnt',
+    Candle = 'candle'
+}
+
+export const ON_PLAYER_INTERACT_REGISTRY: Map<
+    OnPlayerInteractKey,
+    OnPlayerInteract
+> = new Map([
+    [OnPlayerInteractKey.Debug, new Debug()],
+    [OnPlayerInteractKey.TurnInto, new TurnInto()],
+    [OnPlayerInteractKey.PrimeTnt, new PrimeTnt()],
+    [OnPlayerInteractKey.Candle, new Candle()]
+]);

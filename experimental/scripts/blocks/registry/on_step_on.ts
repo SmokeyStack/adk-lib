@@ -1,37 +1,24 @@
 import {
     BlockComponentStepOnEvent,
-    BlockCustomComponent
+    BlockCustomComponent,
+    CustomComponentParameters
 } from '@minecraft/server';
-import { logEventData } from 'utils/debug';
+import * as adk from 'adk-scripts-server';
 
-class onStepOn implements BlockCustomComponent {
-    constructor() {
-        this.onStepOn = this.onStepOn.bind(this);
-    }
-    onStepOn(_componentData: BlockComponentStepOnEvent) {}
+abstract class OnStepOn implements BlockCustomComponent {
+    abstract onStepOn(
+        componentData: BlockComponentStepOnEvent,
+        paramData?: CustomComponentParameters
+    ): void;
 }
 
-export class debug extends onStepOn {
+class Debug extends OnStepOn {
     onStepOn(componentData: BlockComponentStepOnEvent) {
-        let data: Object = logEventData(
-            componentData,
-            componentData.constructor.name
-        );
-        let result: string = JSON.stringify(
-            Object.keys(data)
-                .sort()
-                .reduce((result, key) => {
-                    result[key] = data[key];
-                    return result;
-                }, {}),
-            null,
-            4
-        );
-        console.log(result);
+        console.log(adk.Debug.logEventData(componentData));
     }
 }
 
-export class effect extends onStepOn {
+class Effect extends OnStepOn {
     onStepOn(componentData: BlockComponentStepOnEvent) {
         componentData.entity.addEffect('speed', 200, {
             showParticles: false,
@@ -40,7 +27,7 @@ export class effect extends onStepOn {
     }
 }
 
-export class impulse extends onStepOn {
+class Impulse extends OnStepOn {
     onStepOn(componentData: BlockComponentStepOnEvent) {
         componentData.entity.applyKnockback(
             {
@@ -51,3 +38,15 @@ export class impulse extends onStepOn {
         );
     }
 }
+
+enum OnStepOnKey {
+    Debug = 'debug',
+    Effect = 'effect',
+    Impulse = 'impulse'
+}
+
+export const ON_STEP_ON_REGISTRY: Map<OnStepOnKey, OnStepOn> = new Map([
+    [OnStepOnKey.Debug, new Debug()],
+    [OnStepOnKey.Effect, new Effect()],
+    [OnStepOnKey.Impulse, new Impulse()]
+]);

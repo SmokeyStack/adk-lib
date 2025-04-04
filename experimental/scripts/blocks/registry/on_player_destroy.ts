@@ -2,42 +2,29 @@ import {
     Block,
     BlockComponentPlayerDestroyEvent,
     BlockCustomComponent,
+    CustomComponentParameters,
     ItemStack,
     world
 } from '@minecraft/server';
-import { logEventData } from 'utils/debug';
 import { doesBlockBlockkMovement } from 'utils/helper';
 import { vectorOfCenter } from 'utils/math';
 import { onPlayerDestroyDoubleSlab } from '../double_slab';
+import * as adk from 'adk-scripts-server';
 
-class onPlayerDestroy implements BlockCustomComponent {
-    constructor() {
-        this.onPlayerDestroy = this.onPlayerDestroy.bind(this);
-    }
-    onPlayerDestroy(_componentData: BlockComponentPlayerDestroyEvent) {}
+abstract class OnPlayerDestroy implements BlockCustomComponent {
+    abstract onPlayerDestroy(
+        componentData: BlockComponentPlayerDestroyEvent,
+        paramData?: CustomComponentParameters
+    ): void;
 }
 
-export class debug extends onPlayerDestroy {
+class Debug extends OnPlayerDestroy {
     onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent) {
-        let data: Object = logEventData(
-            componentData,
-            componentData.constructor.name
-        );
-        let result: string = JSON.stringify(
-            Object.keys(data)
-                .sort()
-                .reduce((result, key) => {
-                    result[key] = data[key];
-                    return result;
-                }, {}),
-            null,
-            4
-        );
-        console.log(result);
+        console.log(adk.Debug.logEventData(componentData));
     }
 }
 
-export class spawnItem extends onPlayerDestroy {
+class SpawnItem extends OnPlayerDestroy {
     onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent) {
         if (componentData.player.getGameMode() == 'creative') return;
 
@@ -58,20 +45,15 @@ export class spawnItem extends onPlayerDestroy {
     }
 }
 
-export class regenerate extends onPlayerDestroy {
+class Regenerate extends OnPlayerDestroy {
     onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent) {
         componentData.block.setType(
             componentData.destroyedBlockPermutation.type
         );
-
-        world.sendMessage(
-            `Player destroyed ${componentData.destroyedBlockPermutation.type.id} at ${componentData.block.location.x}, ${componentData.block.location.y}, ${componentData.block.location.z}`
-        );
-        world.sendMessage('Regenerating block...');
     }
 }
 
-export class dropExperience extends onPlayerDestroy {
+class DropExperience extends OnPlayerDestroy {
     onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent) {
         if (componentData.player.getGameMode() == 'creative') return;
         if (!world.gameRules.doTileDrops) return;
@@ -95,7 +77,7 @@ export class dropExperience extends onPlayerDestroy {
     }
 }
 
-export class destroyIce extends onPlayerDestroy {
+class MeltIce extends OnPlayerDestroy {
     onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent): void {
         const block: Block = componentData.block;
 
@@ -113,8 +95,29 @@ export class destroyIce extends onPlayerDestroy {
     }
 }
 
-export class doubleSlab extends onPlayerDestroy {
+class DoubleSlab extends OnPlayerDestroy {
     onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent): void {
         onPlayerDestroyDoubleSlab(componentData);
     }
 }
+
+enum OnPlayerDestroyKey {
+    Debug = 'debug',
+    SpawnItem = 'spawn_item',
+    Regenerate = 'regenerate',
+    DropExperience = 'drop_experience',
+    MeltIce = 'melt_ice',
+    DoubleSlab = 'double_slab'
+}
+
+export const ON_PLAYER_DESTROY_REGISTRY: Map<
+    OnPlayerDestroyKey,
+    OnPlayerDestroy
+> = new Map([
+    [OnPlayerDestroyKey.Debug, new Debug()],
+    [OnPlayerDestroyKey.Regenerate, new Regenerate()],
+    [OnPlayerDestroyKey.SpawnItem, new SpawnItem()],
+    [OnPlayerDestroyKey.DropExperience, new DropExperience()],
+    [OnPlayerDestroyKey.MeltIce, new MeltIce()],
+    [OnPlayerDestroyKey.DoubleSlab, new DoubleSlab()]
+]);

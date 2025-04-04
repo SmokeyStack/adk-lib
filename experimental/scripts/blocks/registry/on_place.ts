@@ -1,26 +1,35 @@
 import {
     BlockComponentOnPlaceEvent,
     BlockCustomComponent,
-    world
+    CustomComponentParameters
 } from '@minecraft/server';
+import * as adk from 'adk-scripts-server';
 
-class onPlace implements BlockCustomComponent {
-    constructor() {
-        this.onPlace = this.onPlace.bind(this);
-    }
-    onPlace(_componentData: BlockComponentOnPlaceEvent) {}
+abstract class OnPlace implements BlockCustomComponent {
+    abstract onPlace(
+        componentData: BlockComponentOnPlaceEvent,
+        paramData?: CustomComponentParameters
+    ): void;
 }
 
-export class debug extends onPlace {
+class Debug extends OnPlace {
     onPlace(componentData: BlockComponentOnPlaceEvent) {
-        world.sendMessage(
-            `Previous Block: ${componentData.previousBlock.type.id}`
-        );
+        console.log(adk.Debug.logEventData(componentData));
     }
 }
 
-export class changeIntoBedrock extends onPlace {
+class TurnInto extends OnPlace {
     onPlace(componentData: BlockComponentOnPlaceEvent) {
         componentData.block.setType('minecraft:bedrock');
     }
 }
+
+enum OnPlaceKey {
+    Debug = 'debug',
+    TurnInto = 'turn_into'
+}
+
+export const ON_PLACE_REGISTRY: Map<OnPlaceKey, OnPlace> = new Map([
+    [OnPlaceKey.Debug, new Debug()],
+    [OnPlaceKey.TurnInto, new TurnInto()]
+]);
