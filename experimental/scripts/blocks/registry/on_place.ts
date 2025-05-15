@@ -18,9 +18,17 @@ class Debug extends OnPlace {
     }
 }
 
+type ParameterTurnInto = {
+    block: string;
+};
+
 class TurnInto extends OnPlace {
-    onPlace(componentData: BlockComponentOnPlaceEvent) {
-        componentData.block.setType('minecraft:bedrock');
+    onPlace(
+        componentData: BlockComponentOnPlaceEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterTurnInto;
+        componentData.block.setType(param.block);
     }
 }
 

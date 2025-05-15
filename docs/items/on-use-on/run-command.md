@@ -1,4 +1,4 @@
-# adk-lib:on_use_on_run_command
+# adk_lib:on_use_on_run_command
 
 # **RC**
 
@@ -8,17 +8,17 @@ This component allows the item to run a command when used.
 
 ## How to use
 
-Add `adk-lib:on_use_on_run_command` to the `minecraft:custom_components` array in your item json file. Since custom components do not have parameter support yet, this component utilizes item tags.
+Add `adk_lib:on_use_on_run_command` to the `minecraft:custom_components` array in your item json file. Since custom components do not have parameter support yet, this component utilizes item tags.
 
-To indicate what command your item should should, add the following tag: `adk-lib:on_use_on_[command]`
+To indicate what command your item should should, add the following tag: `adk_lib:on_use_on_[command]`
 
 ### Example
 
 ```json
 "minecraft:tags": {
     "tags": [
-        "adk-lib:on_use_on_tp ~~10~",
-        "adk-lib:on_use_on_say hi"
+        "adk_lib:on_use_on_tp ~~10~",
+        "adk_lib:on_use_on_say hi"
     ]
 }
 ```

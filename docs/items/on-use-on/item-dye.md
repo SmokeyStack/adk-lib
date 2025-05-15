@@ -1,4 +1,4 @@
-# adk-lib:on_use_on_dye
+# adk_lib:on_use_on_dye
 
 ## What does it do?
 
@@ -6,16 +6,16 @@ This component enables the dye functionality. It allows items to dye signs.
 
 ## How to use
 
-Add `adk-lib:on_use_on_dye` to the `minecraft:custom_components` array in your item json file. Since custom components do not have parameter support yet, this component utilizes item tags.
+Add `adk_lib:on_use_on_dye` to the `minecraft:custom_components` array in your item json file. Since custom components do not have parameter support yet, this component utilizes item tags.
 
-To indicate what dye colour your item is, add the `adk-lib:dye_[colour of the dye]` tag to your item file.
+To indicate what dye colour your item is, add the `adk_lib:dye_[colour of the dye]` tag to your item file.
 
 ### Example
 
 ```json
 "minecraft:tags": {
     "tags": [
-        "adk-lib:dye_Lime"
+        "adk_lib:dye_Lime"
     ]
 }
 ```

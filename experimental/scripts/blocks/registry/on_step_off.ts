@@ -1,10 +1,12 @@
 import {
+    Block,
     BlockComponentStepOffEvent,
     BlockCustomComponent,
     CustomComponentParameters,
-    system
+    Dimension
 } from '@minecraft/server';
 import * as adk from 'adk-scripts-server';
+import { ParameterEffect } from 'utils/shared_parameters';
 
 abstract class OnStepOff implements BlockCustomComponent {
     abstract onStepOff(
@@ -20,33 +22,51 @@ class Debug extends OnStepOff {
 }
 
 class Effect extends OnStepOff {
-    onStepOff(componentData: BlockComponentStepOffEvent) {
-        componentData.entity.addEffect('slowness', 200, {
-            showParticles: false,
-            amplifier: 2
-        });
-    }
-}
-
-class Disappearing extends OnStepOff {
-    onStepOff(componentData: BlockComponentStepOffEvent) {
-        let block = componentData.block.typeId;
-
-        componentData.block.setType('minecraft:air');
-        system.runTimeout(() => {
-            componentData.block.setType(block);
-        }, 100);
+    onStepOff(
+        componentData: BlockComponentStepOffEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterEffect;
+        const dimension: Dimension = adk.Cache.getDimension(
+            componentData.block.dimension.id
+        );
+        const block: Block = componentData.block;
+        param.forEach(
+            ({
+                effect,
+                duration,
+                radius,
+                amplifier = 0,
+                show_particles = true,
+                entity_type
+            }) => {
+                dimension
+                    .getEntities({
+                        location: block.center(),
+                        maxDistance: radius
+                    })
+                    .forEach((entity) => {
+                        if (
+                            !entity_type ||
+                            entity_type.includes(entity.typeId)
+                        ) {
+                            entity.addEffect(effect, duration, {
+                                showParticles: show_particles,
+                                amplifier
+                            });
+                        }
+                    });
+            }
+        );
     }
 }
 
 enum OnStepOffKey {
     Debug = 'debug',
-    Effect = 'effect',
-    Disappearing = 'disappearing'
+    Effect = 'effect'
 }
 
 export const ON_STEP_OFF_REGISTRY: Map<OnStepOffKey, OnStepOff> = new Map([
     [OnStepOffKey.Debug, new Debug()],
-    [OnStepOffKey.Effect, new Effect()],
-    [OnStepOffKey.Disappearing, new Disappearing()]
+    [OnStepOffKey.Effect, new Effect()]
 ]);

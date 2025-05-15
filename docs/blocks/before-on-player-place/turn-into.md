@@ -1,4 +1,4 @@
-# adk-lib:before_on_player_place_turn_into
+# adk_lib:before_on_player_place_turn_into
 
 ## What does it do?
 
@@ -6,12 +6,16 @@ This component allows the block to turn into another block before the player pla
 
 ## How to use
 
-Add `adk-lib:before_on_player_place_turn_into` to the `minecraft:custom_components` array in your block json file. Since custom components do not have parameter support yet, this component utilizes block tags.
+Add `"adk_lib:before_on_player_place_turn_into": {}` to your block json file.
 
-To indicate what block your block should turn into, add the following tag: `adk-lib:before_on_player_place_turn_into_[identifier of the block]`
+### Parameters
+
+- `"block"`: Identifier of the block to turn into
 
 ### Example
 
 ```json
-"tag:adk-lib:before_on_player_place_turn_into_minecraft:bedrock": {}
+"adk_lib:before_on_player_place_turn_into": {
+    "block": "minecraft:bedrock"
+}
 ```

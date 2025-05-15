@@ -1,9 +1,9 @@
 import {
     BlockComponentPlayerPlaceBeforeEvent,
     BlockCustomComponent,
+    BlockPermutation,
     CustomComponentParameters
 } from '@minecraft/server';
-import { beforeOnPlayerPlaceTurnInto } from 'blocks/turn_into';
 import { beforeOnPlayerPlaceDoubleSlab } from 'blocks/double_slab';
 import { beforeOnPlayerPlaceSugarCane } from 'blocks/sugar_cane';
 import { beforeOnPlayerPlaceStairs } from 'blocks/stairs';
@@ -28,12 +28,19 @@ class Cancel extends BeforeOnPlayerPlace {
     }
 }
 
+type ParameterTurnInto = {
+    block: string;
+};
+
 class TurnInto extends BeforeOnPlayerPlace {
     beforeOnPlayerPlace(
         componentData: BlockComponentPlayerPlaceBeforeEvent,
         paramData: CustomComponentParameters
     ) {
-        beforeOnPlayerPlaceTurnInto(componentData, paramData);
+        const param = paramData.params as ParameterTurnInto;
+        componentData.permutationToPlace = BlockPermutation.resolve(
+            param.block
+        );
     }
 }
 

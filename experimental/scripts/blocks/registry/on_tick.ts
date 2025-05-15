@@ -7,7 +7,6 @@ import {
     Vector3
 } from '@minecraft/server';
 import { onTickCandle } from 'blocks/candle';
-import { directionToVector3 } from 'utils/math';
 import * as adk from 'adk-scripts-server';
 
 abstract class OnTick implements BlockCustomComponent {
@@ -63,14 +62,22 @@ class TorchParticles extends OnTick {
             }
 
             dimension.spawnParticle('minecraft:basic_smoke_particle', {
-                x: location.x + xzOffset * directionToVector3(direction).x,
+                x:
+                    location.x +
+                    xzOffset * adk.DirectionHelper.toVector3(direction).x,
                 y: location.y + yOffset,
-                z: location.z + xzOffset * directionToVector3(direction).z
+                z:
+                    location.z +
+                    xzOffset * adk.DirectionHelper.toVector3(direction).z
             });
             dimension.spawnParticle('minecraft:basic_flame_particle', {
-                x: location.x + xzOffset * directionToVector3(direction).x,
+                x:
+                    location.x +
+                    xzOffset * adk.DirectionHelper.toVector3(direction).x,
                 y: location.y + yOffset,
-                z: location.z + xzOffset * directionToVector3(direction).z
+                z:
+                    location.z +
+                    xzOffset * adk.DirectionHelper.toVector3(direction).z
             });
         }
     }
