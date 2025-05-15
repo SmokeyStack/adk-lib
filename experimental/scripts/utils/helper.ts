@@ -27,11 +27,3 @@ export function updateIfAir(
     if (block.typeId == 'minecraft:air')
         updateLiquidBlock(dimension, blockLocation);
 }
-
-export function doesBlockBlockkMovement(block: Block): boolean {
-    return (
-        block.typeId != 'minecraft:cobweb' &&
-        block.typeId != 'minecraft:bamboo_sapling' &&
-        block.isSolid
-    );
-}

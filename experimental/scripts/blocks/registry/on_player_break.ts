@@ -1,8 +1,9 @@
 import {
     Block,
-    BlockComponentPlayerDestroyEvent,
+    BlockComponentPlayerBreakEvent,
     BlockCustomComponent,
     CustomComponentParameters,
+    GameMode,
     ItemStack,
     world
 } from '@minecraft/server';
@@ -10,15 +11,15 @@ import { onPlayerDestroyDoubleSlab } from '../double_slab';
 import * as adk from 'adk-scripts-server';
 import { ParameterMelt } from 'utils/shared_parameters';
 
-abstract class OnPlayerDestroy implements BlockCustomComponent {
-    abstract onPlayerDestroy(
-        componentData: BlockComponentPlayerDestroyEvent,
+abstract class OnPlayerBreak implements BlockCustomComponent {
+    abstract onPlayerBreak(
+        componentData: BlockComponentPlayerBreakEvent,
         paramData?: CustomComponentParameters
     ): void;
 }
 
-class Debug extends OnPlayerDestroy {
-    onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent) {
+class Debug extends OnPlayerBreak {
+    onPlayerBreak(componentData: BlockComponentPlayerBreakEvent) {
         console.log(adk.Debug.logEventData(componentData));
     }
 }
@@ -27,14 +28,14 @@ type ParameterSpawnItem = {
     items: string[];
 };
 
-class SpawnItem extends OnPlayerDestroy {
-    onPlayerDestroy(
-        componentData: BlockComponentPlayerDestroyEvent,
+class SpawnItem extends OnPlayerBreak {
+    onPlayerBreak(
+        componentData: BlockComponentPlayerBreakEvent,
         paramData: CustomComponentParameters
     ) {
         if (!componentData.player) return;
 
-        if (componentData.player.getGameMode() == 'creative') return;
+        if (componentData.player.getGameMode() == GameMode.Creative) return;
         if (!world.gameRules.doTileDrops) return;
         const param = paramData.params as ParameterSpawnItem;
 
@@ -47,11 +48,9 @@ class SpawnItem extends OnPlayerDestroy {
     }
 }
 
-class Regenerate extends OnPlayerDestroy {
-    onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent) {
-        componentData.block.setType(
-            componentData.destroyedBlockPermutation.type
-        );
+class Regenerate extends OnPlayerBreak {
+    onPlayerBreak(componentData: BlockComponentPlayerBreakEvent) {
+        componentData.block.setType(componentData.brokenBlockPermutation.type);
     }
 }
 
@@ -59,14 +58,14 @@ type ParameterDropExperience = {
     experience_reward: number;
 };
 
-class DropExperience extends OnPlayerDestroy {
-    onPlayerDestroy(
-        componentData: BlockComponentPlayerDestroyEvent,
+class DropExperience extends OnPlayerBreak {
+    onPlayerBreak(
+        componentData: BlockComponentPlayerBreakEvent,
         paramData: CustomComponentParameters
     ) {
         if (!componentData.player) return;
 
-        if (componentData.player.getGameMode() == 'creative') return;
+        if (componentData.player.getGameMode() == GameMode.Creative) return;
         if (!world.gameRules.doTileDrops) return;
 
         const param = paramData.params as ParameterDropExperience;
@@ -79,9 +78,9 @@ class DropExperience extends OnPlayerDestroy {
     }
 }
 
-class Melt extends OnPlayerDestroy {
-    onPlayerDestroy(
-        componentData: BlockComponentPlayerDestroyEvent,
+class Melt extends OnPlayerBreak {
+    onPlayerBreak(
+        componentData: BlockComponentPlayerBreakEvent,
         paramData: CustomComponentParameters
     ): void {
         const block: Block = componentData.block;
@@ -102,8 +101,8 @@ class Melt extends OnPlayerDestroy {
     }
 }
 
-class DoubleSlab extends OnPlayerDestroy {
-    onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent): void {
+class DoubleSlab extends OnPlayerBreak {
+    onPlayerBreak(componentData: BlockComponentPlayerBreakEvent): void {
         onPlayerDestroyDoubleSlab(componentData);
     }
 }
@@ -119,7 +118,7 @@ enum OnPlayerDestroyKey {
 
 export const ON_PLAYER_DESTROY_REGISTRY: Map<
     OnPlayerDestroyKey,
-    OnPlayerDestroy
+    OnPlayerBreak
 > = new Map([
     [OnPlayerDestroyKey.Debug, new Debug()],
     [OnPlayerDestroyKey.Regenerate, new Regenerate()],

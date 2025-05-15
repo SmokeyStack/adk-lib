@@ -1,7 +1,7 @@
 import { BEFORE_ON_PLAYER_PLACE_REGISTRY } from './blocks/registry/before_on_player_place';
 import { ON_ENTITY_FALL_ON_REGISTRY } from './blocks/registry/on_entity_fall_on';
 import { ON_PLACE_REGISTRY } from './blocks/registry/on_place';
-import { ON_PLAYER_DESTROY_REGISTRY } from './blocks/registry/on_player_destroy';
+import { ON_PLAYER_DESTROY_REGISTRY } from './blocks/registry/on_player_break';
 import { ON_PLAYER_INTERACT_REGISTRY } from './blocks/registry/on_player_interact';
 import { ON_RANDOM_TICK_REGISTRY } from './blocks/registry/on_random_tick';
 import { ON_STEP_OFF_REGISTRY } from './blocks/registry/on_step_off';

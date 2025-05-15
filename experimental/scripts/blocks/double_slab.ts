@@ -6,7 +6,8 @@ import {
     EquipmentSlot,
     Direction,
     BlockPermutation,
-    BlockComponentPlayerDestroyEvent
+    BlockComponentPlayerBreakEvent,
+    GameMode
 } from '@minecraft/server';
 import type * as minecraftvanilladata from '@minecraft/vanilla-data';
 import * as adk from 'adk-scripts-server';
@@ -61,7 +62,7 @@ export function beforeOnPlayerPlaceDoubleSlab(
 }
 
 export function onPlayerDestroyDoubleSlab(
-    data: BlockComponentPlayerDestroyEvent
+    data: BlockComponentPlayerBreakEvent
 ): void {
     const player: Player | undefined = data.player;
     if (!player) return;
@@ -70,7 +71,7 @@ export function onPlayerDestroyDoubleSlab(
         player,
         EquipmentSlot.Mainhand
     );
-    if (player.getGameMode() == 'creative') return;
+    if (player.getGameMode() == GameMode.Creative) return;
     if (player_equipement === undefined) return;
 
     const has_silk_touch = adk.ComponentItemEnchantable.hasEnchantment(
@@ -81,7 +82,7 @@ export function onPlayerDestroyDoubleSlab(
     if (!has_silk_touch) return;
 
     adk.Cache.getDimension(data.dimension.id).spawnItem(
-        new ItemStack(data.destroyedBlockPermutation.type.id),
+        new ItemStack(data.brokenBlockPermutation.type.id),
         data.block.location
     );
 }

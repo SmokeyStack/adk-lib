@@ -1,8 +1,8 @@
 {
     "author": "SmokeyStack",
     "dependencies": {
-        "@minecraft/server": "2.0.0-beta.1.21.80-preview.28",
-        "adk-scripts-server": "^2.0.0-beta.5"
+        "@minecraft/server": "2.1.0-beta.1.21.90-preview.25",
+        "adk-scripts-server": "^2.1.0-beta.1"
     },
     "description": "",
     "devDependencies": {
