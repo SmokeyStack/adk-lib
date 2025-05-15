@@ -1,74 +1,116 @@
 import {
+    CustomComponentParameters,
     ItemComponentConsumeEvent,
-    ItemCustomComponent
+    ItemCustomComponent,
+    system,
+    Vector3
 } from '@minecraft/server';
-import { clamp } from '../../utils/math';
-import { dimensionMap, teleportEntity } from '../teleport';
-import { giveFoodEffect } from '../item_food';
-import { logEventData } from 'utils/debug';
+import { teleportEntity } from '../teleport';
+import * as adk from 'adk-scripts-server';
+import { ParameterEffect, ParameterRunCommand } from 'utils/shared_parameters';
 
-class onConsume implements ItemCustomComponent {
-    constructor() {
-        this.onConsume = this.onConsume.bind(this);
-    }
-    onConsume(_componentData: ItemComponentConsumeEvent) {}
+abstract class OnConsume implements ItemCustomComponent {
+    abstract onConsume(
+        componentData: ItemComponentConsumeEvent,
+        paramData?: CustomComponentParameters
+    ): void;
 }
 
-export class debug extends onConsume {
+class Debug extends OnConsume {
     onConsume(componentData: ItemComponentConsumeEvent): void {
-        let data: Object = logEventData(
-            componentData,
-            componentData.constructor.name
-        );
-        let result: string = JSON.stringify(
-            Object.keys(data)
-                .sort()
-                .reduce((result, key) => {
-                    result[key] = data[key];
-                    return result;
-                }, {}),
-            null,
-            4
-        );
-        console.log(result);
+        console.log(adk.Debug.logEventData(componentData));
     }
 }
 
-export class teleport extends onConsume {
-    onCompleteUse(componentData: ItemComponentConsumeEvent) {
+class Teleport extends OnConsume {
+    onConsume(componentData: ItemComponentConsumeEvent) {
+        const location: Vector3 = componentData.source.location;
+        const dimension_height_range = adk.Cache.getDimensionHeightRange(
+            componentData.source.dimension.id
+        );
         for (let a = 0; a < 16; ++a) {
-            const x: number =
-                componentData.source.location.x + (Math.random() - 0.5) * 16.0;
-            const y: number = clamp(
-                componentData.source.location.y + (Math.random() * 16 - 8),
-                componentData.source.dimension.heightRange.min,
-                dimensionMap.get(componentData.source.dimension)
+            const x: number = location.x + (Math.random() - 0.5) * 16.0;
+            const y: number = adk.MathHelper.clamp(
+                location.y + (Math.random() * 16 - 8),
+                dimension_height_range.min,
+                dimension_height_range.max
             );
-            const z: number =
-                componentData.source.location.z + (Math.random() - 0.5) * 16.0;
+            const z: number = location.z + (Math.random() - 0.5) * 16.0;
+            const new_location: adk.Vector3Builder = new adk.Vector3Builder(
+                x,
+                y,
+                z
+            );
 
-            if (teleportEntity(componentData.source, x, y, z)) break;
+            if (
+                teleportEntity(
+                    componentData.source,
+                    new_location,
+                    dimension_height_range
+                )
+            )
+                break;
         }
     }
 }
 
-export class foodEffect extends onConsume {
-    onConsume(componentData: ItemComponentConsumeEvent) {
-        giveFoodEffect(componentData);
+class FoodEffect extends OnConsume {
+    onConsume(
+        componentData: ItemComponentConsumeEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterEffect;
+        param.forEach(
+            ({
+                effect,
+                duration,
+                amplifier = 0,
+                show_particles = true,
+                entity_type
+            }) => {
+                if (!entity_type)
+                    componentData.source.addEffect(effect, duration, {
+                        showParticles: show_particles,
+                        amplifier
+                    });
+                else {
+                    entity_type.forEach((type) => {
+                        if (componentData.source.typeId === type)
+                            componentData.source.addEffect(effect, duration, {
+                                showParticles: show_particles,
+                                amplifier
+                            });
+                    });
+                }
+            }
+        );
     }
 }
 
-export class runCommand extends onConsume {
-    onConsume(componentData: ItemComponentConsumeEvent) {
-        const REGEX: RegExp = new RegExp('adk-lib:on_consume_([^]+)');
-        let tags: string[] = componentData.itemStack.getTags();
-        let commands: string[] = [];
-
-        for (let tag of tags)
-            if (REGEX.exec(tag)) commands.push(REGEX.exec(tag)[1]);
-
-        commands.forEach((command) => {
-            componentData.source.runCommand(command);
+class RunCommand extends OnConsume {
+    onConsume(
+        componentData: ItemComponentConsumeEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterRunCommand;
+        system.run(() => {
+            param.command.forEach((command) => {
+                componentData.source.runCommand(command);
+            });
         });
     }
 }
+
+enum OnConsumeKey {
+    Debug = 'debug',
+    Teleport = 'teleport',
+    FoodEffect = 'food_effect',
+    RunCommand = 'run_command'
+}
+
+export const ON_CONSUME_REGISTRY = new Map([
+    [OnConsumeKey.Debug, new Debug()],
+    [OnConsumeKey.Teleport, new Teleport()],
+    [OnConsumeKey.FoodEffect, new FoodEffect()],
+    [OnConsumeKey.RunCommand, new RunCommand()]
+]);

@@ -1,52 +1,94 @@
 import {
+    Block,
     BlockComponentStepOnEvent,
-    BlockCustomComponent
+    BlockCustomComponent,
+    CustomComponentParameters,
+    Dimension,
+    Entity,
+    Vector3
 } from '@minecraft/server';
-import { logEventData } from 'utils/debug';
+import * as adk from 'adk-scripts-server';
+import { ParameterBounceForce, ParameterEffect } from 'utils/shared_parameters';
 
-class onStepOn implements BlockCustomComponent {
-    constructor() {
-        this.onStepOn = this.onStepOn.bind(this);
-    }
-    onStepOn(_componentData: BlockComponentStepOnEvent) {}
+abstract class OnStepOn implements BlockCustomComponent {
+    abstract onStepOn(
+        componentData: BlockComponentStepOnEvent,
+        paramData?: CustomComponentParameters
+    ): void;
 }
 
-export class debug extends onStepOn {
+class Debug extends OnStepOn {
     onStepOn(componentData: BlockComponentStepOnEvent) {
-        let data: Object = logEventData(
-            componentData,
-            componentData.constructor.name
-        );
-        let result: string = JSON.stringify(
-            Object.keys(data)
-                .sort()
-                .reduce((result, key) => {
-                    result[key] = data[key];
-                    return result;
-                }, {}),
-            null,
-            4
-        );
-        console.log(result);
+        console.log(adk.Debug.logEventData(componentData));
     }
 }
 
-export class effect extends onStepOn {
-    onStepOn(componentData: BlockComponentStepOnEvent) {
-        componentData.entity.addEffect('speed', 200, {
-            showParticles: false,
-            amplifier: 2
-        });
-    }
-}
-
-export class impulse extends onStepOn {
-    onStepOn(componentData: BlockComponentStepOnEvent) {
-        componentData.entity.applyKnockback(
-            componentData.entity.getVelocity().x,
-            componentData.entity.getVelocity().z,
-            1,
-            1
+class Effect extends OnStepOn {
+    onStepOn(
+        componentData: BlockComponentStepOnEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterEffect;
+        const dimension: Dimension = adk.Cache.getDimension(
+            componentData.block.dimension.id
+        );
+        const block: Block = componentData.block;
+        param.forEach(
+            ({
+                effect,
+                duration,
+                radius,
+                amplifier = 0,
+                show_particles = true,
+                entity_type
+            }) => {
+                dimension
+                    .getEntities({
+                        location: block.center(),
+                        maxDistance: radius
+                    })
+                    .forEach((entity) => {
+                        if (
+                            !entity_type ||
+                            entity_type.includes(entity.typeId)
+                        ) {
+                            entity.addEffect(effect, duration, {
+                                showParticles: show_particles,
+                                amplifier
+                            });
+                        }
+                    });
+            }
         );
     }
 }
+
+class Bounce extends OnStepOn {
+    onStepOn(
+        componentData: BlockComponentStepOnEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const entity: Entity | undefined = componentData.entity;
+
+        if (!entity) return;
+
+        const velocity: Vector3 = entity.getVelocity();
+        if (velocity.y < 0) {
+            const param = paramData.params as ParameterBounceForce;
+            const bounce_force = param.force ?? 1;
+            entity.applyKnockback({ x: 0, z: 0 }, -velocity.y * bounce_force);
+        }
+    }
+}
+
+enum OnStepOnKey {
+    Debug = 'debug',
+    Effect = 'effect',
+    Bounce = 'bounce'
+}
+
+export const ON_STEP_ON_REGISTRY: Map<OnStepOnKey, OnStepOn> = new Map([
+    [OnStepOnKey.Debug, new Debug()],
+    [OnStepOnKey.Effect, new Effect()],
+    [OnStepOnKey.Bounce, new Bounce()]
+]);

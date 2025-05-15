@@ -1,85 +1,117 @@
 import {
+    CustomComponentParameters,
     ItemComponentHitEntityEvent,
-    ItemCustomComponent
+    ItemCustomComponent,
+    system
 } from '@minecraft/server';
-import { logEventData } from 'utils/debug';
+import * as adk from 'adk-scripts-server';
+import { ParameterRunCommand } from 'utils/shared_parameters';
 
-class onHitEntity implements ItemCustomComponent {
-    constructor() {
-        this.onHitEntity = this.onHitEntity.bind(this);
-    }
-    onHitEntity(_componentData: ItemComponentHitEntityEvent) {}
+abstract class OnHitEntity implements ItemCustomComponent {
+    abstract onHitEntity(
+        componentData: ItemComponentHitEntityEvent,
+        paramData?: CustomComponentParameters
+    ): void;
 }
 
-export class debug extends onHitEntity {
+class Debug extends OnHitEntity {
     onHitEntity(componentData: ItemComponentHitEntityEvent) {
-        let data: Object = logEventData(
-            componentData,
-            componentData.constructor.name
-        );
-        let result: string = JSON.stringify(
-            Object.keys(data)
-                .sort()
-                .reduce((result, key) => {
-                    result[key] = data[key];
-                    return result;
-                }, {}),
-            null,
-            4
-        );
-        console.log(result);
+        console.log(adk.Debug.logEventData(componentData));
     }
 }
 
-export class summonEntity extends onHitEntity {
-    onHitEntity(componentData: ItemComponentHitEntityEvent) {
-        const REGEX: RegExp = new RegExp('adk-lib:on_hit_summon_entity_([^]+)');
-        let tags: string[] = componentData.itemStack.getTags();
-        let entities: string[] = [];
+type ParameterSummonEntity = {
+    entity: string;
+    entity_filter?: string[];
+}[];
 
-        for (let tag of tags)
-            if (REGEX.exec(tag)) entities.push(REGEX.exec(tag)[1]);
+class SummonEntity extends OnHitEntity {
+    onHitEntity(
+        componentData: ItemComponentHitEntityEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterSummonEntity;
+        for (const entry of param) {
+            const entity_filter: string[] | undefined = entry.entity_filter;
+            const entity: string = entry.entity;
 
-        entities.forEach((entity) => {
-            componentData.hitEntity.dimension.spawnEntity(
-                entity,
-                componentData.hitEntity.location
+            // Check if player_equipment matches any transform_from
+            const matches: boolean = (entity_filter ?? []).some(
+                (entity: string) => {
+                    return componentData.hitEntity.typeId === entity;
+                }
             );
-        });
+
+            // If there's a match, log the corresponding transform_to
+            if (matches) {
+                componentData.hitEntity.dimension.spawnEntity(
+                    entity,
+                    componentData.hitEntity.location
+                );
+                return; // Stop further checks if a match is found
+            }
+        }
     }
 }
 
-export class summonParticle extends onHitEntity {
-    onHitEntity(componentData: ItemComponentHitEntityEvent) {
-        const REGEX: RegExp = new RegExp(
-            'adk-lib:on_hit_summon_particle_([^]+)'
-        );
-        let tags: string[] = componentData.itemStack.getTags();
-        let particles: string[] = [];
+type ParameterSummonParticle = {
+    particle: string;
+    entity_filter?: string[];
+}[];
 
-        for (let tag of tags)
-            if (REGEX.exec(tag)) particles.push(REGEX.exec(tag)[1]);
+class SummonParticle extends OnHitEntity {
+    onHitEntity(
+        componentData: ItemComponentHitEntityEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterSummonParticle;
+        for (const entry of param) {
+            const entity_filter: string[] | undefined = entry.entity_filter;
+            const particle: string = entry.particle;
 
-        particles.forEach((entity) => {
-            componentData.hitEntity.dimension.spawnParticle(
-                entity,
-                componentData.hitEntity.location
+            // Check if player_equipment matches any transform_from
+            const matches: boolean = (entity_filter ?? []).some(
+                (entity: string) => {
+                    return componentData.hitEntity.typeId === entity;
+                }
             );
+
+            // If there's a match, log the corresponding transform_to
+            if (matches) {
+                componentData.hitEntity.dimension.spawnParticle(
+                    particle,
+                    componentData.hitEntity.location
+                );
+                return; // Stop further checks if a match is found
+            }
+        }
+    }
+}
+
+class RunCommand extends OnHitEntity {
+    onHitEntity(
+        componentData: ItemComponentHitEntityEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterRunCommand;
+        system.run(() => {
+            param.command.forEach((command) => {
+                componentData.attackingEntity.runCommand(command);
+            });
         });
     }
 }
 
-export class runCommand extends onHitEntity {
-    onHitEntity(componentData: ItemComponentHitEntityEvent) {
-        const REGEX: RegExp = new RegExp('adk-lib:on_hit_entity_([^]+)');
-        let tags: string[] = componentData.itemStack.getTags();
-        let commands: string[] = [];
-
-        for (let tag of tags)
-            if (REGEX.exec(tag)) commands.push(REGEX.exec(tag)[1]);
-
-        commands.forEach((command) => {
-            componentData.attackingEntity.runCommand(command);
-        });
-    }
+enum OnHitEntityKey {
+    Debug = 'debug',
+    SummonEntity = 'summon_entity',
+    SummonParticle = 'summon_particle',
+    RunCommand = 'run_command'
 }
+
+export const ON_HIT_ENTITY_REGISTRY = new Map([
+    [OnHitEntityKey.Debug, new Debug()],
+    [OnHitEntityKey.SummonEntity, new SummonEntity()],
+    [OnHitEntityKey.SummonParticle, new SummonParticle()],
+    [OnHitEntityKey.RunCommand, new RunCommand()]
+]);

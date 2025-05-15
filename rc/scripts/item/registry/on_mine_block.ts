@@ -1,171 +1,88 @@
 import {
-    EntityEquippableComponent,
+    CustomComponentParameters,
     EquipmentSlot,
     ItemComponentMineBlockEvent,
     ItemCustomComponent,
     ItemDurabilityComponent,
     ItemStack,
-    Player
+    Player,
+    system
 } from '@minecraft/server';
-import { logEventData } from 'utils/debug';
+import * as adk from 'adk-scripts-server';
+import { ParameterRunCommand } from 'utils/shared_parameters';
 
-class onMineBlock implements ItemCustomComponent {
-    constructor() {
-        this.onMineBlock = this.onMineBlock.bind(this);
-    }
-    onMineBlock(_componentData: ItemComponentMineBlockEvent) {}
+abstract class OnMineBlock implements ItemCustomComponent {
+    abstract onMineBlock(
+        componentData: ItemComponentMineBlockEvent,
+        paramData?: CustomComponentParameters
+    ): void;
 }
 
-export class debug extends onMineBlock {
+class Debug extends OnMineBlock {
     onMineBlock(componentData: ItemComponentMineBlockEvent) {
-        let data: Object = logEventData(
-            componentData,
-            componentData.constructor.name
-        );
-        let result: string = JSON.stringify(
-            Object.keys(data)
-                .sort()
-                .reduce((result, key) => {
-                    result[key] = data[key];
-                    return result;
-                }, {}),
-            null,
-            4
-        );
-        console.log(result);
+        console.log(adk.Debug.logEventData(componentData));
     }
 }
 
-export class digger extends onMineBlock {
-    onMineBlock(componentData: ItemComponentMineBlockEvent) {
-        const REGEX: RegExp = new RegExp('adk-lib:digger_([0-9]+)');
-        let tags: string[] = componentData.itemStack.getTags();
-        let player: Player = componentData.source as Player;
+type ParameterDigger = {
+    damage_amount: number;
+    block_filter?: string[];
+}[];
 
-        for (let tag of tags)
-            if (REGEX.exec(tag)) {
-                let item: ItemStack = (
-                    player.getComponent(
-                        'equippable'
-                    ) as EntityEquippableComponent
-                ).getEquipment(EquipmentSlot.Mainhand);
+class Digger extends OnMineBlock {
+    onMineBlock(
+        componentData: ItemComponentMineBlockEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterDigger;
+        for (const entry of param) {
+            const block_filter: string[] | undefined = entry.block_filter;
+            const damage: number = entry.damage_amount;
 
-                if (
-                    (
-                        item.getComponent(
-                            'minecraft:durability'
-                        ) as ItemDurabilityComponent
-                    ).damage +
-                        parseInt(REGEX.exec(tag)[1]) >=
-                    (
-                        item.getComponent(
-                            'minecraft:durability'
-                        ) as ItemDurabilityComponent
-                    ).maxDurability
-                ) {
-                    (
-                        player.getComponent(
-                            'equippable'
-                        ) as EntityEquippableComponent
-                    ).setEquipment(EquipmentSlot.Mainhand, undefined);
-
-                    break;
+            // Check if player_equipment matches any transform_from
+            const matches: boolean = (block_filter ?? []).some(
+                (block: string) => {
+                    return (
+                        componentData.minedBlockPermutation.type.id === block
+                    );
                 }
+            );
 
-                (
-                    item.getComponent(
-                        'minecraft:durability'
-                    ) as ItemDurabilityComponent
-                ).damage += parseInt(REGEX.exec(tag)[1]);
-                (
-                    player.getComponent(
-                        'equippable'
-                    ) as EntityEquippableComponent
-                ).setEquipment(EquipmentSlot.Mainhand, item);
-
-                break;
+            // If there's a match, log the corresponding transform_to
+            if (matches) {
+                const item = componentData.itemStack;
+                if (!item) return;
+                const durability: ItemDurabilityComponent =
+                    adk.ComponentItemDurability.get(item);
+                durability.damage += damage;
+                return; // Stop further checks if a match is found
             }
+        }
     }
 }
 
-interface Condition {
-    block: string;
-    amount: number;
-}
-
-export class diggerConditional extends onMineBlock {
-    onMineBlock(componentData: ItemComponentMineBlockEvent) {
-        const REGEX: RegExp = new RegExp(
-            'adk-lib:digger_conditional_block_([^]+)_amount_([0-9]+)'
-        );
-        let tags: string[] = componentData.itemStack.getTags();
-        let conditions: Condition[] = [];
-        let player: Player = componentData.source as Player;
-
-        for (let tag of tags)
-            if (REGEX.exec(tag))
-                conditions.push({
-                    block: REGEX.exec(tag)[1],
-                    amount: parseInt(REGEX.exec(tag)[2])
-                });
-
-        for (let condition of conditions)
-            if (
-                componentData.minedBlockPermutation.type.id === condition.block
-            ) {
-                let item: ItemStack = (
-                    player.getComponent(
-                        'equippable'
-                    ) as EntityEquippableComponent
-                ).getEquipment(EquipmentSlot.Mainhand);
-
-                if (
-                    (
-                        item.getComponent(
-                            'minecraft:durability'
-                        ) as ItemDurabilityComponent
-                    ).damage +
-                        condition.amount >=
-                    (
-                        item.getComponent(
-                            'minecraft:durability'
-                        ) as ItemDurabilityComponent
-                    ).maxDurability
-                ) {
-                    (
-                        player.getComponent(
-                            'equippable'
-                        ) as EntityEquippableComponent
-                    ).setEquipment(EquipmentSlot.Mainhand, undefined);
-
-                    break;
-                }
-
-                (
-                    item.getComponent(
-                        'minecraft:durability'
-                    ) as ItemDurabilityComponent
-                ).damage += condition.amount;
-                (
-                    player.getComponent(
-                        'equippable'
-                    ) as EntityEquippableComponent
-                ).setEquipment(EquipmentSlot.Mainhand, item);
-            }
-    }
-}
-
-export class runCommand extends onMineBlock {
-    onMineBlock(componentData: ItemComponentMineBlockEvent) {
-        const REGEX: RegExp = new RegExp('adk-lib:on_mine_block_([^]+)');
-        let tags: string[] = componentData.itemStack.getTags();
-        let commands: string[] = [];
-
-        for (let tag of tags)
-            if (REGEX.exec(tag)) commands.push(REGEX.exec(tag)[1]);
-
-        commands.forEach((command) => {
-            componentData.source.runCommand(command);
+class RunCommand extends OnMineBlock {
+    onMineBlock(
+        componentData: ItemComponentMineBlockEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterRunCommand;
+        system.run(() => {
+            param.command.forEach((command) => {
+                componentData.source.runCommand(command);
+            });
         });
     }
 }
+
+enum OnMineBlockKey {
+    Debug = 'debug',
+    Digger = 'digger',
+    RunCommand = 'run_command'
+}
+
+export const ON_MINE_BLOCK_REGISTRY = new Map([
+    [OnMineBlockKey.Debug, new Debug()],
+    [OnMineBlockKey.Digger, new Digger()],
+    [OnMineBlockKey.RunCommand, new RunCommand()]
+]);

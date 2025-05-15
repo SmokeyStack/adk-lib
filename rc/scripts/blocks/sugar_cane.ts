@@ -3,34 +3,33 @@ import {
     BlockComponentPlayerPlaceBeforeEvent,
     BlockPermutation
 } from '@minecraft/server';
-import { DirectionType } from 'utils/helper';
-import { directionToVector3 } from 'utils/math';
+import * as adk from 'adk-scripts-server';
 
 export function beforeOnPlayerPlaceSugarCane(
     data: BlockComponentPlayerPlaceBeforeEvent
 ): void {
     const block: Block = data.block;
-    const blockToPlace: BlockPermutation = data.permutationToPlace;
-    const blockToCheck: Block = block.below();
+    const block_to_place: BlockPermutation = data.permutationToPlace;
+    const block_to_check: Block | undefined = block.below();
 
-    if (blockToCheck.typeId === blockToPlace.type.id) return;
+    if (!block_to_check || block_to_check.typeId === block_to_place.type.id)
+        return;
     if (
-        blockToCheck.getTags().includes('dirt') ||
-        blockToCheck.getTags().includes('sand')
+        block_to_check.getTags().includes('dirt') ||
+        block_to_check.getTags().includes('sand')
     ) {
-        for (const direction of DirectionType.HORIZONTAL) {
-            let block2: Block = blockToCheck.offset(
-                directionToVector3(direction)
+        adk.DirectionType.Horizontal.forEach((direction) => {
+            const block_2: Block | undefined = block_to_check.offset(
+                adk.DirectionHelper.toVector3(direction)
             );
 
             if (
-                !block2.getTags().includes('water') &&
-                block2.typeId != 'minecraft:frosted_ice'
+                !block_2 ||
+                block_2.getTags().includes('water') ||
+                block_2.typeId == 'minecraft:frosted_ice'
             )
-                continue;
-
-            return;
-        }
+                return;
+        });
     }
 
     data.cancel = true;

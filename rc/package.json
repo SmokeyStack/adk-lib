@@ -1,15 +1,19 @@
 {
-    "name": "adk-lib-rc",
-    "version": "1.0.0",
-    "main": "index.js",
-    "scripts": {
-        "compile": "tsc"
+    "author": "SmokeyStack",
+    "dependencies": {
+        "@minecraft/server": "2.0.0-rc.1.21.90-preview.25",
+        "adk-scripts-server": "^2.0.0-rc.1"
+    },
+    "description": "",
+    "devDependencies": {
+        "tsup": "^8.3.5"
     },
     "keywords": [],
-    "author": "SmokeyStack",
     "license": "GPL-3.0-only",
-    "description": "",
-    "dependencies": {
-        "@minecraft/server": "1.17.0-rc.1.21.60-preview.24"
-    }
+    "main": "index.js",
+    "name": "adk-lib-rc",
+    "scripts": {
+        "compile": "tsup"
+    },
+    "version": "1.0.0"
 }

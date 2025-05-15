@@ -5,120 +5,108 @@ import {
     Vector3,
     DyeColor,
     SignSide,
-    Player
+    Player,
+    CustomComponentParameters
 } from '@minecraft/server';
-import { areVectorsEqual } from '../utils/math';
-import { decrementStack } from '../utils/helper';
+import * as adk from 'adk-scripts-server';
 
-export function onUseOnDye(componentData: ItemComponentUseOnEvent) {
-    const REGEX: RegExp = new RegExp(
-        'minecraft:(?:[a-z]\\w+_)?(?:standing|wall|hanging)_sign'
+type ParameterDye = {
+    color: string;
+};
+
+export function onUseOnDye(
+    componentData: ItemComponentUseOnEvent,
+    paramData: CustomComponentParameters
+) {
+    const param = paramData.params as ParameterDye;
+    let sign_component: BlockSignComponent = adk.ComponentBlockSign.get(
+        componentData.block
     );
-
-    if (!REGEX.test(componentData.block.typeId)) return;
-
-    let tags: string[] = componentData.itemStack.getTags();
-    const REGEX_DYE: RegExp = new RegExp('adk-lib:dye_([a-zA-Z]\\w+)');
-
-    let signComponent: BlockSignComponent = componentData.block.getComponent(
-        'sign'
-    ) as BlockSignComponent;
-    let blockPermutation: BlockPermutation =
+    let block_permutation: BlockPermutation =
         componentData.usedOnBlockPermutation;
-    let playerLocation: Vector3 = componentData.source.location;
-    let blockLocation: Vector3 = componentData.block.location;
-    let flooredX: number, flooredZ: number;
-    let color: string;
+    let player_location: Vector3 = componentData.source.location;
+    let block_location: Vector3 = componentData.block.location;
+    let floored_x: number, floored_z: number;
     let player: Player = componentData.source as Player;
-
-    for (let tag of tags) {
-        if (REGEX_DYE.exec(tag)) {
-            color = REGEX_DYE.exec(tag)[1];
-
-            break;
-        }
-    }
-    if (playerLocation.x > 0) flooredX = Math.floor(playerLocation.x);
-    else flooredX = signedFloor(playerLocation.x);
-    if (playerLocation.z > 0) flooredZ = Math.floor(playerLocation.z);
-    else flooredZ = signedFloor(playerLocation.z);
+    if (player_location.x > 0) floored_x = Math.floor(player_location.x);
+    else floored_x = signedFloor(player_location.x);
+    if (player_location.z > 0) floored_z = Math.floor(player_location.z);
+    else floored_z = signedFloor(player_location.z);
     if (componentData.block.typeId.endsWith('wall_sign')) {
         dyeSignFacingDirection(
-            blockPermutation,
-            signComponent,
-            playerLocation,
-            blockLocation,
-            DyeColor[color],
-            flooredX,
-            flooredZ,
+            block_permutation,
+            sign_component,
+            player_location,
+            block_location,
+            DyeColor[param.color],
+            floored_x,
+            floored_z,
             player
         );
-
         return;
     }
     if (componentData.block.typeId.endsWith('standing_sign')) {
         dyeSignGroundDirection(
-            blockPermutation,
-            signComponent,
-            playerLocation,
-            blockLocation,
-            DyeColor[color],
-            flooredX,
-            flooredZ,
+            block_permutation,
+            sign_component,
+            player_location,
+            block_location,
+            DyeColor[param.color],
+            floored_x,
+            floored_z,
             player
         );
-
         return;
     }
     if (componentData.block.typeId.endsWith('hanging_sign')) {
-        if (!blockPermutation.getState('attached_bit')) {
+        if (!block_permutation.getState('attached_bit')) {
             dyeSignFacingDirection(
-                blockPermutation,
-                signComponent,
-                playerLocation,
-                blockLocation,
-                DyeColor[color],
-                flooredX,
-                flooredZ,
+                block_permutation,
+                sign_component,
+                player_location,
+                block_location,
+                DyeColor[param.color],
+                floored_x,
+                floored_z,
                 player
             );
 
             return;
         }
-
         dyeSignGroundDirection(
-            blockPermutation,
-            signComponent,
-            playerLocation,
-            blockLocation,
-            DyeColor[color],
-            flooredX,
-            flooredZ,
+            block_permutation,
+            sign_component,
+            player_location,
+            block_location,
+            DyeColor[param.color],
+            floored_x,
+            floored_z,
             player
         );
     }
 }
 
 /**
- * @brief Dye the sign based on the player's location.
- * @param signComponent SignComponent
- * @param playerLocation Player's location
- * @param blockLocation Block's location
+ * Dye the sign based on the player's location.
+ *
+ * @param sign_component SignComponent
+ * @param player_location Player's location
+ * @param block_location Block's location
  * @param color DyeColor
  */
 function dyeSign(
-    signComponent: BlockSignComponent,
-    playerLocation: Vector3,
-    blockLocation: Vector3,
+    sign_component: BlockSignComponent,
+    player_location: Vector3,
+    block_location: Vector3,
     color: DyeColor,
     player: Player
 ): void {
-    const side = areVectorsEqual(playerLocation, blockLocation)
+    const side = adk.Vector3Helper.equals(player_location, block_location)
         ? SignSide.Front
         : SignSide.Back;
-    if (signComponent.getTextDyeColor(side) !== color) {
-        signComponent.setTextDyeColor(color, side);
-        decrementStack(player);
+    if (sign_component.getTextDyeColor(side) !== color) {
+        sign_component.setTextDyeColor(color, side);
+        adk.PlayerHelper.decrementStack(player);
     }
 }
 
