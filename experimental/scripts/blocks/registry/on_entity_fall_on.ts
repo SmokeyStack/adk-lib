@@ -1,9 +1,12 @@
 import {
     BlockComponentEntityFallOnEvent,
     BlockCustomComponent,
-    CustomComponentParameters
+    CustomComponentParameters,
+    Entity,
+    Vector3
 } from '@minecraft/server';
 import * as adk from 'adk-scripts-server';
+import { ParameterBounceForce } from 'utils/shared_parameters';
 
 abstract class OnEntityFallOn implements BlockCustomComponent {
     abstract onEntityFallOn(
@@ -18,25 +21,27 @@ class Debug extends OnEntityFallOn {
     }
 }
 
-class PlayerBounce extends OnEntityFallOn {
-    onEntityFallOn(componentData: BlockComponentEntityFallOnEvent) {
-        if (Math.abs(componentData.entity.getVelocity().y) < 1) {
-            componentData.entity.applyKnockback(
-                { x: 0, z: 0 },
-                componentData.entity.getVelocity().y * -1.5
-            );
-        } else {
-            componentData.entity.applyKnockback(
-                { x: 0, z: 0 },
-                componentData.entity.getVelocity().y * -0.5
-            );
+class Bounce extends OnEntityFallOn {
+    onEntityFallOn(
+        componentData: BlockComponentEntityFallOnEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const entity: Entity | undefined = componentData.entity;
+
+        if (!entity) return;
+
+        const velocity: Vector3 = entity.getVelocity();
+        if (velocity.y < 0) {
+            const param = paramData.params as ParameterBounceForce;
+            const bounce_force = param.force ?? 1;
+            entity.applyKnockback({ x: 0, z: 0 }, -velocity.y * bounce_force);
         }
     }
 }
 
 enum OnEntityFallOnKey {
     Debug = 'debug',
-    PlayerBounce = 'player_bounce'
+    Bounce = 'bounce'
 }
 
 export const ON_ENTITY_FALL_ON_REGISTRY: Map<
@@ -44,5 +49,5 @@ export const ON_ENTITY_FALL_ON_REGISTRY: Map<
     OnEntityFallOn
 > = new Map([
     [OnEntityFallOnKey.Debug, new Debug()],
-    [OnEntityFallOnKey.PlayerBounce, new PlayerBounce()]
+    [OnEntityFallOnKey.Bounce, new Bounce()]
 ]);

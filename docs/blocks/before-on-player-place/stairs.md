@@ -1,4 +1,4 @@
-# adk-lib:before_on_player_place_stairs
+# adk_lib:before_on_player_place_stairs
 
 ## What does it do?
 
@@ -6,4 +6,4 @@ This component is used for determining the shape of the block that uses the `adk
 
 ## How to use
 
-Add `adk-lib:before_on_player_place_stairs` to the `minecraft:custom_components` array in your block json file.
+Add `"adk_lib:before_on_player_place_stairs": {}` to your block json file.

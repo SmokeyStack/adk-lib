@@ -1,4 +1,4 @@
-# adk-lib:on_tick_candle_particles
+# adk_lib:on_tick_candle_particles
 
 ## What does it do?
 
@@ -6,4 +6,4 @@ This component will spawn flame particles for the `adk::BlockCandleAbstract` cla
 
 ## How to use
 
-Add `adk-lib:on_tick_candle_particles` to the `minecraft:custom_components` array in your item json file.
+Add `adk_lib:on_tick_candle_particles` to the `minecraft:custom_components` array in your item json file.

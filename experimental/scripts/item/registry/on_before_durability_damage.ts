@@ -1,39 +1,26 @@
 import {
+    CustomComponentParameters,
     ItemComponentBeforeDurabilityDamageEvent,
     ItemCustomComponent,
+    ItemDurabilityComponent,
+    ItemStack,
     system
 } from '@minecraft/server';
-import { logEventData } from 'utils/debug';
+import * as adk from 'adk-scripts-server';
+import { ParameterRunCommand } from 'utils/shared_parameters';
 
-class onBeforeDurabilityDamage implements ItemCustomComponent {
-    constructor() {
-        this.onBeforeDurabilityDamage =
-            this.onBeforeDurabilityDamage.bind(this);
-    }
-    onBeforeDurabilityDamage(
-        _componentData: ItemComponentBeforeDurabilityDamageEvent
-    ) {}
+abstract class OnBeforeDurabilityDamage implements ItemCustomComponent {
+    abstract onBeforeDurabilityDamage(
+        componentData: ItemComponentBeforeDurabilityDamageEvent,
+        paramData?: CustomComponentParameters
+    ): void;
 }
 
-export class debug extends onBeforeDurabilityDamage {
+class Debug extends OnBeforeDurabilityDamage {
     onBeforeDurabilityDamage(
         componentData: ItemComponentBeforeDurabilityDamageEvent
     ) {
-        let data: Object = logEventData(
-            componentData,
-            componentData.constructor.name
-        );
-        let result: string = JSON.stringify(
-            Object.keys(data)
-                .sort()
-                .reduce((result, key) => {
-                    result[key] = data[key];
-                    return result;
-                }, {}),
-            null,
-            4
-        );
-        console.log(result);
+        console.log(adk.Debug.logEventData(componentData));
     }
 }
 
@@ -42,91 +29,93 @@ export class debug extends onBeforeDurabilityDamage {
  * Unfortunately, I forgot that onBeforeDurabilityDamage only activates if the item gets damaged by hitting an entity, not by using it.
  * I'll leave this here for reference.
  */
-export class elytraIsUseable extends onBeforeDurabilityDamage {
+class ElytraIsUseable extends OnBeforeDurabilityDamage {
     onBeforeDurabilityDamage(
         componentData: ItemComponentBeforeDurabilityDamageEvent
     ) {
-        const { itemStack } = componentData;
-        const { maxDurability, damage } = itemStack.getComponent('durability');
-        const potentialDurabilityDamage = maxDurability + 1 - (damage + 1);
+        const item: ItemStack | undefined = componentData.itemStack;
+        if (!item) return;
+
+        const durability: ItemDurabilityComponent =
+            adk.ComponentItemDurability.get(item);
+        const potentialDurabilityDamage =
+            durability.maxDurability + 1 - (durability.damage + 1);
         componentData.durabilityDamage = potentialDurabilityDamage > 0 ? 1 : 0;
     }
 }
 
-export class runCommand extends onBeforeDurabilityDamage {
+class RunCommand extends OnBeforeDurabilityDamage {
     onBeforeDurabilityDamage(
-        componentData: ItemComponentBeforeDurabilityDamageEvent
+        componentData: ItemComponentBeforeDurabilityDamageEvent,
+        paramData: CustomComponentParameters
     ) {
-        const REGEX: RegExp = new RegExp(
-            'adk-lib:before_durability_damage_([^]+)'
-        );
-        let tags: string[] = componentData.itemStack.getTags();
-        let commands: string[] = [];
-
-        for (let tag of tags)
-            if (REGEX.exec(tag)) commands.push(REGEX.exec(tag)[1]);
-
+        const param = paramData.params as ParameterRunCommand;
         system.run(() => {
-            commands.forEach((command) => {
+            param.command.forEach((command) => {
                 componentData.attackingEntity.runCommand(command);
             });
         });
     }
 }
 
-export class modifyDurabilityDamageAmount extends onBeforeDurabilityDamage {
+type ParameterModifyDurabilityDamageAmount = {
+    damage_amount: number;
+    entity_filter?: string[];
+}[];
+
+class ModifyDurabilityDamageAmount extends OnBeforeDurabilityDamage {
     onBeforeDurabilityDamage(
-        componentData: ItemComponentBeforeDurabilityDamageEvent
+        componentData: ItemComponentBeforeDurabilityDamageEvent,
+        paramData: CustomComponentParameters
     ): void {
-        const REGEX: RegExp = new RegExp(
-            'adk-lib:modify_durability_damage_([0-9]+)'
-        );
-        let tags: string[] = componentData.itemStack.getTags();
+        const param = paramData.params as ParameterModifyDurabilityDamageAmount;
+        for (const entry of param) {
+            const entity_filter: string[] | undefined = entry.entity_filter;
+            const damage: number = entry.damage_amount;
 
-        for (let tag of tags)
-            if (REGEX.exec(tag)) {
-                componentData.durabilityDamage +=
-                    parseInt(REGEX.exec(tag)[1]) - 2;
+            // Check if player_equipment matches any transform_from
+            const matches: boolean = (entity_filter ?? []).some(
+                (entity: string) => {
+                    return componentData.hitEntity.typeId === entity;
+                }
+            );
 
-                break;
+            // If there's a match, log the corresponding transform_to
+            if (matches) {
+                componentData.durabilityDamage = damage;
+                return; // Stop further checks if a match is found
             }
+        }
     }
 }
 
-export class preventDamageDurability extends onBeforeDurabilityDamage {
+class PreventDamageDurability extends OnBeforeDurabilityDamage {
     onBeforeDurabilityDamage(
         componentData: ItemComponentBeforeDurabilityDamageEvent
     ): void {
-        componentData.durabilityDamage -= 2;
+        componentData.durabilityDamage = 0;
     }
 }
 
-interface Condition {
-    entity: string;
-    amount: number;
+enum OnBeforeDurabilityDamageKey {
+    Debug = 'debug',
+    RunCommand = 'run_command',
+    ModifyDurabilityDamageAmount = 'modify_durability_damage_amount',
+    PreventDamageDurability = 'prevent_damage_durability'
 }
 
-export class modifyDurabilityDamageAmountConditional extends onBeforeDurabilityDamage {
-    onBeforeDurabilityDamage(
-        componentData: ItemComponentBeforeDurabilityDamageEvent
-    ): void {
-        const REGEX: RegExp = new RegExp(
-            'adk-lib:modify_durability_damage_conditional_entity_([^]+)_amount_([0-9]+)'
-        );
-        let tags: string[] = componentData.itemStack.getTags();
-        let conditions: Condition[] = [];
-
-        for (let tag of tags)
-            if (REGEX.exec(tag))
-                conditions.push({
-                    entity: REGEX.exec(tag)[1],
-                    amount: parseInt(REGEX.exec(tag)[2])
-                });
-
-        for (let condition of conditions)
-            if (componentData.hitEntity.typeId === condition.entity) {
-                componentData.durabilityDamage += condition.amount - 2;
-                break;
-            }
-    }
-}
+export const ON_BEFORE_DURABILITY_DAMAGE_REGISTRY: Map<
+    OnBeforeDurabilityDamageKey,
+    OnBeforeDurabilityDamage
+> = new Map([
+    [OnBeforeDurabilityDamageKey.Debug, new Debug()],
+    [OnBeforeDurabilityDamageKey.RunCommand, new RunCommand()],
+    [
+        OnBeforeDurabilityDamageKey.ModifyDurabilityDamageAmount,
+        new ModifyDurabilityDamageAmount()
+    ],
+    [
+        OnBeforeDurabilityDamageKey.PreventDamageDurability,
+        new PreventDamageDurability()
+    ]
+]);

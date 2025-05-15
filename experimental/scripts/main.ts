@@ -1,4 +1,3 @@
-import { system } from '@minecraft/server';
 import { BEFORE_ON_PLAYER_PLACE_REGISTRY } from './blocks/registry/before_on_player_place';
 import { ON_ENTITY_FALL_ON_REGISTRY } from './blocks/registry/on_entity_fall_on';
 import { ON_PLACE_REGISTRY } from './blocks/registry/on_place';
@@ -8,198 +7,96 @@ import { ON_RANDOM_TICK_REGISTRY } from './blocks/registry/on_random_tick';
 import { ON_STEP_OFF_REGISTRY } from './blocks/registry/on_step_off';
 import { ON_STEP_ON_REGISTRY } from './blocks/registry/on_step_on';
 import { ON_TICK_REGISTRY } from './blocks/registry/on_tick';
-import * as itemOnBeforeDurabilityDamage from './item/registry/on_before_durability_damage';
-import * as itemOnCompleteUse from './item/registry/on_complete_use';
-import * as itemOnConsume from './item/registry/on_consume';
-import * as itemUse from './item/registry/on_use';
-import * as itemOnMineBlock from './item/registry/on_mine_block';
-import * as itemOnHitEntity from './item/registry/on_hit_entity';
-import * as itemOnUseOn from './item/registry/on_use_on';
+import { ON_BEFORE_DURABILITY_DAMAGE_REGISTRY } from './item/registry/on_before_durability_damage';
+import { ON_COMPLETE_USE_REGISTRY } from './item/registry/on_complete_use';
+import { ON_CONSUME_REGISTRY } from './item/registry/on_consume';
+import { ON_HIT_ENTITY_REGISTRY } from './item/registry/on_hit_entity';
+import { ON_MINE_BLOCK_REGISTRY } from './item/registry/on_mine_block';
+import { ON_USE_ON_REGISTRY } from './item/registry/on_use_on';
+import { ON_USE_REGISTRY } from './item/registry/on_use';
 import { SystemHelper } from 'adk-scripts-server';
 
 BEFORE_ON_PLAYER_PLACE_REGISTRY.forEach((value, key) => {
     SystemHelper.registerCustomComponentBlock(
-        `adk-lib:before_on_player_place_${key}`,
+        `adk_lib:before_on_player_place_${key}`,
         value
     );
 });
 ON_ENTITY_FALL_ON_REGISTRY.forEach((value, key) => {
     SystemHelper.registerCustomComponentBlock(
-        `adk-lib:on_entity_fall_on_${key}`,
+        `adk_lib:on_entity_fall_on_${key}`,
         value
     );
 });
 ON_PLACE_REGISTRY.forEach((value, key) => {
-    SystemHelper.registerCustomComponentBlock(`adk-lib:on_place_${key}`, value);
+    SystemHelper.registerCustomComponentBlock(`adk_lib:on_place_${key}`, value);
 });
 ON_PLAYER_DESTROY_REGISTRY.forEach((value, key) => {
     SystemHelper.registerCustomComponentBlock(
-        `adk-lib:on_player_destroy_${key}`,
+        `adk_lib:on_player_destroy_${key}`,
         value
     );
 });
 ON_PLAYER_INTERACT_REGISTRY.forEach((value, key) => {
     SystemHelper.registerCustomComponentBlock(
-        `adk-lib:on_player_interact_${key}`,
+        `adk_lib:on_player_interact_${key}`,
         value
     );
 });
 ON_RANDOM_TICK_REGISTRY.forEach((value, key) => {
     SystemHelper.registerCustomComponentBlock(
-        `adk-lib:on_random_tick_${key}`,
+        `adk_lib:on_random_tick_${key}`,
         value
     );
 });
 ON_STEP_OFF_REGISTRY.forEach((value, key) => {
     SystemHelper.registerCustomComponentBlock(
-        `adk-lib:on_step_off_${key}`,
+        `adk_lib:on_step_off_${key}`,
         value
     );
 });
 ON_STEP_ON_REGISTRY.forEach((value, key) => {
     SystemHelper.registerCustomComponentBlock(
-        `adk-lib:on_step_on_${key}`,
+        `adk_lib:on_step_on_${key}`,
         value
     );
 });
 ON_TICK_REGISTRY.forEach((value, key) => {
-    SystemHelper.registerCustomComponentBlock(`adk-lib:on_tick_${key}`, value);
+    SystemHelper.registerCustomComponentBlock(`adk_lib:on_tick_${key}`, value);
 });
-
-system.beforeEvents.startup.subscribe((eventData) => {
-    // Items
-
-    // On Before Durability Damage
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:before_durability_damage_debug',
-        new itemOnBeforeDurabilityDamage.debug()
+ON_BEFORE_DURABILITY_DAMAGE_REGISTRY.forEach((value, key) => {
+    SystemHelper.registerCustomComponentItem(
+        `adk_lib:on_before_durability_damage_${key}`,
+        value
     );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:before_durability_damage_elytra_is_useable',
-        new itemOnBeforeDurabilityDamage.elytraIsUseable()
+});
+ON_COMPLETE_USE_REGISTRY.forEach((value, key) => {
+    SystemHelper.registerCustomComponentItem(
+        `adk_lib:on_complete_use_${key}`,
+        value
     );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:before_durability_damage_run_command',
-        new itemOnBeforeDurabilityDamage.runCommand()
+});
+ON_CONSUME_REGISTRY.forEach((value, key) => {
+    SystemHelper.registerCustomComponentItem(
+        `adk_lib:on_consume_${key}`,
+        value
     );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:before_durability_damage_modify_durability_damage',
-        new itemOnBeforeDurabilityDamage.modifyDurabilityDamageAmount()
+});
+ON_HIT_ENTITY_REGISTRY.forEach((value, key) => {
+    SystemHelper.registerCustomComponentItem(
+        `adk_lib:on_hit_entity_${key}`,
+        value
     );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:before_durability_damage_modify_durability_damage_conditional',
-        new itemOnBeforeDurabilityDamage.modifyDurabilityDamageAmountConditional()
+});
+ON_MINE_BLOCK_REGISTRY.forEach((value, key) => {
+    SystemHelper.registerCustomComponentItem(
+        `adk_lib:on_mine_block_${key}`,
+        value
     );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:before_durability_damage_prevent_damage_durability',
-        new itemOnBeforeDurabilityDamage.preventDamageDurability()
-    );
-
-    // On Complete Use
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_complete_use_debug',
-        new itemOnCompleteUse.debug()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_complete_use_run_command',
-        new itemOnCompleteUse.runCommand()
-    );
-
-    // On Consume
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_consume_teleport',
-        new itemOnConsume.teleport()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_consume_food_effect',
-        new itemOnConsume.foodEffect()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_consume_run_command',
-        new itemOnConsume.runCommand()
-    );
-
-    // On Hit Entity
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_hit_entity_debug',
-        new itemOnHitEntity.debug()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_hit_entity_summon_entity',
-        new itemOnHitEntity.summonEntity()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_hit_entity_summon_particle',
-        new itemOnHitEntity.summonParticle()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_hit_entity_run_command',
-        new itemOnHitEntity.runCommand()
-    );
-
-    // On Mine Block
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_mine_block_debug',
-        new itemOnMineBlock.debug()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_mine_block_digger',
-        new itemOnMineBlock.digger()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_mine_block_digger_conditional',
-        new itemOnMineBlock.diggerConditional()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_mine_block_run_command',
-        new itemOnMineBlock.runCommand()
-    );
-
-    // On Use
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_use_debug',
-        new itemUse.debug()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_use_goat_horn',
-        new itemUse.goatHorn()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_use_run_command',
-        new itemUse.runCommand()
-    );
-
-    // On Use On
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:use_on_debug',
-        new itemOnUseOn.debug()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:use_on_fertilizable',
-        new itemOnUseOn.useOnFertilizable()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_use_on_bucket',
-        new itemOnUseOn.bucket()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_use_on_dye',
-        new itemOnUseOn.dye()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_use_on_fire',
-        new itemOnUseOn.fire()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_use_on_glass_bottle',
-        new itemOnUseOn.glassBottle()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_use_on_wax',
-        new itemOnUseOn.wax()
-    );
-    eventData.itemComponentRegistry.registerCustomComponent(
-        'adk-lib:on_use_on_run_command',
-        new itemOnUseOn.runCommand()
-    );
+});
+ON_USE_ON_REGISTRY.forEach((value, key) => {
+    SystemHelper.registerCustomComponentItem(`adk_lib:on_use_on_${key}`, value);
+});
+ON_USE_REGISTRY.forEach((value, key) => {
+    SystemHelper.registerCustomComponentItem(`adk_lib:on_use_${key}`, value);
 });

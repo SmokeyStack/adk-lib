@@ -6,10 +6,9 @@ import {
     ItemStack,
     world
 } from '@minecraft/server';
-import { doesBlockBlockkMovement } from 'utils/helper';
-import { vectorOfCenter } from 'utils/math';
 import { onPlayerDestroyDoubleSlab } from '../double_slab';
 import * as adk from 'adk-scripts-server';
+import { ParameterMelt } from 'utils/shared_parameters';
 
 abstract class OnPlayerDestroy implements BlockCustomComponent {
     abstract onPlayerDestroy(
@@ -24,21 +23,24 @@ class Debug extends OnPlayerDestroy {
     }
 }
 
+type ParameterSpawnItem = {
+    items: string[];
+};
+
 class SpawnItem extends OnPlayerDestroy {
-    onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent) {
+    onPlayerDestroy(
+        componentData: BlockComponentPlayerDestroyEvent,
+        paramData: CustomComponentParameters
+    ) {
+        if (!componentData.player) return;
+
         if (componentData.player.getGameMode() == 'creative') return;
+        if (!world.gameRules.doTileDrops) return;
+        const param = paramData.params as ParameterSpawnItem;
 
-        const REGEX: RegExp = new RegExp('adk-lib:spawn_item_([^]+)');
-        const tags: string[] =
-            componentData.destroyedBlockPermutation.getTags();
-        let results: string[] = [];
-
-        for (const tag of tags)
-            if (REGEX.exec(tag)) results.push(REGEX.exec(tag)[1]);
-
-        results.forEach((result) => {
-            componentData.dimension.spawnItem(
-                new ItemStack(result),
+        param.items.forEach((item) => {
+            adk.Cache.getDimension(componentData.dimension.id).spawnItem(
+                new ItemStack(item),
                 componentData.block.location
             );
         });
@@ -53,32 +55,35 @@ class Regenerate extends OnPlayerDestroy {
     }
 }
 
+type ParameterDropExperience = {
+    experience_reward: number;
+};
+
 class DropExperience extends OnPlayerDestroy {
-    onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent) {
+    onPlayerDestroy(
+        componentData: BlockComponentPlayerDestroyEvent,
+        paramData: CustomComponentParameters
+    ) {
+        if (!componentData.player) return;
+
         if (componentData.player.getGameMode() == 'creative') return;
         if (!world.gameRules.doTileDrops) return;
 
-        const REGEX: RegExp = new RegExp('adk-lib:drop_experience_([0-9]+)');
-        const tags: string[] =
-            componentData.destroyedBlockPermutation.getTags();
-        let experienceDrop: number;
+        const param = paramData.params as ParameterDropExperience;
 
-        for (let tag of tags)
-            if (REGEX.exec(tag)) {
-                experienceDrop = parseInt(REGEX.exec(tag)[1]);
-                break;
-            }
-
-        for (let a = 0; a < experienceDrop; a++)
-            componentData.dimension.spawnEntity(
+        for (let a = 0; a < param.experience_reward; a++)
+            adk.Cache.getDimension(componentData.dimension.id).spawnEntity(
                 'minecraft:xp_orb',
-                vectorOfCenter(componentData.block.location)
+                componentData.block.center()
             );
     }
 }
 
-class MeltIce extends OnPlayerDestroy {
-    onPlayerDestroy(componentData: BlockComponentPlayerDestroyEvent): void {
+class Melt extends OnPlayerDestroy {
+    onPlayerDestroy(
+        componentData: BlockComponentPlayerDestroyEvent,
+        paramData: CustomComponentParameters
+    ): void {
         const block: Block = componentData.block;
 
         if (block.dimension.id == 'minecraft:nether') {
@@ -86,10 +91,12 @@ class MeltIce extends OnPlayerDestroy {
             return;
         }
 
-        const blockBelow: Block = block.below();
+        const block_below: Block | undefined = block.below();
 
-        if (doesBlockBlockkMovement(blockBelow) || block.isLiquid) {
-            block.setType('minecraft:water');
+        if (!block_below) return;
+        if (adk.BlockHelper.blocksMovement(block_below) || block.isLiquid) {
+            const param = paramData.params as ParameterMelt;
+            block.setType(param.melted_state);
             return;
         }
     }
@@ -106,7 +113,7 @@ enum OnPlayerDestroyKey {
     SpawnItem = 'spawn_item',
     Regenerate = 'regenerate',
     DropExperience = 'drop_experience',
-    MeltIce = 'melt_ice',
+    Melt = 'melt',
     DoubleSlab = 'double_slab'
 }
 
@@ -118,6 +125,6 @@ export const ON_PLAYER_DESTROY_REGISTRY: Map<
     [OnPlayerDestroyKey.Regenerate, new Regenerate()],
     [OnPlayerDestroyKey.SpawnItem, new SpawnItem()],
     [OnPlayerDestroyKey.DropExperience, new DropExperience()],
-    [OnPlayerDestroyKey.MeltIce, new MeltIce()],
+    [OnPlayerDestroyKey.Melt, new Melt()],
     [OnPlayerDestroyKey.DoubleSlab, new DoubleSlab()]
 ]);

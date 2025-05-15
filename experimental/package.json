@@ -1,16 +1,19 @@
 {
     "author": "SmokeyStack",
     "dependencies": {
-        "@minecraft/server": "2.0.0-beta.1.21.80-preview.26",
-        "adk-scripts-server": "^2.0.0-beta.3"
+        "@minecraft/server": "2.0.0-beta.1.21.80-preview.28",
+        "adk-scripts-server": "^2.0.0-beta.5"
     },
     "description": "",
+    "devDependencies": {
+        "tsup": "^8.3.5"
+    },
     "keywords": [],
     "license": "GPL-3.0-only",
     "main": "index.js",
     "name": "adk-lib-experimental",
     "scripts": {
-        "compile": "tsc"
+        "compile": "tsup"
     },
     "version": "1.0.0"
 }

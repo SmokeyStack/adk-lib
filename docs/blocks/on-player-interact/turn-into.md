@@ -1,4 +1,4 @@
-# adk-lib:on_player_interact_turn_into
+# adk_lib:on_player_interact_turn_into
 
 ## What does it do?
 
@@ -6,12 +6,37 @@ This component allows the block to turn into another block when interacted with 
 
 ## How to use
 
-Add `adk-lib:on_player_interact_turn_into` to the `minecraft:custom_components` array in your item json file. Since custom components do not have parameter support yet, this component utilizes block tags.
+Add `"adk_lib:on_player_interact_turn_into": {}` to your block json file.
 
-To indicate what block your block should turn into, add the following tag: `adk-lib:turn_into_[identifier of the block]_[identifier of the item to check]`
+### Parameters
+
+- Key: Represents the block it transforms to.
+- Value: A list of items (string array) that can trigger the transformation when interacted with.
 
 ### Example
 
 ```json
-"tag:adk-lib:turn_into_minecraft:farmland_minecraft:wooden_hoe": {}
+"adk_lib:on_player_interact_turn_into": [
+    {
+        "transform_to": "test",
+        "transform_from": [
+            "test",
+            {
+                "tag": "air"
+            }
+        ]
+    },
+    {
+        "transform_to": {
+            "name": "furnace",
+            "states": {
+                "minecraft:cardinal_direction": "east",
+                "test": 2
+            }
+        },
+        "transform_from": [
+            "test"
+        ]
+    }
+]
 ```

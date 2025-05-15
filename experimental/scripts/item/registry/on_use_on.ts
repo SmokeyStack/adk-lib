@@ -1,49 +1,37 @@
 import {
     Block,
     BlockPermutation,
-    Container,
+    CustomComponentParameters,
     ItemComponentUseOnEvent,
     ItemCustomComponent,
     Player,
+    system,
     Vector3
 } from '@minecraft/server';
-
-import { BLOCK_MAP } from '../fertilzeable';
-import { onUseOnBucket, pickupLiquid } from '../item_bucket';
+import * as adk from 'adk-scripts-server';
+import { BLOCK_MAP } from '../fertilizable';
+import { pickupLiquid } from '../item_bucket';
 import { onUseOnDye } from '../item_dye';
-import { decrementStack } from '../../utils/helper';
-import { directionToVector3 } from 'utils/math';
 import { onUseOnWax } from '../item_wax';
-import { logEventData } from 'utils/debug';
+import {
+    ParameterLiquidPickup,
+    ParameterRunCommand
+} from 'utils/shared_parameters';
 
-class onUseOn implements ItemCustomComponent {
-    constructor() {
-        this.onUseOn = this.onUseOn.bind(this);
-    }
-    onUseOn(_componentData: ItemComponentUseOnEvent) {}
+abstract class OnUseOn implements ItemCustomComponent {
+    abstract onUseOn(
+        componentData: ItemComponentUseOnEvent,
+        paramData?: CustomComponentParameters
+    ): void;
 }
 
-export class debug extends onUseOn {
+class Debug extends OnUseOn {
     onUseOn(componentData: ItemComponentUseOnEvent) {
-        let data: Object = logEventData(
-            componentData,
-            componentData.constructor.name
-        );
-        let result: string = JSON.stringify(
-            Object.keys(data)
-                .sort()
-                .reduce((result, key) => {
-                    result[key] = data[key];
-                    return result;
-                }, {}),
-            null,
-            4
-        );
-        console.log(result);
+        console.log(adk.Debug.logEventData(componentData));
     }
 }
 
-export class useOnFertilizable extends onUseOn {
+class Fertilizable extends OnUseOn {
     onUseOn(componentData: ItemComponentUseOnEvent) {
         if (
             BLOCK_MAP.get(componentData.block.typeId)?.canGrow(
@@ -62,95 +50,160 @@ export class useOnFertilizable extends onUseOn {
                 componentData.block.location,
                 componentData.usedOnBlockPermutation
             );
-            let player: Player = componentData.source as Player;
-            decrementStack(player);
+            const player: Player = componentData.source as Player;
+            adk.PlayerHelper.decrementStack(player);
         }
     }
 }
-export class bucket extends onUseOn {
-    onUseOn(componentData: ItemComponentUseOnEvent) {
-        onUseOnBucket(componentData);
+class Bucket extends OnUseOn {
+    onUseOn(
+        componentData: ItemComponentUseOnEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterLiquidPickup;
+        for (const entry of param) {
+            const liquid_to_pickup: string[] | undefined =
+                entry.liquid_to_pickup;
+            const tranform_to: string = entry.transform_to;
+
+            // Check if player_equipment matches any transform_from
+            const matches: boolean = (liquid_to_pickup ?? []).some(
+                (block: string) => {
+                    return (
+                        componentData.usedOnBlockPermutation.type.id === block
+                    );
+                }
+            );
+
+            // If there's a match, log the corresponding transform_to
+            if (matches) {
+                pickupLiquid(
+                    tranform_to,
+                    componentData.block,
+                    componentData.blockFace,
+                    componentData.source as Player,
+                    componentData.itemStack,
+                    true
+                );
+                return; // Stop further checks if a match is found
+            }
+        }
     }
 }
 
-export class dye extends onUseOn {
-    onUseOn(componentData: ItemComponentUseOnEvent): void {
-        onUseOnDye(componentData);
+class Dye extends OnUseOn {
+    onUseOn(
+        componentData: ItemComponentUseOnEvent,
+        paramData: CustomComponentParameters
+    ): void {
+        onUseOnDye(componentData, paramData);
     }
 }
 
-export class fire extends onUseOn {
+class Fire extends OnUseOn {
     onUseOn(componentData: ItemComponentUseOnEvent): void {
-        let block: Block = componentData.block;
-        let blockPermutation: BlockPermutation =
+        const block: Block = componentData.block;
+        const block_permutation: BlockPermutation =
             componentData.usedOnBlockPermutation;
 
         if (block.typeId.endsWith('campfire')) {
             block.setPermutation(
-                blockPermutation.withState('extinguished', false)
+                block_permutation.withState('extinguished', false)
             );
         } else if (block.typeId.endsWith('candle')) {
-            block.setPermutation(blockPermutation.withState('lit', true));
+            block.setPermutation(block_permutation.withState('lit', true));
         } else {
-            let location: Vector3 = directionToVector3(componentData.blockFace);
-            let blockOffset: Block = block.offset(location);
-            let blockBelow: Block = blockOffset.below();
+            const location: Vector3 = adk.DirectionHelper.toVector3(
+                componentData.blockFace
+            );
+            const block_offset: Block | undefined = block.offset(location);
+            if (!block_offset) return;
+            const block_below: Block | undefined = block_offset.below();
+            if (!block_below) return;
+            if (!block_below.isSolid || !block_offset.isAir) return;
 
-            if (!blockBelow.isSolid || !blockOffset.isAir) return;
-
-            blockOffset.setType('minecraft:fire');
+            block_offset.setType('minecraft:fire');
         }
 
-        decrementStack(componentData.source as Player);
+        const player: Player = componentData.source as Player;
+        adk.PlayerHelper.decrementStack(player);
     }
 }
 
-export class glassBottle extends onUseOn {
-    onUseOn(componentData: ItemComponentUseOnEvent): void {
-        let tags: string[] = componentData.itemStack.getTags();
-        const REGEX_TURN_INTO: RegExp = new RegExp(
-            'adk-lib:fluid_([a-z]\\w+:[a-z]\\w+)_turn_into_([a-z]\\w+:[a-z]\\w+)'
-        );
-        let player: Player = componentData.source as Player;
-        let inventory: Container = player.getComponent('inventory').container;
-        let sourceIntoItem: Map<string, string> = new Map();
+class GlassBottle extends OnUseOn {
+    onUseOn(
+        componentData: ItemComponentUseOnEvent,
+        paramData: CustomComponentParameters
+    ): void {
+        const param = paramData.params as ParameterLiquidPickup;
+        for (const entry of param) {
+            const liquid_to_pickup: string[] | undefined =
+                entry.liquid_to_pickup;
+            const tranform_to: string = entry.transform_to;
 
-        for (let tag of tags) {
-            const match = REGEX_TURN_INTO.exec(tag);
+            // Check if player_equipment matches any transform_from
+            const matches: boolean = (liquid_to_pickup ?? []).some(
+                (block: string) => {
+                    return (
+                        componentData.usedOnBlockPermutation.type.id === block
+                    );
+                }
+            );
 
-            if (match) sourceIntoItem.set(match[1], match[2]);
+            // If there's a match, log the corresponding transform_to
+            if (matches) {
+                pickupLiquid(
+                    tranform_to,
+                    componentData.block,
+                    componentData.blockFace,
+                    componentData.source as Player,
+                    componentData.itemStack,
+                    false
+                );
+                return; // Stop further checks if a match is found
+            }
         }
-
-        pickupLiquid(
-            sourceIntoItem,
-            componentData.block,
-            componentData.usedOnBlockPermutation,
-            componentData.blockFace,
-            player,
-            inventory,
-            componentData.itemStack,
-            false
-        );
     }
 }
 
-export class wax extends onUseOn {
+class Wax extends OnUseOn {
     onUseOn(componentData: ItemComponentUseOnEvent): void {
         onUseOnWax(componentData);
     }
 }
 
-export class runCommand extends onUseOn {
-    onUseOn(componentData: ItemComponentUseOnEvent) {
-        const REGEX: RegExp = new RegExp('adk-lib:on_use_on_([^]+)');
-        let tags: string[] = componentData.itemStack.getTags();
-        let commands: string[] = [];
-
-        for (let tag of tags)
-            if (REGEX.exec(tag)) commands.push(REGEX.exec(tag)[1]);
-
-        commands.forEach((command) => {
-            componentData.source.runCommand(command);
+class RunCommand extends OnUseOn {
+    onUseOn(
+        componentData: ItemComponentUseOnEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterRunCommand;
+        system.run(() => {
+            param.command.forEach((command) => {
+                componentData.source.runCommand(command);
+            });
         });
     }
 }
+
+enum OnUseOnKey {
+    Debug = 'debug',
+    Fertilizable = 'fertilizable',
+    Bucket = 'bucket',
+    Dye = 'dye',
+    Fire = 'fire',
+    GlassBottle = 'glass_bottle',
+    Wax = 'wax',
+    RunCommand = 'run_command'
+}
+
+export const ON_USE_ON_REGISTRY = new Map([
+    [OnUseOnKey.Debug, new Debug()],
+    [OnUseOnKey.Fertilizable, new Fertilizable()],
+    [OnUseOnKey.Bucket, new Bucket()],
+    [OnUseOnKey.Dye, new Dye()],
+    [OnUseOnKey.Fire, new Fire()],
+    [OnUseOnKey.GlassBottle, new GlassBottle()],
+    [OnUseOnKey.Wax, new Wax()],
+    [OnUseOnKey.RunCommand, new RunCommand()]
+]);
