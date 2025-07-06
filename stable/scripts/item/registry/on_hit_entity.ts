@@ -1,104 +1,117 @@
 import {
-    EntityEquippableComponent,
-    EquipmentSlot,
+    CustomComponentParameters,
     ItemComponentHitEntityEvent,
     ItemCustomComponent,
-    ItemDurabilityComponent,
-    ItemStack
+    system
 } from '@minecraft/server';
-import { Debug } from 'adk-scripts-server';
+import * as adk from 'adk-scripts-server';
+import { ParameterRunCommand } from 'utils/shared_parameters';
 
-class onHitEntity implements ItemCustomComponent {
-    constructor() {
-        this.onHitEntity = this.onHitEntity.bind(this);
-    }
-    onHitEntity(_componentData: ItemComponentHitEntityEvent) {}
+abstract class OnHitEntity implements ItemCustomComponent {
+    abstract onHitEntity(
+        componentData: ItemComponentHitEntityEvent,
+        paramData?: CustomComponentParameters
+    ): void;
 }
 
-export class debug extends onHitEntity {
+class Debug extends OnHitEntity {
     onHitEntity(componentData: ItemComponentHitEntityEvent) {
-        let data: Object = Debug.logEventData(
-            componentData,
-            componentData.constructor.name
-        );
-        let result: string = JSON.stringify(
-            Object.keys(data)
-                .sort()
-                .reduce((result, key) => {
-                    result[key] = data[key];
-                    return result;
-                }, {}),
-            null,
-            4
-        );
-        console.log(result);
+        console.log(adk.Debug.logEventData(componentData));
     }
 }
 
-export class summonLightning extends onHitEntity {
-    onHitEntity(componentData: ItemComponentHitEntityEvent) {
-        componentData.hitEntity.dimension.spawnEntity(
-            'minecraft:lightning_bolt',
-            componentData.hitEntity.location
-        );
-    }
-}
+type ParameterSummonEntity = {
+    entity: string;
+    entity_filter?: string[];
+}[];
 
-export class differentDamageDurability extends onHitEntity {
-    onHitEntity(componentData: ItemComponentHitEntityEvent) {
-        let player = componentData.attackingEntity;
-        let item = new ItemStack(componentData.itemStack.typeId, 1);
+class SummonEntity extends OnHitEntity {
+    onHitEntity(
+        componentData: ItemComponentHitEntityEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterSummonEntity;
+        for (const entry of param) {
+            const entity_filter: string[] | undefined = entry.entity_filter;
+            const entity: string = entry.entity;
 
-        if (componentData.hitEntity.typeId === 'minecraft:sheep') {
-            (
-                item.getComponent('durability') as ItemDurabilityComponent
-            ).damage +=
-                (
-                    componentData.itemStack.getComponent(
-                        'durability'
-                    ) as ItemDurabilityComponent
-                ).damage + 0;
-        } else if (componentData.hitEntity.typeId === 'minecraft:armadillo') {
-            (
-                item.getComponent('durability') as ItemDurabilityComponent
-            ).damage +=
-                (
-                    componentData.itemStack.getComponent(
-                        'durability'
-                    ) as ItemDurabilityComponent
-                ).damage + 5;
-        } else {
-            (
-                item.getComponent('durability') as ItemDurabilityComponent
-            ).damage +=
-                (
-                    componentData.itemStack.getComponent(
-                        'durability'
-                    ) as ItemDurabilityComponent
-                ).damage + 1;
+            // Check if player_equipment matches any transform_from
+            const matches: boolean = (entity_filter ?? []).some(
+                (entity: string) => {
+                    return componentData.hitEntity.typeId === entity;
+                }
+            );
+
+            // If there's a match, log the corresponding transform_to
+            if (matches) {
+                componentData.hitEntity.dimension.spawnEntity(
+                    entity,
+                    componentData.hitEntity.location
+                );
+                return; // Stop further checks if a match is found
+            }
         }
-
-        (
-            player.getComponent(
-                'minecraft:equippable'
-            ) as EntityEquippableComponent
-        ).setEquipment(EquipmentSlot.Mainhand, item);
     }
 }
 
-export class preventDamageDurability extends onHitEntity {
-    onHitEntity(componentData: ItemComponentHitEntityEvent) {
-        let player = componentData.attackingEntity;
-        let item = new ItemStack(componentData.itemStack.typeId, 1);
-        (item.getComponent('durability') as ItemDurabilityComponent).damage += (
-            componentData.itemStack.getComponent(
-                'durability'
-            ) as ItemDurabilityComponent
-        ).damage;
-        (
-            player.getComponent(
-                'minecraft:equippable'
-            ) as EntityEquippableComponent
-        ).setEquipment(EquipmentSlot.Mainhand, item);
+type ParameterSummonParticle = {
+    particle: string;
+    entity_filter?: string[];
+}[];
+
+class SummonParticle extends OnHitEntity {
+    onHitEntity(
+        componentData: ItemComponentHitEntityEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterSummonParticle;
+        for (const entry of param) {
+            const entity_filter: string[] | undefined = entry.entity_filter;
+            const particle: string = entry.particle;
+
+            // Check if player_equipment matches any transform_from
+            const matches: boolean = (entity_filter ?? []).some(
+                (entity: string) => {
+                    return componentData.hitEntity.typeId === entity;
+                }
+            );
+
+            // If there's a match, log the corresponding transform_to
+            if (matches) {
+                componentData.hitEntity.dimension.spawnParticle(
+                    particle,
+                    componentData.hitEntity.location
+                );
+                return; // Stop further checks if a match is found
+            }
+        }
     }
 }
+
+class RunCommand extends OnHitEntity {
+    onHitEntity(
+        componentData: ItemComponentHitEntityEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterRunCommand;
+        system.run(() => {
+            param.command.forEach((command) => {
+                componentData.attackingEntity.runCommand(command);
+            });
+        });
+    }
+}
+
+enum OnHitEntityKey {
+    Debug = 'debug',
+    SummonEntity = 'summon_entity',
+    SummonParticle = 'summon_particle',
+    RunCommand = 'run_command'
+}
+
+export const ON_HIT_ENTITY_REGISTRY = new Map([
+    [OnHitEntityKey.Debug, new Debug()],
+    [OnHitEntityKey.SummonEntity, new SummonEntity()],
+    [OnHitEntityKey.SummonParticle, new SummonParticle()],
+    [OnHitEntityKey.RunCommand, new RunCommand()]
+]);

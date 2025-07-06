@@ -1,53 +1,50 @@
 import {
     BlockComponentPlayerPlaceBeforeEvent,
-    BlockCustomComponent
+    BlockCustomComponent,
+    BlockPermutation,
+    CustomComponentParameters
 } from '@minecraft/server';
-import { Debug } from 'adk-scripts-server';
-import { beforeOnPlayerPlaceTurnInto } from 'blocks/turn_into';
 import { beforeOnPlayerPlaceDoubleSlab } from 'blocks/double_slab';
 import { beforeOnPlayerPlaceSugarCane } from 'blocks/sugar_cane';
 import { beforeOnPlayerPlaceStairs } from 'blocks/stairs';
+import * as adk from 'adk-scripts-server';
 
-class beforeOnPlayerPlace implements BlockCustomComponent {
-    constructor() {
-        this.beforeOnPlayerPlace = this.beforeOnPlayerPlace.bind(this);
-    }
-    beforeOnPlayerPlace(_componentData: BlockComponentPlayerPlaceBeforeEvent) {}
+abstract class BeforeOnPlayerPlace implements BlockCustomComponent {
+    abstract beforeOnPlayerPlace(
+        componentData: BlockComponentPlayerPlaceBeforeEvent,
+        paramData?: CustomComponentParameters
+    ): void;
 }
 
-export class debug extends beforeOnPlayerPlace {
+class Debug extends BeforeOnPlayerPlace {
     beforeOnPlayerPlace(componentData: BlockComponentPlayerPlaceBeforeEvent) {
-        let data: Object = Debug.logEventData(
-            componentData,
-            componentData.constructor.name
-        );
-        let result: string = JSON.stringify(
-            Object.keys(data)
-                .sort()
-                .reduce((result, key) => {
-                    result[key] = data[key];
-                    return result;
-                }, {}),
-            null,
-            4
-        );
-        console.log(result);
+        console.log(adk.Debug.logEventData(componentData));
     }
 }
 
-export class cancel extends beforeOnPlayerPlace {
+class Cancel extends BeforeOnPlayerPlace {
     beforeOnPlayerPlace(componentData: BlockComponentPlayerPlaceBeforeEvent) {
         componentData.cancel = true;
     }
 }
 
-export class turnInto extends beforeOnPlayerPlace {
-    beforeOnPlayerPlace(componentData: BlockComponentPlayerPlaceBeforeEvent) {
-        beforeOnPlayerPlaceTurnInto(componentData);
+type ParameterTurnInto = {
+    block: string;
+};
+
+class TurnInto extends BeforeOnPlayerPlace {
+    beforeOnPlayerPlace(
+        componentData: BlockComponentPlayerPlaceBeforeEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterTurnInto;
+        componentData.permutationToPlace = BlockPermutation.resolve(
+            param.block
+        );
     }
 }
 
-export class doubleSlab extends beforeOnPlayerPlace {
+class DoubleSlab extends BeforeOnPlayerPlace {
     beforeOnPlayerPlace(
         componentData: BlockComponentPlayerPlaceBeforeEvent
     ): void {
@@ -55,7 +52,7 @@ export class doubleSlab extends beforeOnPlayerPlace {
     }
 }
 
-export class sugarCane extends beforeOnPlayerPlace {
+class SugarCane extends BeforeOnPlayerPlace {
     beforeOnPlayerPlace(
         componentData: BlockComponentPlayerPlaceBeforeEvent
     ): void {
@@ -63,10 +60,31 @@ export class sugarCane extends beforeOnPlayerPlace {
     }
 }
 
-export class stairs extends beforeOnPlayerPlace {
+class Stairs extends BeforeOnPlayerPlace {
     beforeOnPlayerPlace(
         componentData: BlockComponentPlayerPlaceBeforeEvent
     ): void {
         beforeOnPlayerPlaceStairs(componentData);
     }
 }
+
+enum BeforeOnPlayerPlaceKey {
+    Debug = 'debug',
+    Cancel = 'cancel',
+    TurnInto = 'turn_into',
+    DoubleSlab = 'double_slab',
+    SugarCane = 'sugar_cane',
+    Stairs = 'stairs'
+}
+
+export const BEFORE_ON_PLAYER_PLACE_REGISTRY: Map<
+    BeforeOnPlayerPlaceKey,
+    BeforeOnPlayerPlace
+> = new Map([
+    [BeforeOnPlayerPlaceKey.Debug, new Debug()],
+    [BeforeOnPlayerPlaceKey.Cancel, new Cancel()],
+    [BeforeOnPlayerPlaceKey.TurnInto, new TurnInto()],
+    [BeforeOnPlayerPlaceKey.DoubleSlab, new DoubleSlab()],
+    [BeforeOnPlayerPlaceKey.SugarCane, new SugarCane()],
+    [BeforeOnPlayerPlaceKey.Stairs, new Stairs()]
+]);

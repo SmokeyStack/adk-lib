@@ -3,12 +3,13 @@ import {
     BlockComponentPlayerInteractEvent,
     BlockComponentTickEvent,
     Dimension,
-    EntityEquippableComponent,
     EquipmentSlot,
     ItemStack,
     Player,
     Vector3
 } from '@minecraft/server';
+import type * as minecraftvanilladata from '@minecraft/vanilla-data';
+import * as adk from 'adk-scripts-server';
 
 const ParticleOffsets = {
     1: [{ x: 0.5, y: 0.5, z: 0.5 }],
@@ -51,10 +52,16 @@ function spawnParticle(world: Dimension, vector: Vector3): void {
 function extinguish(block: Block, world: Dimension, vector: Vector3): void {
     const namespace: string = block.typeId.split(':')[0];
     const candles: number = block.permutation.getState(
-        namespace + ':candles'
+        (namespace +
+            ':candles') as keyof minecraftvanilladata.BlockStateSuperset
     ) as number;
     const lit: string = namespace + ':lit';
-    block.setPermutation(block.permutation.withState(lit, false));
+    block.setPermutation(
+        block.permutation.withState(
+            lit as keyof minecraftvanilladata.BlockStateSuperset,
+            false
+        )
+    );
     world.playSound('extinguish.candle', vector, { volume: 1, pitch: 1 });
     ParticleOffsets[candles].forEach(
         (offset: { x: number; y: number; z: number }) => {
@@ -69,7 +76,8 @@ function extinguish(block: Block, world: Dimension, vector: Vector3): void {
 
 export function onTickCandle(data: BlockComponentTickEvent): void {
     let candles: number = data.block.permutation.getState(
-        data.block.typeId.split(':')[0] + ':candles'
+        (data.block.typeId.split(':')[0] +
+            ':candles') as keyof minecraftvanilladata.BlockStateSuperset
     ) as number;
 
     ParticleOffsets[candles].forEach(
@@ -86,51 +94,59 @@ export function onTickCandle(data: BlockComponentTickEvent): void {
 export function onInteractCandle(
     data: BlockComponentPlayerInteractEvent
 ): void {
-    const player: Player = data.player;
-    const playerEquipment: ItemStack = (
-        player.getComponent('equippable') as EntityEquippableComponent
-    ).getEquipment(EquipmentSlot.Mainhand);
-    const namespace: string = data.block.typeId.split(':')[0];
-    const isLit: boolean = data.block.permutation.getState(
-        namespace + ':lit'
+    const player: Player = data.player!;
+    const player_equipment: ItemStack = adk.PlayerHelper.getItemFromEquippable(
+        player,
+        EquipmentSlot.Mainhand
+    );
+    const block: Block = data.block;
+    const dimension: Dimension = data.dimension;
+    const namespace: string = block.typeId.split(':')[0];
+    const is_lit: boolean = block.permutation.getState(
+        `${namespace}:lit` as keyof minecraftvanilladata.BlockStateSuperset
     ) as boolean;
     const candles: number = data.block.permutation.getState(
-        namespace + ':candles'
+        `${namespace}:candles` as keyof minecraftvanilladata.BlockStateSuperset
     ) as number;
 
-    if (playerEquipment === undefined && !isLit) return;
-    if (playerEquipment === undefined && isLit) {
-        extinguish(data.block, data.dimension, data.block.location);
+    if (player_equipment === undefined && !is_lit) return;
+    if (player_equipment === undefined && is_lit) {
+        extinguish(block, dimension, block);
         return;
     }
-    if (playerEquipment.typeId === data.block.typeId && candles != 4) {
-        data.block.setPermutation(
-            data.block.permutation.withState(
-                namespace + ':candles',
+    if (player_equipment.typeId === block.typeId && candles != 4) {
+        block.setPermutation(
+            block.permutation.withState(
+                `${namespace}:candles` as keyof minecraftvanilladata.BlockStateSuperset,
                 candles + 1
             )
         );
-        decrementStack(player);
+        adk.PlayerHelper.decrementStack(player);
+
         return;
     }
     if (
-        (playerEquipment.typeId == 'minecraft:flint_and_steel' ||
-            playerEquipment.typeId == 'minecraft:fire_charge') &&
-        !isLit
+        (player_equipment.typeId == 'minecraft:flint_and_steel' ||
+            player_equipment.typeId == 'minecraft:fire_charge') &&
+        !is_lit
     ) {
-        data.block.setPermutation(
-            data.block.permutation.withState(namespace + ':lit', true)
+        block.setPermutation(
+            block.permutation.withState(
+                `${namespace}:lit` as keyof minecraftvanilladata.BlockStateSuperset,
+                true
+            )
         );
-        data.dimension.playSound('fire.ignite', data.block.location);
+        dimension.playSound('fire.ignite', block);
         ParticleOffsets[candles].forEach(
             (offset: { x: number; y: number; z: number }) => {
-                spawnParticle(data.dimension, {
-                    x: data.block.location.x + offset.x,
-                    y: data.block.location.y + offset.y,
-                    z: data.block.location.z + offset.z
+                spawnParticle(dimension, {
+                    x: block.location.x + offset.x,
+                    y: block.location.y + offset.y,
+                    z: block.location.z + offset.z
                 });
             }
         );
+
         return;
     }
 }

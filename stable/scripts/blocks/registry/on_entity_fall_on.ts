@@ -1,39 +1,53 @@
 import {
     BlockComponentEntityFallOnEvent,
     BlockCustomComponent,
-    world
+    CustomComponentParameters,
+    Entity,
+    Vector3
 } from '@minecraft/server';
+import * as adk from 'adk-scripts-server';
+import { ParameterBounceForce } from 'utils/shared_parameters';
 
-class onEntityFallOn implements BlockCustomComponent {
-    constructor() {
-        this.onEntityFallOn = this.onEntityFallOn.bind(this);
-    }
-    onEntityFallOn(_componentData: BlockComponentEntityFallOnEvent) {}
+abstract class OnEntityFallOn implements BlockCustomComponent {
+    abstract onEntityFallOn(
+        componentData: BlockComponentEntityFallOnEvent,
+        paramData?: CustomComponentParameters
+    ): void;
 }
 
-export class debug extends onEntityFallOn {
+class Debug extends OnEntityFallOn {
     onEntityFallOn(componentData: BlockComponentEntityFallOnEvent): void {
-        world.sendMessage(`Entity: ${componentData.entity.nameTag}`);
-        world.sendMessage(`Fall Distance: ${componentData.fallDistance}`);
+        console.log(adk.Debug.logEventData(componentData));
     }
 }
 
-export class player_bounce extends onEntityFallOn {
-    onEntityFallOn(componentData: BlockComponentEntityFallOnEvent) {
-        if (Math.abs(componentData.entity.getVelocity().y) < 1) {
-            componentData.entity.applyKnockback(
-                0,
-                0,
-                0,
-                componentData.entity.getVelocity().y * -1.5
-            );
-        } else {
-            componentData.entity.applyKnockback(
-                0,
-                0,
-                0,
-                componentData.entity.getVelocity().y * -0.5
-            );
+class Bounce extends OnEntityFallOn {
+    onEntityFallOn(
+        componentData: BlockComponentEntityFallOnEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const entity: Entity | undefined = componentData.entity;
+
+        if (!entity) return;
+
+        const velocity: Vector3 = entity.getVelocity();
+        if (velocity.y < 0) {
+            const param = paramData.params as ParameterBounceForce;
+            const bounce_force = param.force ?? 1;
+            entity.applyKnockback({ x: 0, z: 0 }, -velocity.y * bounce_force);
         }
     }
 }
+
+enum OnEntityFallOnKey {
+    Debug = 'debug',
+    Bounce = 'bounce'
+}
+
+export const ON_ENTITY_FALL_ON_REGISTRY: Map<
+    OnEntityFallOnKey,
+    OnEntityFallOn
+> = new Map([
+    [OnEntityFallOnKey.Debug, new Debug()],
+    [OnEntityFallOnKey.Bounce, new Bounce()]
+]);

@@ -1,32 +1,45 @@
 import {
+    CustomComponentParameters,
     ItemComponentCompleteUseEvent,
-    ItemCustomComponent
+    ItemCustomComponent,
+    system
 } from '@minecraft/server';
-import { Debug } from 'adk-scripts-server';
+import * as adk from 'adk-scripts-server';
+import { ParameterRunCommand } from 'utils/shared_parameters';
 
-class onCompleteUse implements ItemCustomComponent {
-    constructor() {
-        this.onCompleteUse = this.onCompleteUse.bind(this);
-    }
-    onCompleteUse(_componentData: ItemComponentCompleteUseEvent) {}
+abstract class OnCompleteUse implements ItemCustomComponent {
+    abstract onCompleteUse(
+        componentData: ItemComponentCompleteUseEvent,
+        paramData?: CustomComponentParameters
+    ): void;
 }
 
-export class debug extends onCompleteUse {
+class Debug extends OnCompleteUse {
     onCompleteUse(componentData: ItemComponentCompleteUseEvent) {
-        let data: Object = Debug.logEventData(
-            componentData,
-            componentData.constructor.name
-        );
-        let result: string = JSON.stringify(
-            Object.keys(data)
-                .sort()
-                .reduce((result, key) => {
-                    result[key] = data[key];
-                    return result;
-                }, {}),
-            null,
-            4
-        );
-        console.log(result);
+        console.log(adk.Debug.logEventData(componentData));
     }
 }
+
+class RunCommand extends OnCompleteUse {
+    onCompleteUse(
+        componentData: ItemComponentCompleteUseEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterRunCommand;
+        system.run(() => {
+            param.command.forEach((command) => {
+                componentData.source.runCommand(command);
+            });
+        });
+    }
+}
+
+enum OnCompleteUseKey {
+    Debug = 'debug',
+    RunCommand = 'run_command'
+}
+
+export const ON_COMPLETE_USE_REGISTRY = new Map([
+    [OnCompleteUseKey.Debug, new Debug()],
+    [OnCompleteUseKey.RunCommand, new RunCommand()]
+]);

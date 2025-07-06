@@ -1,89 +1,88 @@
 import {
-    EntityEquippableComponent,
+    CustomComponentParameters,
     EquipmentSlot,
     ItemComponentMineBlockEvent,
     ItemCustomComponent,
     ItemDurabilityComponent,
-    ItemStack
+    ItemStack,
+    Player,
+    system
 } from '@minecraft/server';
-import { Debug } from 'adk-scripts-server';
-import { canHarvest } from '../item_pickaxe';
+import * as adk from 'adk-scripts-server';
+import { ParameterRunCommand } from 'utils/shared_parameters';
 
-class onMineBlock implements ItemCustomComponent {
-    constructor() {
-        this.onMineBlock = this.onMineBlock.bind(this);
-    }
-    onMineBlock(_componentData: ItemComponentMineBlockEvent) {}
+abstract class OnMineBlock implements ItemCustomComponent {
+    abstract onMineBlock(
+        componentData: ItemComponentMineBlockEvent,
+        paramData?: CustomComponentParameters
+    ): void;
 }
 
-export class debug extends onMineBlock {
+class Debug extends OnMineBlock {
     onMineBlock(componentData: ItemComponentMineBlockEvent) {
-        let data: Object = Debug.logEventData(
-            componentData,
-            componentData.constructor.name
-        );
-        let result: string = JSON.stringify(
-            Object.keys(data)
-                .sort()
-                .reduce((result, key) => {
-                    result[key] = data[key];
-                    return result;
-                }, {}),
-            null,
-            4
-        );
-        console.log(result);
+        console.log(adk.Debug.logEventData(componentData));
     }
 }
 
-export class digger extends onMineBlock {
-    onMineBlock(componentData: ItemComponentMineBlockEvent) {
-        let player = componentData.source;
-        let item = new ItemStack(componentData.itemStack.typeId, 1);
+type ParameterDigger = {
+    damage_amount: number;
+    block_filter?: string[];
+}[];
 
-        if (componentData.minedBlockPermutation.type.id === 'minecraft:glass') {
-            (
-                item.getComponent('durability') as ItemDurabilityComponent
-            ).damage +=
-                (
-                    componentData.itemStack.getComponent(
-                        'durability'
-                    ) as ItemDurabilityComponent
-                ).damage + 0;
-        } else if (
-            componentData.minedBlockPermutation.type.id ===
-            'minecraft:oak_planks'
-        ) {
-            (
-                item.getComponent('durability') as ItemDurabilityComponent
-            ).damage +=
-                (
-                    componentData.itemStack.getComponent(
-                        'durability'
-                    ) as ItemDurabilityComponent
-                ).damage + 5;
-        } else {
-            (
-                item.getComponent('durability') as ItemDurabilityComponent
-            ).damage +=
-                (
-                    componentData.itemStack.getComponent(
-                        'durability'
-                    ) as ItemDurabilityComponent
-                ).damage + 1;
+class Digger extends OnMineBlock {
+    onMineBlock(
+        componentData: ItemComponentMineBlockEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterDigger;
+        for (const entry of param) {
+            const block_filter: string[] | undefined = entry.block_filter;
+            const damage: number = entry.damage_amount;
+
+            // Check if player_equipment matches any transform_from
+            const matches: boolean = (block_filter ?? []).some(
+                (block: string) => {
+                    return (
+                        componentData.minedBlockPermutation.type.id === block
+                    );
+                }
+            );
+
+            // If there's a match, log the corresponding transform_to
+            if (matches) {
+                const item = componentData.itemStack;
+                if (!item) return;
+                const durability: ItemDurabilityComponent =
+                    adk.ComponentItemDurability.get(item);
+                durability.damage += damage;
+                return; // Stop further checks if a match is found
+            }
         }
-
-        (
-            player.getComponent(
-                'minecraft:equippable'
-            ) as EntityEquippableComponent
-        ).setEquipment(EquipmentSlot.Mainhand, item);
     }
 }
 
-export class pickaxe extends onMineBlock {
-    onMineBlock(componentData: ItemComponentMineBlockEvent): void {
-        Debug.logEventData(componentData, componentData.constructor.name);
-        canHarvest(componentData);
+class RunCommand extends OnMineBlock {
+    onMineBlock(
+        componentData: ItemComponentMineBlockEvent,
+        paramData: CustomComponentParameters
+    ) {
+        const param = paramData.params as ParameterRunCommand;
+        system.run(() => {
+            param.command.forEach((command) => {
+                componentData.source.runCommand(command);
+            });
+        });
     }
 }
+
+enum OnMineBlockKey {
+    Debug = 'debug',
+    Digger = 'digger',
+    RunCommand = 'run_command'
+}
+
+export const ON_MINE_BLOCK_REGISTRY = new Map([
+    [OnMineBlockKey.Debug, new Debug()],
+    [OnMineBlockKey.Digger, new Digger()],
+    [OnMineBlockKey.RunCommand, new RunCommand()]
+]);
