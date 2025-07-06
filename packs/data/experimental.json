@@ -2,7 +2,7 @@
     "dependencies": [
         {
             "module_name": "@minecraft/server",
-            "version": "2.1.0-beta"
+            "version": "2.2.0-beta"
         }
     ],
     "format_version": 2,
@@ -11,23 +11,23 @@
         "min_engine_version": [
             1,
             21,
-            90
+            100
         ],
         "name": "ADK LIB",
         "uuid": "5e2eda3e-6eaf-4068-9076-0a7f0587b8bb",
-        "version": "1.1.0-experimental.1.21.90.25"
+        "version": "1.2.0-experimental.1.21.100.23"
     },
     "modules": [
         {
             "type": "data",
             "uuid": "bb174344-46c7-46a5-87bf-d2535876b70f",
-            "version": "1.1.0-experimental.1.21.90.25"
+            "version": "1.2.0-experimental.1.21.100.23"
         },
         {
             "entry": "scripts/main.js",
             "type": "script",
             "uuid": "c57c9003-0630-4432-8275-200ee08e6796",
-            "version": "1.1.0-experimental.1.21.90.25"
+            "version": "1.2.0-experimental.1.21.100.23"
         }
     ]
 }
